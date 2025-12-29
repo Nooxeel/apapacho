@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { API_URL } from '@/lib/config';
 
 interface CommentUser {
   id: string;
@@ -36,8 +37,6 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPending, setShowPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
   // Cargar comentarios aprobados
   const loadComments = useCallback(async () => {

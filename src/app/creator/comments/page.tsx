@@ -7,8 +7,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button, Card } from '@/components/ui';
 import { MessageCircle, Check, X, Trash2, Clock, CheckCircle } from 'lucide-react';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { API_URL } from '@/lib/config';
 
 interface Comment {
   id: string;

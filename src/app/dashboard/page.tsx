@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
-import { 
-  User, 
-  Heart, 
-  CreditCard, 
-  MessageCircle, 
+import { API_URL } from '@/lib/config';
+import {
+  User,
+  Heart,
+  CreditCard,
+  MessageCircle,
   Gift,
   Settings,
   Camera,
@@ -110,8 +111,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
   useEffect(() => {
     // Esperar a que el store se hidrate desde localStorage
@@ -215,8 +214,6 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem('apapacho-token');
-    localStorage.removeItem('apapacho-user');
     router.push('/');
   };
 

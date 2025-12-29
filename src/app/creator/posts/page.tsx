@@ -8,8 +8,7 @@ import { Card, Button } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
 import { Edit2, Trash2, Eye, Heart, MessageCircle, Image, Video, Plus } from 'lucide-react';
 import Link from 'next/link';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { API_URL } from '@/lib/config';
 
 interface PostContent {
   type: 'text' | 'image' | 'video';

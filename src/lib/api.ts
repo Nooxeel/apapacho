@@ -4,10 +4,23 @@ interface ApiOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   body?: any
   token?: string
+  signal?: AbortSignal
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public endpoint?: string,
+    public method?: string
+  ) {
+    super(message)
+    this.name = 'ApiError'
+  }
 }
 
 async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-  const { method = 'GET', body, token } = options
+  const { method = 'GET', body, token, signal } = options
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -17,39 +30,111 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
     headers['Authorization'] = `Bearer ${token}`
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  })
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal,
+    })
 
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error || 'API request failed')
+    if (!response.ok) {
+      let errorMessage = 'API request failed'
+
+      try {
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+        } else {
+          errorMessage = await response.text() || errorMessage
+        }
+      } catch {
+        // If parsing error response fails, use generic message
+      }
+
+      throw new ApiError(errorMessage, response.status, endpoint, method)
+    }
+
+    return response.json()
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new ApiError('Request cancelled', undefined, endpoint, method)
+      }
+
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new ApiError('Network error. Please check your connection.', undefined, endpoint, method)
+      }
+
+      throw new ApiError(error.message, undefined, endpoint, method)
+    }
+
+    throw new ApiError('An unexpected error occurred', undefined, endpoint, method)
   }
-
-  return response.json()
 }
 
 // File upload helper
-async function uploadFile(endpoint: string, file: File, fieldName: string, token: string) {
+async function uploadFile(
+  endpoint: string,
+  file: File,
+  fieldName: string,
+  token: string,
+  signal?: AbortSignal
+) {
   const formData = new FormData()
   formData.append(fieldName, file)
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-    body: formData,
-  })
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+      signal,
+    })
 
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error || 'Upload failed')
+    if (!response.ok) {
+      let errorMessage = 'Upload failed'
+
+      try {
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+        }
+      } catch {
+        // If parsing error response fails, use generic message
+      }
+
+      throw new ApiError(errorMessage, response.status, endpoint, 'POST')
+    }
+
+    return response.json()
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new ApiError('Upload cancelled', undefined, endpoint, 'POST')
+      }
+
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new ApiError('Network error during upload. Please check your connection.', undefined, endpoint, 'POST')
+      }
+
+      throw new ApiError(error.message, undefined, endpoint, 'POST')
+    }
+
+    throw new ApiError('Upload failed unexpectedly', undefined, endpoint, 'POST')
   }
-
-  return response.json()
 }
 
 // Auth API
@@ -118,24 +203,56 @@ export const uploadApi = {
 
   cover: (file: File, token: string) => uploadFile('/upload/cover', file, 'cover', token),
 
-  content: async (files: File[], token: string) => {
+  content: async (files: File[], token: string, signal?: AbortSignal) => {
     const formData = new FormData()
     files.forEach((file) => formData.append('files', file))
 
-    const response = await fetch(`${API_URL}/upload/content`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      body: formData,
-    })
+    try {
+      const response = await fetch(`${API_URL}/upload/content`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+        signal,
+      })
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Upload failed')
+      if (!response.ok) {
+        let errorMessage = 'Upload failed'
+
+        try {
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json()
+            errorMessage = errorData.error || errorData.message || errorMessage
+          }
+        } catch {
+          // If parsing error response fails, use generic message
+        }
+
+        throw new ApiError(errorMessage, response.status, '/upload/content', 'POST')
+      }
+
+      return response.json()
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error
+      }
+
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new ApiError('Upload cancelled', undefined, '/upload/content', 'POST')
+        }
+
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          throw new ApiError('Network error during upload. Please check your connection.', undefined, '/upload/content', 'POST')
+        }
+
+        throw new ApiError(error.message, undefined, '/upload/content', 'POST')
+      }
+
+      throw new ApiError('Upload failed unexpectedly', undefined, '/upload/content', 'POST')
     }
-
-    return response.json()
   },
 }
 

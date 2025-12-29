@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi } from '@/lib/api'
+import { API_URL } from '@/lib/config'
 
 // Opciones de colores de fondo predefinidos
 const backgroundColors = [
@@ -46,8 +47,6 @@ interface MusicTrack {
   thumbnail: string
   order: number
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
 export function CreatorProfileEditor() {
   const router = useRouter()

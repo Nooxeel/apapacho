@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { API_URL } from '@/lib/config';
 
 interface FavoriteButtonProps {
   creatorId: string;
@@ -21,8 +22,6 @@ export default function FavoriteButton({
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [count, setCount] = useState(0);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
   const sizeClasses = {
     sm: 'p-2',

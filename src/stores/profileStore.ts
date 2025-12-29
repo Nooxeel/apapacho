@@ -1,11 +1,14 @@
 import { create } from 'zustand'
 import type { CreatorProfile, YouTubeTrack, ProfileTheme } from '@/types'
+import { creatorApi } from '@/lib/api'
 
 interface ProfileCustomizationState {
   profile: Partial<CreatorProfile>
   isDirty: boolean
   isPreviewMode: boolean
-  
+  isSaving: boolean
+  saveError: string | null
+
   // Actions
   setBackgroundColor: (color: string) => void
   setBackgroundGradient: (gradient: string) => void
@@ -14,16 +17,17 @@ interface ProfileCustomizationState {
   setTextColor: (color: string) => void
   setFontFamily: (font: string) => void
   setTheme: (theme: ProfileTheme) => void
-  
+
   // Music
   addMusicTrack: (track: YouTubeTrack) => void
   removeMusicTrack: (trackId: string) => void
   reorderMusicTracks: (tracks: YouTubeTrack[]) => void
-  
+
   // Preview
   togglePreviewMode: () => void
   resetChanges: () => void
-  saveChanges: () => void
+  saveChanges: (token: string) => Promise<void>
+  loadProfile: (profile: Partial<CreatorProfile>) => void
 }
 
 const defaultProfile: Partial<CreatorProfile> = {
@@ -45,6 +49,8 @@ export const useProfileCustomizationStore = create<ProfileCustomizationState>((s
   profile: defaultProfile,
   isDirty: false,
   isPreviewMode: false,
+  isSaving: false,
+  saveError: null,
 
   setBackgroundColor: (color) =>
     set((state) => ({
@@ -120,10 +126,32 @@ export const useProfileCustomizationStore = create<ProfileCustomizationState>((s
     set((state) => ({ isPreviewMode: !state.isPreviewMode })),
 
   resetChanges: () =>
-    set({ profile: defaultProfile, isDirty: false }),
+    set({ profile: defaultProfile, isDirty: false, saveError: null }),
 
-  saveChanges: () => {
-    // TODO: Implement API call to save profile
-    set({ isDirty: false })
+  saveChanges: async (token: string) => {
+    const { profile } = get()
+
+    set({ isSaving: true, saveError: null })
+
+    try {
+      await creatorApi.updateProfile({
+        backgroundColor: profile.backgroundColor,
+        backgroundGradient: profile.backgroundGradient,
+        backgroundImage: profile.backgroundImage,
+        accentColor: profile.accentColor,
+        textColor: profile.textColor,
+        fontFamily: profile.fontFamily,
+        coverImage: profile.coverImage,
+      }, token)
+
+      set({ isDirty: false, isSaving: false })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al guardar cambios'
+      set({ saveError: errorMessage, isSaving: false })
+      throw error
+    }
   },
+
+  loadProfile: (profile: Partial<CreatorProfile>) =>
+    set({ profile, isDirty: false, saveError: null }),
 }))

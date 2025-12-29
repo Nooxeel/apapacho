@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Card, Button, Input, Badge } from '@/components/ui'
 import { useProfileCustomizationStore } from '@/stores'
+import { useAuthStore } from '@/stores/authStore'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/utils'
 import type { YouTubeTrack } from '@/types'
 
@@ -37,9 +38,20 @@ export function ProfileCustomizer() {
     resetChanges,
   } = useProfileCustomizationStore()
 
+  const { token } = useAuthStore()
+
   const [activeTab, setActiveTab] = useState<'theme' | 'music' | 'advanced'>('theme')
   const [newMusicUrl, setNewMusicUrl] = useState('')
   const [musicError, setMusicError] = useState('')
+
+  const handleSaveChanges = async () => {
+    if (!token) return
+    try {
+      await saveChanges(token)
+    } catch (error) {
+      console.error('Error saving changes:', error)
+    }
+  }
 
   const handleAddMusic = () => {
     setMusicError('')
@@ -305,7 +317,7 @@ export function ProfileCustomizer() {
             <Button variant="ghost" onClick={resetChanges} className="flex-1">
               Descartar
             </Button>
-            <Button variant="primary" onClick={saveChanges} className="flex-1">
+            <Button variant="primary" onClick={handleSaveChanges} className="flex-1">
               Guardar Cambios
             </Button>
           </div>

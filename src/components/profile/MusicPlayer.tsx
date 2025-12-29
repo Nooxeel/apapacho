@@ -126,7 +126,12 @@ export function MusicPlayer({
       setIsPlaying(true)
       setNeedsInteraction(false)
       setDuration(playerRef.current?.getDuration() || 0)
-      
+
+      // Clear any existing interval before creating new one
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current)
+      }
+
       // Update progress
       progressInterval.current = setInterval(() => {
         if (playerRef.current) {
@@ -137,6 +142,7 @@ export function MusicPlayer({
       setIsPlaying(false)
       if (progressInterval.current) {
         clearInterval(progressInterval.current)
+        progressInterval.current = null
       }
       // If paused at 0:00 and we tried to autoplay, browser blocked it
       if (playerRef.current?.getCurrentTime() === 0 && autoPlay) {

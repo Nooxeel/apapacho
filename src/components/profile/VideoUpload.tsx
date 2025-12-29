@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Card } from '@/components/ui'
 import { Upload, X, Video, Loader2, AlertCircle } from 'lucide-react'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+import { API_URL } from '@/lib/config'
 
 interface VideoUploadProps {
   onSuccess?: (videoUrl: string) => void

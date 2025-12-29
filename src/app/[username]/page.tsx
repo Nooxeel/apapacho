@@ -7,6 +7,7 @@ import { creatorApi } from '@/lib/api'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { Navbar } from '@/components/layout'
 import { useAuthStore } from '@/stores/authStore'
+import { API_URL } from '@/lib/config'
 import { 
   Heart, 
   FileText, 
@@ -71,8 +72,6 @@ interface CreatorProfile {
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-
 function formatNumber(num: number): string {
   if (num >= 1000000) {
     return (num / 1000000).toFixed(1) + 'M'
@@ -103,7 +102,6 @@ export default function CreatorPublicProfile() {
         
         // Cargar conteo de comentarios
         try {
-          const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
           const statsRes = await fetch(`${API_URL}/comments/${data.creatorProfile.id}/stats`)
           if (statsRes.ok) {
             const stats = await statsRes.json()
