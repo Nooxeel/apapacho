@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi } from '@/lib/api'
-import { API_URL } from '@/lib/config'
 
 // Opciones de colores de fondo predefinidos
 const backgroundColors = [
