@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
-import { creatorApi, uploadApi, authApi } from '@/lib/api'
+import { creatorApi, uploadApi, authApi, ApiError } from '@/lib/api'
+import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
 
 // Opciones de colores de fondo predefinidos
@@ -50,7 +51,7 @@ interface MusicTrack {
 
 export function CreatorProfileEditor() {
   const router = useRouter()
-  const [token, setToken] = useState<string | null>(null)
+  const { token, logout, hasHydrated } = useAuthStore()
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
     username: '',
@@ -80,14 +81,15 @@ export function CreatorProfileEditor() {
 
   // Load current profile data
   useEffect(() => {
-    const storedToken = localStorage.getItem('apapacho-token')
-    if (!storedToken) {
+    if (!hasHydrated) return
+
+    if (!token) {
       router.push('/login')
       return
     }
-    setToken(storedToken)
-    loadProfile(storedToken)
-  }, [router])
+
+    loadProfile(token)
+  }, [token, hasHydrated, router])
 
   const loadProfile = async (authToken: string) => {
     setIsLoading(true)
@@ -123,6 +125,11 @@ export function CreatorProfileEditor() {
         setMusicTracks(userData.creatorProfile.musicTracks)
       }
     } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        logout()
+        router.push('/login')
+        return
+      }
       setError('Error al cargar el perfil')
       console.error(err)
     } finally {
@@ -180,41 +187,13 @@ export function CreatorProfileEditor() {
     setSuccess(null)
 
     try {
-      // 1. Upload images first (if changed) using separate endpoints
-      if (profileImageFile) {
-        const profileFormData = new FormData()
-        profileFormData.append('profileImage', profileImageFile)
-        
-        const profileRes = await fetch(`${API_URL}/upload/profile`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          body: profileFormData,
-        })
-        
-        if (!profileRes.ok) {
-          const error = await profileRes.json()
-          throw new Error(error.error || 'Error al subir imagen de perfil')
-        }
+      // 1. Upload images first (if changed) using uploadApi
+      if (profileImageFile && token) {
+        await uploadApi.profile(profileImageFile, token)
       }
 
-      if (coverImageFile) {
-        const coverFormData = new FormData()
-        coverFormData.append('coverImage', coverImageFile)
-        
-        const coverRes = await fetch(`${API_URL}/upload/cover`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          body: coverFormData,
-        })
-        
-        if (!coverRes.ok) {
-          const error = await coverRes.json()
-          throw new Error(error.error || 'Error al subir imagen de portada')
-        }
+      if (coverImageFile && token) {
+        await uploadApi.cover(coverImageFile, token)
       }
 
       // 2. Update profile data (without files)
@@ -244,6 +223,11 @@ export function CreatorProfileEditor() {
       // Reload to get updated data
       await loadProfile(token)
     } catch (err: any) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        logout()
+        router.push('/login')
+        return
+      }
       setError(err.message || 'Error al guardar los cambios')
       console.error(err)
     } finally {
@@ -313,6 +297,11 @@ export function CreatorProfileEditor() {
       setNewYoutubeUrl('')
       setSuccess('¡Canción agregada!')
     } catch (err: any) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        logout()
+        router.push('/login')
+        return
+      }
       setError(err.message || 'Error al agregar la canción')
     } finally {
       setIsAddingTrack(false)
@@ -328,6 +317,11 @@ export function CreatorProfileEditor() {
       setMusicTracks(prev => prev.filter(t => t.id !== trackId))
       setSuccess('Canción eliminada')
     } catch (err: any) {
+      if (err instanceof ApiError && err.statusCode === 401) {
+        logout()
+        router.push('/login')
+        return
+      }
       setError(err.message || 'Error al eliminar la canción')
     }
   }

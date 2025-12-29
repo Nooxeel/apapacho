@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
+import { uploadApi, ApiError } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import {
   User,
@@ -189,23 +190,14 @@ export default function DashboardPage() {
     setUploadingAvatar(true);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', 'avatar');
-
-      const response = await fetch(`${API_URL}/upload/${user.id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        updateUser({ avatar: data.url });
-      }
+      const data = await uploadApi.avatar(file, token);
+      updateUser({ avatar: data.url });
     } catch (error) {
+      if (error instanceof ApiError && error.statusCode === 401) {
+        logout();
+        router.push('/login');
+        return;
+      }
       console.error('Error subiendo avatar:', error);
     } finally {
       setUploadingAvatar(false);
