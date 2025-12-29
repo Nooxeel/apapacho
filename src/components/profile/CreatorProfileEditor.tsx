@@ -182,31 +182,56 @@ export function CreatorProfileEditor() {
     setSuccess(null)
 
     try {
-      // Create FormData to send all data including files
-      const formData = new FormData()
-      
-      // Add profile data as JSON fields
-      if (profile.bio) formData.append('bio', profile.bio)
-      if (profile.backgroundColor) formData.append('backgroundColor', profile.backgroundColor)
-      if (profile.backgroundGradient) formData.append('backgroundGradient', profile.backgroundGradient)
-      if (profile.accentColor) formData.append('accentColor', profile.accentColor)
-      
-      // Add image files if changed
+      // 1. Upload images first (if changed) using separate endpoints
       if (profileImageFile) {
-        formData.append('profileImage', profileImageFile)
-      }
-      
-      if (coverImageFile) {
-        formData.append('coverImage', coverImageFile)
+        const profileFormData = new FormData()
+        profileFormData.append('profileImage', profileImageFile)
+        
+        const profileRes = await fetch(`${API_URL}/upload/profile`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: profileFormData,
+        })
+        
+        if (!profileRes.ok) {
+          const error = await profileRes.json()
+          throw new Error(error.error || 'Error al subir imagen de perfil')
+        }
       }
 
-      // Send everything in one request
+      if (coverImageFile) {
+        const coverFormData = new FormData()
+        coverFormData.append('coverImage', coverImageFile)
+        
+        const coverRes = await fetch(`${API_URL}/upload/cover`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: coverFormData,
+        })
+        
+        if (!coverRes.ok) {
+          const error = await coverRes.json()
+          throw new Error(error.error || 'Error al subir imagen de portada')
+        }
+      }
+
+      // 2. Update profile data (without files)
       const response = await fetch(`${API_URL}/creators/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          bio: profile.bio,
+          backgroundColor: profile.backgroundColor,
+          backgroundGradient: profile.backgroundGradient,
+          accentColor: profile.accentColor,
+        }),
       })
 
       if (!response.ok) {
