@@ -21,7 +21,8 @@ import {
   Calendar,
   Video,
   Image as ImageIcon,
-  ArrowRight
+  ArrowRight,
+  Users
 } from 'lucide-react';
 
 interface Subscription {
@@ -64,6 +65,7 @@ interface UserStats {
   favorites: number;
   comments: number;
   donations: number;
+  fans?: number; // Cuántos usuarios tienen a este creador en favoritos
 }
 
 interface Payment {
@@ -452,32 +454,69 @@ export default function DashboardPage() {
 
       {/* Stats */}
       <div className="max-w-4xl mx-auto px-4 mt-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard
-            icon={<CreditCard className="w-5 h-5" />}
-            value={stats?.activeSubscriptions || 0}
-            label="Suscripciones"
-            color="bg-blue-500"
-          />
-          <StatCard
-            icon={<Heart className="w-5 h-5" />}
-            value={stats?.favorites || 0}
-            label="Favoritos"
-            color="bg-pink-500"
-          />
-          <StatCard
-            icon={<MessageCircle className="w-5 h-5" />}
-            value={stats?.comments || 0}
-            label="Comentarios"
-            color="bg-green-500"
-          />
-          <StatCard
-            icon={<Gift className="w-5 h-5" />}
-            value={stats?.donations || 0}
-            label="Propinas"
-            color="bg-yellow-500"
-          />
-        </div>
+        {user.isCreator ? (
+          // Stats para creadores
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <StatCard
+              icon={<Users className="w-5 h-5" />}
+              value={stats?.fans || 0}
+              label="Fans"
+              color="bg-purple-500"
+            />
+            <StatCard
+              icon={<CreditCard className="w-5 h-5" />}
+              value={stats?.activeSubscriptions || 0}
+              label="Suscripciones"
+              color="bg-blue-500"
+            />
+            <StatCard
+              icon={<MessageCircle className="w-5 h-5" />}
+              value={stats?.comments || 0}
+              label="Comentarios"
+              color="bg-green-500"
+            />
+            <StatCard
+              icon={<Gift className="w-5 h-5" />}
+              value={stats?.donations || 0}
+              label="Propinas"
+              color="bg-yellow-500"
+            />
+            <StatCard
+              icon={<Heart className="w-5 h-5" />}
+              value={stats?.favorites || 0}
+              label="Favoritos"
+              color="bg-pink-500"
+            />
+          </div>
+        ) : (
+          // Stats para fans normales
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard
+              icon={<CreditCard className="w-5 h-5" />}
+              value={stats?.activeSubscriptions || 0}
+              label="Suscripciones"
+              color="bg-blue-500"
+            />
+            <StatCard
+              icon={<Heart className="w-5 h-5" />}
+              value={stats?.favorites || 0}
+              label="Favoritos"
+              color="bg-pink-500"
+            />
+            <StatCard
+              icon={<MessageCircle className="w-5 h-5" />}
+              value={stats?.comments || 0}
+              label="Comentarios"
+              color="bg-green-500"
+            />
+            <StatCard
+              icon={<Gift className="w-5 h-5" />}
+              value={stats?.donations || 0}
+              label="Propinas"
+              color="bg-yellow-500"
+            />
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
