@@ -245,7 +245,7 @@ export default function CreatorPostsPage() {
                         {post.content[0]?.type === 'image' && post.content[0].url && (
                           <div className="w-32 h-32 rounded-lg overflow-hidden bg-white/5">
                             <img 
-                              src={`http://localhost:3001${post.content[0].url}`}
+                              src={post.content[0].url}
                               alt="Post preview"
                               className="w-full h-full object-cover"
                             />

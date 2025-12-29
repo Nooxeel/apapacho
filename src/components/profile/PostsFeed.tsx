@@ -131,14 +131,14 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                 <div className="relative bg-black">
                   {videoContent ? (
                     <video 
-                      src={`http://localhost:3001${videoContent.url}`}
+                      src={videoContent.url}
                       className="w-full max-h-[500px] object-contain mx-auto"
                       controls
                       preload="metadata"
                     />
                   ) : imageContent ? (
                     <img 
-                      src={`http://localhost:3001${imageContent.url}`}
+                      src={imageContent.url}
                       alt={post.title || 'Post image'}
                       className="w-full max-h-[500px] object-contain mx-auto"
                     />
