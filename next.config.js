@@ -26,7 +26,49 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'ui-avatars.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.youtube.com https://www.googletagmanager.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://images.unsplash.com https://ui-avatars.com https://res.cloudinary.com https://*.placeholder.com http://localhost:3001",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "connect-src 'self' https://www.youtube.com http://localhost:3001 https://*.railway.app",
+              "frame-src 'self' https://www.youtube.com",
+              "media-src 'self' https://res.cloudinary.com http://localhost:3001 blob:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+            ].join('; '),
+          },
+        ],
+      },
+    ]
   },
 }
 
