@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { Button, Card } from '@/components/ui'
 import { Upload, X, Video, Loader2, AlertCircle } from 'lucide-react'
 
-const API_URL = 'http://localhost:3001/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
 interface VideoUploadProps {
   onSuccess?: (videoUrl: string) => void

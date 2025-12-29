@@ -9,6 +9,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { Edit2, Trash2, Eye, Heart, MessageCircle, Image, Video, Plus } from 'lucide-react';
 import Link from 'next/link';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
 interface PostContent {
   type: 'text' | 'image' | 'video';
   content?: string;
@@ -51,7 +53,7 @@ export default function CreatorPostsPage() {
     try {
       setIsLoading(true);
       console.log('[Posts] Fetching posts with token:', token?.substring(0, 20) + '...');
-      const response = await fetch('http://localhost:3001/api/posts/my-posts', {
+      const response = await fetch(`${API_URL}/posts/my-posts`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -84,7 +86,7 @@ export default function CreatorPostsPage() {
     if (!editingPost) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/posts/${editingPost.id}`, {
+      const response = await fetch(`${API_URL}/posts/${editingPost.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -112,7 +114,7 @@ export default function CreatorPostsPage() {
     if (!confirm('¿Estás seguro de que quieres eliminar este post?')) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/posts/${postId}`, {
+      const response = await fetch(`${API_URL}/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

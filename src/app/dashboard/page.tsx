@@ -111,7 +111,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-  const API_URL = 'http://localhost:3001/api';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
   useEffect(() => {
     // Esperar a que el store se hidrate desde localStorage

@@ -5,7 +5,7 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { Card, Button } from '@/components/ui'
 import { useAuthStore } from '@/stores'
 
-const API_URL = 'http://localhost:3001/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
 export function ImageUpload() {
   const { token } = useAuthStore()

@@ -37,7 +37,7 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
   const [showPending, setShowPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = 'http://localhost:3001/api';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
   // Cargar comentarios aprobados
   const loadComments = useCallback(async () => {

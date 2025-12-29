@@ -22,7 +22,7 @@ export default function FavoriteButton({
   const [isLoading, setIsLoading] = useState(false);
   const [count, setCount] = useState(0);
 
-  const API_URL = 'http://localhost:3001/api';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
   const sizeClasses = {
     sm: 'p-2',

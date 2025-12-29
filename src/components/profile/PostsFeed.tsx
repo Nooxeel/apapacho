@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Video, Heart, MessageCircle, DollarSign, Lock } from 'lucide-react'
 import { Card } from '@/components/ui'
 
-const API_URL = 'http://localhost:3001/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
 interface Post {
   id: string
