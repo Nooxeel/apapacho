@@ -103,7 +103,8 @@ export default function CreatorPublicProfile() {
         
         // Cargar conteo de comentarios
         try {
-          const statsRes = await fetch(`http://localhost:3001/api/comments/${data.creatorProfile.id}/stats`)
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+          const statsRes = await fetch(`${API_URL}/comments/${data.creatorProfile.id}/stats`)
           if (statsRes.ok) {
             const stats = await statsRes.json()
             setCommentsCount(stats.approved)
@@ -295,7 +296,7 @@ export default function CreatorPublicProfile() {
               <StatItem 
                 icon={<MessageCircle className="w-5 h-5" />} 
                 value={formatNumber(commentsCount)} 
-                label="Comentarios" 
+                label="Libro de visitas" 
                 accentColor={profile.accentColor}
                 active={activeTab === 'comments'}
                 onClick={() => setActiveTab('comments')}
