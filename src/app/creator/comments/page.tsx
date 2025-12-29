@@ -142,7 +142,7 @@ export default function CreatorCommentsPage() {
   };
 
   const handleDelete = async (commentId: string, isPending: boolean) => {
-    if (!confirm('¿Estás seguro de eliminar este comentario?')) return;
+    if (!confirm('¿Estás seguro de eliminar este mensaje del libro de visitas?')) return;
     
     try {
       const response = await fetch(`${API_URL}/comments/${commentId}`, {
@@ -249,10 +249,10 @@ export default function CreatorCommentsPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
-              Administrar <span className="gradient-text">Comentarios</span>
+              Administrar <span className="gradient-text">Libro de visitas</span>
             </h1>
             <p className="text-white/60">
-              Aprueba o rechaza los comentarios en tu perfil
+              Aprueba o rechaza los mensajes en tu libro de visitas
             </p>
           </div>
 
@@ -304,10 +304,10 @@ export default function CreatorCommentsPage() {
                   <Card variant="solid" className="p-12 text-center">
                     <MessageCircle className="w-12 h-12 text-white/20 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-white mb-2">
-                      No hay comentarios pendientes
+                      No hay mensajes pendientes
                     </h3>
                     <p className="text-white/60 text-sm">
-                      Los nuevos comentarios aparecerán aquí para tu aprobación
+                      Los nuevos mensajes en tu libro de visitas aparecerán aquí para tu aprobación
                     </p>
                   </Card>
                 ) : (
@@ -324,10 +324,10 @@ export default function CreatorCommentsPage() {
                   <Card variant="solid" className="p-12 text-center">
                     <CheckCircle className="w-12 h-12 text-white/20 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-white mb-2">
-                      No hay comentarios aprobados
+                      No hay mensajes aprobados
                     </h3>
                     <p className="text-white/60 text-sm">
-                      Los comentarios aprobados aparecerán aquí
+                      Los mensajes aprobados de tu libro de visitas aparecerán aquí
                     </p>
                   </Card>
                 ) : (
