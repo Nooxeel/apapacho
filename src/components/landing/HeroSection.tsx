@@ -30,16 +30,18 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <p className="text-xl md:text-2xl text-white/60 max-w-3xl mx-auto mb-10">
-          La plataforma más personalizable para creadores. 
-          Crea tu perfil único con música, colores y estilos{' '}
-          <span className="text-white">como en los viejos tiempos de MySpace</span>.
+          ¿Recuerdas cuando tu perfil era realmente <span className="text-white font-semibold">tuyo</span>?
+          <br />
+          <span className="text-white">Música de fondo, colores personalizados, tu propio espacio</span>.
+          <br />
+          La nostalgia de MySpace con las herramientas de hoy.
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <Link href="/login">
             <Button variant="primary" size="lg">
-              Empezar a Crear
+              Crea tu Espacio
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"
@@ -55,25 +57,29 @@ export function HeroSection() {
               </svg>
             </Button>
           </Link>
+          <Link href="/explore">
+            <Button variant="ghost" size="lg">
+              Ver Ejemplos
+            </Button>
+          </Link>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold gradient-text">100%</div>
-            <div className="text-white/50 text-sm">Tuya tu audiencia</div>
+        {/* Features Highlight */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="text-3xl mb-2">🎨</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Diseña sin límites</h3>
+            <p className="text-white/60 text-sm">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
           </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold gradient-text">0€</div>
-            <div className="text-white/50 text-sm">Setup inicial</div>
+          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="text-3xl mb-2">🎵</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Tu soundtrack</h3>
+            <p className="text-white/60 text-sm">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
           </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold gradient-text">15%</div>
-            <div className="text-white/50 text-sm">Comisión justa</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold gradient-text">∞</div>
-            <div className="text-white/50 text-sm">Personalización</div>
+          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="text-3xl mb-2">💰</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Monetiza tu arte</h3>
+            <p className="text-white/60 text-sm">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
           </div>
         </div>
       </div>

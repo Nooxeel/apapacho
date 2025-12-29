@@ -28,8 +28,8 @@ const mockCreators = [
   },
   {
     id: '2',
-    name: 'Zippy',
-    username: 'zippy',
+    name: 'Imperfecto',
+    username: 'imperfecto',
     avatar: '',
     coverGradient: 'from-blue-600 via-cyan-500 to-teal-500',
     category: 'Tech',
