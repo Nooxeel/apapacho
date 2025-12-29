@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi } from '@/lib/api'
+import { API_URL } from '@/lib/config'
 
 // Opciones de colores de fondo predefinidos
 const backgroundColors = [
@@ -181,22 +182,37 @@ export function CreatorProfileEditor() {
     setSuccess(null)
 
     try {
-      // Upload images first if changed
+      // Create FormData to send all data including files
+      const formData = new FormData()
+      
+      // Add profile data as JSON fields
+      if (profile.bio) formData.append('bio', profile.bio)
+      if (profile.backgroundColor) formData.append('backgroundColor', profile.backgroundColor)
+      if (profile.backgroundGradient) formData.append('backgroundGradient', profile.backgroundGradient)
+      if (profile.accentColor) formData.append('accentColor', profile.accentColor)
+      
+      // Add image files if changed
       if (profileImageFile) {
-        await uploadApi.profile(profileImageFile, token)
+        formData.append('profileImage', profileImageFile)
       }
-
+      
       if (coverImageFile) {
-        await uploadApi.cover(coverImageFile, token)
+        formData.append('coverImage', coverImageFile)
       }
 
-      // Update profile data
-      await creatorApi.updateProfile({
-        bio: profile.bio,
-        backgroundColor: profile.backgroundColor,
-        backgroundGradient: profile.backgroundGradient,
-        accentColor: profile.accentColor,
-      }, token)
+      // Send everything in one request
+      const response = await fetch(`${API_URL}/creators/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to update profile')
+      }
 
       setSuccess('¡Perfil actualizado correctamente!')
       setProfileImageFile(null)
