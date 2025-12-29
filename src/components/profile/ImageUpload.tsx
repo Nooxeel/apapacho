@@ -5,15 +5,18 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react'
 import { Card, Button } from '@/components/ui'
 import { useAuthStore } from '@/stores'
 import { API_URL } from '@/lib/config'
+import { VisibilitySelector } from './VisibilitySelector'
+import type { PostVisibility } from '@/types'
 
 export function ImageUpload() {
-  const { token } = useAuthStore()
+  const { token, user } = useAuthStore()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [visibility, setVisibility] = useState<PostVisibility>('public')
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +99,7 @@ export function ImageUpload() {
             url: imageUrl,
             thumbnail: null
           }],
-          visibility: 'public'
+          visibility: visibility
         })
       })
 
@@ -111,6 +114,7 @@ export function ImageUpload() {
       setPreview(null)
       setTitle('')
       setDescription('')
+      setVisibility('public')
       setUploadedUrl(null)
       setUploadProgress(0)
 
@@ -212,6 +216,14 @@ export function ImageUpload() {
                 className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 resize-none"
               />
             </div>
+
+            {/* Visibility Selector */}
+            <VisibilitySelector
+              value={visibility}
+              onChange={setVisibility}
+              disabled={uploading}
+              hasSubscriptionTiers={user?.isCreator && 'subscriptionTiers' in user ? user.subscriptionTiers.length > 0 : false}
+            />
 
             {/* Upload Progress */}
             {uploading && (

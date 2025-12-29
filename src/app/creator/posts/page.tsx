@@ -9,6 +9,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { Edit2, Trash2, Eye, Heart, MessageCircle, Image, Video, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { API_URL } from '@/lib/config';
+import { VisibilitySelector } from '@/components/profile/VisibilitySelector';
+import type { PostVisibility } from '@/types';
 
 interface PostContent {
   type: 'text' | 'image' | 'video';
@@ -22,7 +24,7 @@ interface Post {
   title: string | null;
   description: string | null;
   content: PostContent[];
-  visibility: string;
+  visibility: PostVisibility;
   price: number | null;
   views: number;
   likes: number;
@@ -32,12 +34,13 @@ interface Post {
 
 export default function CreatorPostsPage() {
   const router = useRouter();
-  const { token, hasHydrated } = useAuthStore();
+  const { token, hasHydrated, user } = useAuthStore();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editVisibility, setEditVisibility] = useState<PostVisibility>('public');
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -79,6 +82,7 @@ export default function CreatorPostsPage() {
     setEditingPost(post);
     setEditTitle(post.title || '');
     setEditDescription(post.description || '');
+    setEditVisibility(post.visibility);
   };
 
   const handleSaveEdit = async () => {
@@ -93,7 +97,8 @@ export default function CreatorPostsPage() {
         },
         body: JSON.stringify({
           title: editTitle,
-          description: editDescription
+          description: editDescription,
+          visibility: editVisibility
         })
       });
 
@@ -102,6 +107,7 @@ export default function CreatorPostsPage() {
         setEditingPost(null);
         setEditTitle('');
         setEditDescription('');
+        setEditVisibility('public');
       }
     } catch (error) {
       console.error('Error updating post:', error);
@@ -220,16 +226,25 @@ export default function CreatorPostsPage() {
                           placeholder="Descripción del post"
                         />
                       </div>
+
+                      {/* Visibility Selector */}
+                      <VisibilitySelector
+                        value={editVisibility}
+                        onChange={setEditVisibility}
+                        hasSubscriptionTiers={user?.isCreator && 'subscriptionTiers' in user ? user.subscriptionTiers.length > 0 : false}
+                      />
+
                       <div className="flex gap-3">
                         <Button variant="primary" onClick={handleSaveEdit}>
                           Guardar
                         </Button>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           onClick={() => {
                             setEditingPost(null);
                             setEditTitle('');
                             setEditDescription('');
+                            setEditVisibility('public');
                           }}
                         >
                           Cancelar

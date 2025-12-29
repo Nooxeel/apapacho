@@ -92,13 +92,15 @@ export interface Subscription {
 }
 
 // Content Types
+export type PostVisibility = 'public' | 'authenticated' | 'subscribers'
+
 export interface Post {
   id: string
   creatorId: string
   title?: string
   description?: string
   content: PostContent[]
-  visibility: 'public' | 'subscribers' | 'tier'
+  visibility: PostVisibility
   requiredTierId?: string
   price?: number
   likes: number

@@ -6,6 +6,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { Button, Card } from '@/components/ui'
 import { Upload, X, Video, Loader2, AlertCircle } from 'lucide-react'
 import { API_URL } from '@/lib/config'
+import { VisibilitySelector } from './VisibilitySelector'
+import type { PostVisibility } from '@/types'
 
 interface VideoUploadProps {
   onSuccess?: (videoUrl: string) => void
@@ -14,11 +16,12 @@ interface VideoUploadProps {
 
 export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
   const router = useRouter()
-  const { token } = useAuthStore()
+  const { token, user } = useAuthStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [visibility, setVisibility] = useState<PostVisibility>('public')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -86,7 +89,7 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
             thumbnail: null
           }
         ],
-        visibility: 'public'
+        visibility: visibility
       }
 
       const postRes = await fetch(`${API_URL}/posts`, {
@@ -219,6 +222,14 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
                 className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/30 focus:outline-none focus:border-primary-500 resize-none"
               />
             </div>
+
+            {/* Visibility Selector */}
+            <VisibilitySelector
+              value={visibility}
+              onChange={setVisibility}
+              disabled={uploading}
+              hasSubscriptionTiers={user?.isCreator && 'subscriptionTiers' in user ? user.subscriptionTiers.length > 0 : false}
+            />
           </div>
         )}
 
