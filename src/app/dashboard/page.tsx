@@ -18,7 +18,10 @@ import {
   LogOut,
   BadgeCheck,
   Receipt,
-  Calendar
+  Calendar,
+  Video,
+  Image as ImageIcon,
+  ArrowRight
 } from 'lucide-react';
 
 interface Subscription {
@@ -112,6 +115,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
 
   useEffect(() => {
     // Esperar a que el store se hidrate desde localStorage
@@ -174,6 +178,17 @@ export default function DashboardPage() {
         // Actualizar stats con el conteo de comentarios
         if (stats) {
           setStats({ ...stats, comments: commentsData.length });
+        }
+      }
+
+      // Si es creador, cargar comentarios pendientes
+      if (user?.isCreator) {
+        const pendingRes = await fetch(`${API_URL}/comments/creator/pending`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (pendingRes.ok) {
+          const pendingData = await pendingRes.json();
+          setPendingCommentsCount(pendingData.length || 0);
         }
       }
     } catch (error) {
@@ -278,46 +293,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0f0f14] text-white">
-      {/* Creator Banner */}
-      {user.isCreator && (
-        <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-3">
-          <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
-              </svg>
-              <span className="font-medium">Herramientas de Creador</span>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => router.push('/creator/upload-video')}
-                className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-              >
-                Subir Video
-              </button>
-              <button
-                onClick={() => router.push('/creator/upload-image')}
-                className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-              >
-                Subir Foto
-              </button>
-              <button
-                onClick={() => router.push('/creator/edit')}
-                className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-              >
-                Editar Perfil
-              </button>
-              <button
-                onClick={() => router.push('/creator/comments')}
-                className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
-              >
-                Comentarios
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Header */}
       <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-16">
         <div className="max-w-4xl mx-auto px-4">
@@ -385,8 +360,98 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Creator Action Cards - Only for creators */}
+      {user.isCreator && (
+        <div className="max-w-4xl mx-auto px-4 mt-8">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+            </svg>
+            Herramientas de Creador
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Subir Video */}
+            <button
+              onClick={() => router.push('/creator/upload-video')}
+              className="group bg-gradient-to-br from-purple-500/10 to-fuchsia-500/10 hover:from-purple-500/20 hover:to-fuchsia-500/20 border border-purple-500/20 hover:border-purple-500/40 rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20"
+            >
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Video className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg text-white mb-1">Subir Video</h3>
+                  <p className="text-white/60 text-sm">Comparte contenido en video</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
+
+            {/* Subir Foto */}
+            <button
+              onClick={() => router.push('/creator/upload-image')}
+              className="group bg-gradient-to-br from-pink-500/10 to-rose-500/10 hover:from-pink-500/20 hover:to-rose-500/20 border border-pink-500/20 hover:border-pink-500/40 rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-pink-500/20"
+            >
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ImageIcon className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg text-white mb-1">Subir Foto</h3>
+                  <p className="text-white/60 text-sm">Publica imágenes para fans</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
+
+            {/* Libro de Visitas */}
+            <button
+              onClick={() => router.push('/creator/comments')}
+              className="group bg-gradient-to-br from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-500/20 hover:border-blue-500/40 rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 relative"
+            >
+              {pendingCommentsCount > 0 && (
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg animate-pulse">
+                  {pendingCommentsCount}
+                </div>
+              )}
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <MessageCircle className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg text-white mb-1">Libro de Visitas</h3>
+                  <p className="text-white/60 text-sm">
+                    {pendingCommentsCount > 0
+                      ? `${pendingCommentsCount} ${pendingCommentsCount === 1 ? 'nuevo' : 'nuevos'}`
+                      : 'Gestiona comentarios'}
+                  </p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
+
+            {/* Editar Perfil */}
+            <button
+              onClick={() => router.push('/creator/edit')}
+              className="group bg-gradient-to-br from-orange-500/10 to-amber-500/10 hover:from-orange-500/20 hover:to-amber-500/20 border border-orange-500/20 hover:border-orange-500/40 rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20"
+            >
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Settings className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg text-white mb-1">Editar Perfil</h3>
+                  <p className="text-white/60 text-sm">Personaliza tu espacio</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-orange-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
-      <div className="max-w-4xl mx-auto px-4 -mt-8">
+      <div className="max-w-4xl mx-auto px-4 mt-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
             icon={<CreditCard className="w-5 h-5" />}
