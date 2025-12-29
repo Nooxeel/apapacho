@@ -182,24 +182,29 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          💬 Comentarios
-          <span className="text-sm text-white/60">({comments.length})</span>
-        </h3>
-        
-        {isOwner && pendingComments.length > 0 && (
-          <button
-            onClick={() => setShowPending(!showPending)}
-            className="px-3 py-1 rounded-full text-sm font-medium transition-colors"
-            style={{ 
-              backgroundColor: showPending ? accentColor : 'rgba(255,255,255,0.1)',
-              color: showPending ? 'white' : accentColor
-            }}
-          >
-            🔔 {pendingComments.length} pendiente{pendingComments.length !== 1 ? 's' : ''}
-          </button>
-        )}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            📖 Libro de visitas
+            <span className="text-sm text-white/60">({comments.length})</span>
+          </h3>
+          
+          {isOwner && pendingComments.length > 0 && (
+            <button
+              onClick={() => setShowPending(!showPending)}
+              className="px-3 py-1 rounded-full text-sm font-medium transition-colors"
+              style={{ 
+                backgroundColor: showPending ? accentColor : 'rgba(255,255,255,0.1)',
+                color: showPending ? 'white' : accentColor
+              }}
+            >
+              🔔 {pendingComments.length} pendiente{pendingComments.length !== 1 ? 's' : ''}
+            </button>
+          )}
+        </div>
+        <p className="text-sm text-white/50">
+          Deja tu mensaje. El creador lo aprueba antes de mostrarlo.
+        </p>
       </div>
 
       {/* Comentarios pendientes (solo visible para el dueño) */}
