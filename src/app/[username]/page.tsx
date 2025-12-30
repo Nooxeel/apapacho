@@ -290,21 +290,22 @@ export default function CreatorPublicProfile() {
 
               {/* Botón de Favorito */}
               {!isOwner && (
-                <FavoriteButton 
+                <FavoriteButton
                   creatorId={profile.id}
                   accentColor={profile.accentColor}
                   size="md"
                 />
               )}
 
-              {/* Botón de Mensaje */}
+              {/* Botón de Mensaje - Mejorado visualmente */}
               {!isOwner && user && (
-                <button 
+                <button
                   onClick={handleSendMessage}
-                  className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors"
+                  className="flex items-center gap-2 px-5 py-3 rounded-full border-2 border-fuchsia-500/50 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 transition-colors text-white font-medium"
                   title="Enviar mensaje"
                 >
                   <MessageCircle className="w-5 h-5" />
+                  <span>Mensaje</span>
                 </button>
               )}
 
