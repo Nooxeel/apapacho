@@ -72,10 +72,10 @@ export function FeaturesSection() {
           <h2 className="text-3xl md:text-5xl font-bold text-[#5E6472] mb-4">
             La plataforma que <span className="bg-gradient-to-r from-[#FFA69E] to-[#AED9E0] bg-clip-text text-transparent">extrañabas</span>
           </h2>
-          <p className="text-lg text-[#5E6472]/70 max-w-2xl mx-auto">
+          <p className="text-lg text-[#5E6472] max-w-2xl mx-auto">
             Donde tu creatividad no tiene límites y tu perfil es tan único como tú.
             <br />
-            <span className="text-[#5E6472]">Bienvenido de vuelta a la era dorada de la personalización.</span>
+            Bienvenido de vuelta a la era dorada de la personalización.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export function FeaturesSection() {
               key={index}
               variant="glass"
               hover
-              className="group bg-white/60 border-[#5E6472]/10"
+              className="group bg-white/80 border-[#5E6472]/10"
             >
               <CardContent>
                 <div
@@ -99,7 +99,7 @@ export function FeaturesSection() {
                 <h3 className="text-xl font-semibold text-[#5E6472] mb-2 group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#AED9E0] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {feature.title}
                 </h3>
-                <p className="text-[#5E6472]/60">
+                <p className="text-[#5E6472]">
                   {feature.description}
                 </p>
               </CardContent>
