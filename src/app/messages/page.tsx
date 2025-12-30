@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
 import { Navbar } from '@/components/layout'
 import { formatDistanceToNow } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { es } from 'date-fns/locale/es'
 import { MessageCircle, Search, ArrowLeft } from 'lucide-react'
 
 interface Conversation {

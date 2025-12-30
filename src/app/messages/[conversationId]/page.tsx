@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
 import { Navbar } from '@/components/layout'
 import { format, isToday, isYesterday } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { es } from 'date-fns/locale/es'
 import { ArrowLeft, Send, MoreVertical, Image as ImageIcon, Trash2 } from 'lucide-react'
 
 interface Message {
