@@ -6,13 +6,14 @@ import Image from 'next/image'
 import { creatorApi } from '@/lib/api'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { Navbar } from '@/components/layout'
+import ChatModal from '@/components/messages/ChatModal'
 import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
-import { 
-  Heart, 
-  FileText, 
-  Image as ImageIcon, 
-  Video, 
+import {
+  Heart,
+  FileText,
+  Image as ImageIcon,
+  Video,
   Mic,
   MessageCircle,
   Share2,
@@ -104,6 +105,8 @@ export default function CreatorPublicProfile() {
   const [activeTab, setActiveTab] = useState<'posts' | 'photos' | 'videos' | 'audio' | 'comments'>('posts')
   const [commentsCount, setCommentsCount] = useState(0)
   const [isSubscriber, setIsSubscriber] = useState(false)
+  const [showChat, setShowChat] = useState(false)
+  const [chatConversationId, setChatConversationId] = useState<string | null>(null)
 
   // Set initial active tab based on visibility settings
   useEffect(() => {
@@ -203,7 +206,8 @@ export default function CreatorPublicProfile() {
 
       if (res.ok) {
         const conversation = await res.json()
-        router.push(`/messages/${conversation.id}`)
+        setChatConversationId(conversation.id)
+        setShowChat(true)
       } else {
         console.error('Error creating conversation:', res.status)
         alert('No se pudo iniciar la conversación. Intenta de nuevo.')
@@ -507,6 +511,23 @@ export default function CreatorPublicProfile() {
         </div>
       </div>
       </div>
+
+      {/* Chat Modal */}
+      {showChat && chatConversationId && creator && (
+        <ChatModal
+          conversationId={chatConversationId}
+          otherUser={{
+            id: creator.id,
+            username: creator.username,
+            displayName: creator.displayName,
+            avatar: creator.avatar || null
+          }}
+          onClose={() => {
+            setShowChat(false)
+            setChatConversationId(null)
+          }}
+        />
+      )}
     </>
   )
 }

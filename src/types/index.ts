@@ -146,6 +146,34 @@ export interface Donation {
   createdAt: Date
 }
 
+// Messaging Types
+export interface Message {
+  id: string
+  conversationId: string
+  senderId: string
+  content: string
+  type: 'TEXT' | 'PAID_CONTENT'
+  mediaUrl?: string
+  price?: number
+  readAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sender: User
+}
+
+export interface Conversation {
+  id: string
+  participant1Id: string
+  participant2Id: string
+  lastMessageAt: Date | string
+  participant1Unread: number
+  participant2Unread: number
+  status: 'active' | 'archived' | 'blocked'
+  createdAt: Date | string
+  updatedAt: Date | string
+}
+
 // Platform Configuration
 export interface PlatformConfig {
   commissionRate: number // e.g., 0.15 for 15%
