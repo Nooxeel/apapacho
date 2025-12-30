@@ -78,17 +78,17 @@ export function CreatorsShowcase() {
   }, [])
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#B8F2E6]/20 to-[#AED9E0]/30">
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-500/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFA69E]/5 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-            Creadores <span className="gradient-text">destacados</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-[#5E6472] mb-4">
+            Creadores <span className="bg-gradient-to-r from-[#FFA69E] to-[#B8F2E6] bg-clip-text text-transparent">destacados</span>
           </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-lg text-[#5E6472]/70 max-w-2xl mx-auto">
             Descubre creadores únicos con perfiles personalizables
           </p>
         </div>
@@ -100,7 +100,7 @@ export function CreatorsShowcase() {
               <Card
                 variant="solid"
                 hover
-                className="overflow-hidden cursor-pointer group"
+                className="overflow-hidden cursor-pointer group bg-white/70 border-[#5E6472]/10"
               >
               {/* Cover Gradient */}
               <div
@@ -109,7 +109,7 @@ export function CreatorsShowcase() {
 
               {/* Avatar */}
               <div className="relative -mt-10 mb-4 flex justify-center">
-                <div className="ring-4 ring-[#1a1a24] rounded-full">
+                <div className="ring-4 ring-white rounded-full">
                   <Avatar
                     src={creator.avatar}
                     fallback={creator.name}
@@ -121,23 +121,23 @@ export function CreatorsShowcase() {
 
               {/* Info */}
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-white group-hover:gradient-text transition-all">
+                <h3 className="text-lg font-semibold text-[#5E6472] group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#B8F2E6] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {creator.name}
                 </h3>
-                <p className="text-white/50 text-sm mb-3">@{creator.username}</p>
-                
+                <p className="text-[#5E6472]/50 text-sm mb-3">@{creator.username}</p>
+
                 <div className="flex items-center justify-center gap-3">
                   <Badge variant="primary" size="sm">
                     {creator.category}
                   </Badge>
-                  <span className="text-white/40 text-sm">
+                  <span className="text-[#5E6472]/50 text-sm">
                     {formatSubscribers(creator.subscribers)} subs
                   </span>
                 </div>
               </div>
 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FFA69E]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </Card>
             </Link>
           ))}
@@ -146,7 +146,7 @@ export function CreatorsShowcase() {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Link href="/creators">
-            <button className="text-primary-400 hover:text-primary-300 font-medium transition-colors inline-flex items-center gap-2">
+            <button className="text-[#FFA69E] hover:text-[#B8F2E6] font-medium transition-colors inline-flex items-center gap-2">
               Ver todos los creadores
               <svg
                 className="w-4 h-4"

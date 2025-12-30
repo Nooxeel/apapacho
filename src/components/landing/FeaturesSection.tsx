@@ -65,17 +65,17 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 relative">
+    <section className="py-24 relative bg-gradient-to-b from-[#FAF3DD] to-[#B8F2E6]/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-            La plataforma que <span className="gradient-text">extrañabas</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-[#5E6472] mb-4">
+            La plataforma que <span className="bg-gradient-to-r from-[#FFA69E] to-[#AED9E0] bg-clip-text text-transparent">extrañabas</span>
           </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <p className="text-lg text-[#5E6472]/70 max-w-2xl mx-auto">
             Donde tu creatividad no tiene límites y tu perfil es tan único como tú.
             <br />
-            <span className="text-white/80">Bienvenido de vuelta a la era dorada de la personalización.</span>
+            <span className="text-[#5E6472]">Bienvenido de vuelta a la era dorada de la personalización.</span>
           </p>
         </div>
 
@@ -86,20 +86,20 @@ export function FeaturesSection() {
               key={index}
               variant="glass"
               hover
-              className="group"
+              className="group bg-white/60 border-[#5E6472]/10"
             >
               <CardContent>
                 <div
                   className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} p-0.5 mb-5`}
                 >
-                  <div className="w-full h-full rounded-2xl bg-[#0f0f14] flex items-center justify-center text-white">
+                  <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center text-[#5E6472]">
                     {feature.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2 group-hover:gradient-text transition-all">
+                <h3 className="text-xl font-semibold text-[#5E6472] mb-2 group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#AED9E0] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {feature.title}
                 </h3>
-                <p className="text-white/50">
+                <p className="text-[#5E6472]/60">
                   {feature.description}
                 </p>
               </CardContent>
