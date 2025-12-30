@@ -117,8 +117,12 @@ export function MusicPlayer({
       setDuration(dur)
     }
 
-    // Solo reproducir automáticamente si autoPlay está habilitado
-    if (autoPlay) {
+    // Asegurar que el video esté pausado inicialmente
+    if (!autoPlay) {
+      // Pausar inmediatamente para prevenir cualquier autoplay
+      event.target.pauseVideo()
+    } else {
+      // Solo reproducir automáticamente si autoPlay está habilitado
       event.target.playVideo()
     }
   }
