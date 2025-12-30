@@ -6,6 +6,7 @@ import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi, ApiError } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
+import { LayoutDashboard, ImagePlus } from 'lucide-react'
 
 // Opciones de colores de fondo predefinidos
 const backgroundColors = [
@@ -357,24 +358,32 @@ export function CreatorProfileEditor() {
             ✨ Vista previa en vivo - Los cambios se reflejan automáticamente
           </span>
           <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
+              <LayoutDashboard className="w-4 h-4 mr-1.5" />
+              Dashboard
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => router.push('/creator/posts')}>
+              <ImagePlus className="w-4 h-4 mr-1.5" />
+              Posts
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => router.push('/creator/comments')}>
               Comentarios
             </Button>
             <Button variant="ghost" size="sm" onClick={() => router.back()}>
               Cancelar
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleViewProfile}
               disabled={!profile.username}
             >
               Ver Perfil
             </Button>
-            <Button 
-              variant="primary" 
-              size="sm" 
-              onClick={handleSave} 
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleSave}
               isLoading={isSaving}
               style={{ backgroundColor: profile.accentColor }}
             >
