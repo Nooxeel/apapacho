@@ -366,9 +366,9 @@ export default function CreatorPublicProfile() {
             
             {/* Music Player */}
             {profile.musicTracks && profile.musicTracks.length > 0 && (
-              <MusicPlayer 
-                tracks={profile.musicTracks} 
-                autoPlay={true}
+              <MusicPlayer
+                tracks={profile.musicTracks}
+                autoPlay={false}
                 accentColor={profile.accentColor}
               />
             )}
