@@ -28,6 +28,28 @@ const accentColors = [
   { id: 'red', name: 'Rojo', color: '#ef4444' },
 ]
 
+interface VisibilitySettings {
+  tabs: {
+    likes: boolean
+    posts: boolean
+    photos: boolean
+    videos: boolean
+    audio: boolean
+    guestbook: boolean
+  }
+}
+
+const defaultVisibility: VisibilitySettings = {
+  tabs: {
+    likes: true,
+    posts: true,
+    photos: true,
+    videos: true,
+    audio: true,
+    guestbook: true,
+  }
+}
+
 interface ProfileData {
   displayName: string
   username: string
@@ -38,6 +60,7 @@ interface ProfileData {
   backgroundColor: string
   backgroundGradient: string
   accentColor: string
+  visibilitySettings: VisibilitySettings
 }
 
 interface MusicTrack {
@@ -63,6 +86,7 @@ export function CreatorProfileEditor() {
     backgroundColor: backgroundColors[0].color,
     backgroundGradient: backgroundColors[0].gradient,
     accentColor: accentColors[0].color,
+    visibilitySettings: defaultVisibility,
   })
   
   const [isLoading, setIsLoading] = useState(true)
@@ -111,6 +135,7 @@ export function CreatorProfileEditor() {
         backgroundColor: userData.creatorProfile.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.creatorProfile.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.creatorProfile.accentColor || accentColors[0].color,
+        visibilitySettings: userData.creatorProfile.visibilitySettings || defaultVisibility,
       })
 
       // Set previews from existing images (images are served from frontend /public)
@@ -209,6 +234,7 @@ export function CreatorProfileEditor() {
           backgroundColor: profile.backgroundColor,
           backgroundGradient: profile.backgroundGradient,
           accentColor: profile.accentColor,
+          visibilitySettings: profile.visibilitySettings,
         }),
       })
 
@@ -732,6 +758,75 @@ export function CreatorProfileEditor() {
                     Has alcanzado el límite de 3 canciones
                   </p>
                 )}
+              </div>
+            </Card>
+
+            {/* Visibility Settings */}
+            <Card variant="glass">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-2">👁️ Secciones Visibles</h2>
+                <p className="text-sm text-white/50 mb-6">
+                  Elige qué secciones mostrar en tu perfil público
+                </p>
+
+                <div className="space-y-3">
+                  {[
+                    { key: 'likes', label: 'Likes', icon: '❤️' },
+                    { key: 'posts', label: 'Posts', icon: '📝' },
+                    { key: 'photos', label: 'Fotos', icon: '📷' },
+                    { key: 'videos', label: 'Videos', icon: '🎬' },
+                    { key: 'audio', label: 'Audio', icon: '🎵' },
+                    { key: 'guestbook', label: 'Libro de visitas', icon: '📖' },
+                  ].map((item) => (
+                    <label 
+                      key={item.key}
+                      className="flex items-center justify-between p-3 rounded-lg bg-white/5 cursor-pointer hover:bg-white/10 transition-colors"
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="text-lg">{item.icon}</span>
+                        <span className="text-white">{item.label}</span>
+                      </span>
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={profile.visibilitySettings.tabs[item.key as keyof typeof profile.visibilitySettings.tabs]}
+                          onChange={(e) => setProfile(prev => ({
+                            ...prev,
+                            visibilitySettings: {
+                              ...prev.visibilitySettings,
+                              tabs: {
+                                ...prev.visibilitySettings.tabs,
+                                [item.key]: e.target.checked
+                              }
+                            }
+                          }))}
+                          className="sr-only peer"
+                        />
+                        <div 
+                          className="w-11 h-6 rounded-full transition-colors peer-checked:bg-opacity-100"
+                          style={{ 
+                            backgroundColor: profile.visibilitySettings.tabs[item.key as keyof typeof profile.visibilitySettings.tabs] 
+                              ? profile.accentColor 
+                              : 'rgba(255,255,255,0.2)' 
+                          }}
+                        >
+                          <div 
+                            className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"
+                            style={{
+                              transform: profile.visibilitySettings.tabs[item.key as keyof typeof profile.visibilitySettings.tabs] 
+                                ? 'translateX(20px)' 
+                                : 'translateX(0)'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+
+                <p className="text-xs text-white/40 text-center mt-4">
+                  Las secciones ocultas no aparecerán en tu perfil público
+                </p>
               </div>
             </Card>
 

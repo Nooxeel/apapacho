@@ -70,9 +70,9 @@ export function FeaturesSection() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-[#2D3748] mb-4">
-            La plataforma que <span className="bg-gradient-to-r from-[#FFA69E] to-[#AED9E0] bg-clip-text text-transparent">extrañabas</span>
+            La plataforma que <span className="bg-gradient-to-r from-[#FF6B6B] to-[#45B7D1] bg-clip-text text-transparent">extrañabas</span>
           </h2>
-          <p className="text-lg text-[#2D3748] max-w-2xl mx-auto">
+          <p className="text-lg text-[#2D3748]/90 max-w-2xl mx-auto">
             Donde tu creatividad no tiene límites y tu perfil es tan único como tú.
             <br />
             Bienvenido de vuelta a la era dorada de la personalización.
@@ -96,7 +96,7 @@ export function FeaturesSection() {
                     {feature.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-[#2D3748] mb-2 group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#AED9E0] group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                <h3 className="text-xl font-semibold text-[#2D3748] mb-2 group-hover:bg-gradient-to-r group-hover:from-[#FF6B6B] group-hover:to-[#45B7D1] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {feature.title}
                 </h3>
                 <p className="text-[#2D3748]/80">

@@ -37,6 +37,16 @@ interface CreatorProfile {
     textColor: string
     fontFamily: string
     isVerified: boolean
+    visibilitySettings?: {
+      tabs: {
+        likes: boolean
+        posts: boolean
+        photos: boolean
+        videos: boolean
+        audio: boolean
+        guestbook: boolean
+      }
+    }
     musicTracks: Array<{
       id: string
       youtubeUrl: string
@@ -92,6 +102,20 @@ export default function CreatorPublicProfile() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'posts' | 'photos' | 'videos' | 'audio' | 'comments'>('posts')
   const [commentsCount, setCommentsCount] = useState(0)
+
+  // Set initial active tab based on visibility settings
+  useEffect(() => {
+    if (creator?.creatorProfile?.visibilitySettings?.tabs) {
+      const tabs = creator.creatorProfile.visibilitySettings.tabs
+      if (tabs.posts === false && activeTab === 'posts') {
+        // Find first visible tab
+        if (tabs.photos !== false) setActiveTab('photos')
+        else if (tabs.videos !== false) setActiveTab('videos')
+        else if (tabs.audio !== false) setActiveTab('audio')
+        else if (tabs.guestbook !== false) setActiveTab('comments')
+      }
+    }
+  }, [creator, activeTab])
 
   useEffect(() => {
     async function fetchCreator() {
@@ -253,52 +277,64 @@ export default function CreatorPublicProfile() {
 
             {/* Stats */}
             <div className="mt-8 flex flex-wrap justify-center gap-6 md:gap-12">
-              <StatItem 
-                icon={<Heart className="w-5 h-5" />} 
-                value={formatNumber(stats.totalLikes)} 
-                label="Likes" 
-                accentColor={profile.accentColor}
-              />
-              <StatItem 
-                icon={<FileText className="w-5 h-5" />} 
-                value={formatNumber(stats.postsCount)} 
-                label="Posts" 
-                accentColor={profile.accentColor}
-                active={activeTab === 'posts'}
-                onClick={() => setActiveTab('posts')}
-              />
-              <StatItem 
-                icon={<ImageIcon className="w-5 h-5" />} 
-                value={formatNumber(stats.photosCount)} 
-                label="Fotos" 
-                accentColor={profile.accentColor}
-                active={activeTab === 'photos'}
-                onClick={() => setActiveTab('photos')}
-              />
-              <StatItem 
-                icon={<Video className="w-5 h-5" />} 
-                value={formatNumber(stats.videosCount)} 
-                label="Videos" 
-                accentColor={profile.accentColor}
-                active={activeTab === 'videos'}
-                onClick={() => setActiveTab('videos')}
-              />
-              <StatItem 
-                icon={<Mic className="w-5 h-5" />} 
-                value={formatNumber(stats.audioCount)} 
-                label="Audio" 
-                accentColor={profile.accentColor}
-                active={activeTab === 'audio'}
-                onClick={() => setActiveTab('audio')}
-              />
-              <StatItem 
-                icon={<MessageCircle className="w-5 h-5" />} 
-                value={formatNumber(commentsCount)} 
-                label="Libro de visitas" 
-                accentColor={profile.accentColor}
-                active={activeTab === 'comments'}
-                onClick={() => setActiveTab('comments')}
-              />
+              {(profile.visibilitySettings?.tabs?.likes !== false) && (
+                <StatItem 
+                  icon={<Heart className="w-5 h-5" />} 
+                  value={formatNumber(stats.totalLikes)} 
+                  label="Likes" 
+                  accentColor={profile.accentColor}
+                />
+              )}
+              {(profile.visibilitySettings?.tabs?.posts !== false) && (
+                <StatItem 
+                  icon={<FileText className="w-5 h-5" />} 
+                  value={formatNumber(stats.postsCount)} 
+                  label="Posts" 
+                  accentColor={profile.accentColor}
+                  active={activeTab === 'posts'}
+                  onClick={() => setActiveTab('posts')}
+                />
+              )}
+              {(profile.visibilitySettings?.tabs?.photos !== false) && (
+                <StatItem 
+                  icon={<ImageIcon className="w-5 h-5" />} 
+                  value={formatNumber(stats.photosCount)} 
+                  label="Fotos" 
+                  accentColor={profile.accentColor}
+                  active={activeTab === 'photos'}
+                  onClick={() => setActiveTab('photos')}
+                />
+              )}
+              {(profile.visibilitySettings?.tabs?.videos !== false) && (
+                <StatItem 
+                  icon={<Video className="w-5 h-5" />} 
+                  value={formatNumber(stats.videosCount)} 
+                  label="Videos" 
+                  accentColor={profile.accentColor}
+                  active={activeTab === 'videos'}
+                  onClick={() => setActiveTab('videos')}
+                />
+              )}
+              {(profile.visibilitySettings?.tabs?.audio !== false) && (
+                <StatItem 
+                  icon={<Mic className="w-5 h-5" />} 
+                  value={formatNumber(stats.audioCount)} 
+                  label="Audio" 
+                  accentColor={profile.accentColor}
+                  active={activeTab === 'audio'}
+                  onClick={() => setActiveTab('audio')}
+                />
+              )}
+              {(profile.visibilitySettings?.tabs?.guestbook !== false) && (
+                <StatItem 
+                  icon={<MessageCircle className="w-5 h-5" />} 
+                  value={formatNumber(commentsCount)} 
+                  label="Libro de visitas" 
+                  accentColor={profile.accentColor}
+                  active={activeTab === 'comments'}
+                  onClick={() => setActiveTab('comments')}
+                />
+              )}
             </div>
           </div>
         </div>

@@ -25,7 +25,7 @@ export function HeroSection() {
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6">
           <span className="text-[#2D3748]">Tu espacio,</span>
           <br />
-          <span className="bg-gradient-to-r from-[#FFA69E] via-[#B8F2E6] to-[#AED9E0] bg-clip-text text-transparent">tu estilo</span>
+          <span className="bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#45B7D1] bg-clip-text text-transparent">tu estilo</span>
         </h1>
 
         {/* Subtitle */}
