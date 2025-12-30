@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
-import { User, LogOut, Settings, FileText } from 'lucide-react'
+import { User, LogOut, Settings, FileText, MessageCircle } from 'lucide-react'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -69,6 +69,14 @@ export function Navbar() {
                       >
                         <User className="w-4 h-4" />
                         Dashboard
+                      </Link>
+                      <Link
+                        href="/messages"
+                        className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Mensajes
                       </Link>
                       {user.isCreator && (
                         <>

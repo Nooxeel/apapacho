@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { creatorApi } from '@/lib/api'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
@@ -15,7 +15,6 @@ import {
   Video, 
   Mic,
   MessageCircle,
-  Send,
   Share2,
   BadgeCheck,
   Lock
@@ -94,8 +93,9 @@ function formatNumber(num: number): string {
 
 export default function CreatorPublicProfile() {
   const params = useParams()
+  const router = useRouter()
   const username = params.username as string
-  const { user } = useAuthStore()
+  const { user, token } = useAuthStore()
   
   const [creator, setCreator] = useState<CreatorProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -143,6 +143,37 @@ export default function CreatorPublicProfile() {
       fetchCreator()
     }
   }, [username])
+
+  // Handler para enviar mensaje
+  const handleSendMessage = async () => {
+    if (!token || !creator) {
+      // Si no está autenticado, redirigir al login
+      router.push('/login')
+      return
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/messages/conversations`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ recipientId: creator.id })
+      })
+
+      if (res.ok) {
+        const conversation = await res.json()
+        router.push(`/messages/${conversation.id}`)
+      } else {
+        console.error('Error creating conversation:', res.status)
+        alert('No se pudo iniciar la conversación. Intenta de nuevo.')
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error)
+      alert('Error de conexión. Verifica tu internet.')
+    }
+  }
 
   if (loading) {
     return (
@@ -266,9 +297,16 @@ export default function CreatorPublicProfile() {
                 />
               )}
 
-              <button className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors">
-                <Send className="w-5 h-5" />
-              </button>
+              {/* Botón de Mensaje */}
+              {!isOwner && user && (
+                <button 
+                  onClick={handleSendMessage}
+                  className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors"
+                  title="Enviar mensaje"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </button>
+              )}
 
               <button className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors">
                 <Share2 className="w-5 h-5" />
