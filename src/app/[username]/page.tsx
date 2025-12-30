@@ -45,6 +45,7 @@ interface CreatorProfile {
         audio: boolean
         guestbook: boolean
       }
+      messaging?: 'all' | 'logged_in' | 'subscribers_only'
     }
     musicTracks: Array<{
       id: string
@@ -102,6 +103,7 @@ export default function CreatorPublicProfile() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'posts' | 'photos' | 'videos' | 'audio' | 'comments'>('posts')
   const [commentsCount, setCommentsCount] = useState(0)
+  const [isSubscriber, setIsSubscriber] = useState(false)
 
   // Set initial active tab based on visibility settings
   useEffect(() => {
@@ -123,7 +125,7 @@ export default function CreatorPublicProfile() {
         setLoading(true)
         const data = await creatorApi.getByUsername(username) as CreatorProfile
         setCreator(data)
-        
+
         // Cargar conteo de comentarios
         try {
           const statsRes = await fetch(`${API_URL}/comments/${data.creatorProfile.id}/stats`)
@@ -132,6 +134,19 @@ export default function CreatorPublicProfile() {
             setCommentsCount(stats.approved)
           }
         } catch {}
+
+        // Verificar si el usuario actual es suscriptor
+        if (token && user) {
+          try {
+            const subRes = await fetch(`${API_URL}/subscriptions/check/${data.id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
+            if (subRes.ok) {
+              const { isSubscribed } = await subRes.json()
+              setIsSubscriber(isSubscribed)
+            }
+          } catch {}
+        }
       } catch (err) {
         setError('Creador no encontrado')
       } finally {
@@ -142,7 +157,31 @@ export default function CreatorPublicProfile() {
     if (username) {
       fetchCreator()
     }
-  }, [username])
+  }, [username, token, user])
+
+  // Verificar si el usuario puede enviar mensajes según la configuración de privacidad
+  const canSendMessage = () => {
+    if (!creator) return false
+
+    const messagingPrivacy = creator.creatorProfile.visibilitySettings?.messaging || 'logged_in'
+
+    // Si es 'all', cualquiera puede enviar mensajes (aunque aún requiere login para funcionar)
+    if (messagingPrivacy === 'all') {
+      return true
+    }
+
+    // Si es 'logged_in', necesita estar autenticado
+    if (messagingPrivacy === 'logged_in') {
+      return !!user
+    }
+
+    // Si es 'subscribers_only', necesita estar suscrito
+    if (messagingPrivacy === 'subscribers_only') {
+      return isSubscriber
+    }
+
+    return false
+  }
 
   // Handler para enviar mensaje
   const handleSendMessage = async () => {
@@ -297,8 +336,8 @@ export default function CreatorPublicProfile() {
                 />
               )}
 
-              {/* Botón de Mensaje - Mejorado visualmente */}
-              {!isOwner && user && (
+              {/* Botón de Mensaje - Con control de privacidad */}
+              {!isOwner && canSendMessage() && (
                 <button
                   onClick={handleSendMessage}
                   className="flex items-center gap-2 px-5 py-3 rounded-full border-2 border-fuchsia-500/50 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 transition-colors text-white font-medium"

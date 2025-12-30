@@ -37,6 +37,7 @@ interface VisibilitySettings {
     audio: boolean
     guestbook: boolean
   }
+  messaging: 'all' | 'logged_in' | 'subscribers_only'
 }
 
 const defaultVisibility: VisibilitySettings = {
@@ -47,7 +48,8 @@ const defaultVisibility: VisibilitySettings = {
     videos: true,
     audio: true,
     guestbook: true,
-  }
+  },
+  messaging: 'logged_in'
 }
 
 interface ProfileData {
@@ -632,6 +634,91 @@ export function CreatorProfileEditor() {
 
                 <p className="text-xs text-white/40 text-center mt-4">
                   Las secciones ocultas no aparecerán en tu perfil público
+                </p>
+              </div>
+            </Card>
+
+            {/* Messaging Privacy Settings */}
+            <Card variant="glass">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-2">💬 Privacidad de Mensajes</h2>
+                <p className="text-sm text-white/50 mb-6">
+                  Controla quién puede enviarte mensajes directos
+                </p>
+
+                <div className="space-y-3">
+                  {[
+                    {
+                      value: 'all',
+                      label: 'Todos',
+                      icon: '🌍',
+                      description: 'Cualquier persona puede enviarte mensajes'
+                    },
+                    {
+                      value: 'logged_in',
+                      label: 'Solo usuarios registrados',
+                      icon: '👤',
+                      description: 'Solo usuarios con cuenta pueden enviarte mensajes'
+                    },
+                    {
+                      value: 'subscribers_only',
+                      label: 'Solo suscriptores',
+                      icon: '⭐',
+                      description: 'Solo tus suscriptores pueden enviarte mensajes'
+                    },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className={`flex items-start gap-3 p-4 rounded-xl cursor-pointer transition-all ${
+                        profile.visibilitySettings.messaging === option.value
+                          ? 'bg-white/15 ring-2'
+                          : 'bg-white/5 hover:bg-white/10'
+                      }`}
+                      style={profile.visibilitySettings.messaging === option.value ? {
+                        outlineColor: profile.accentColor,
+                        borderColor: profile.accentColor
+                      } : {}}
+                    >
+                      <input
+                        type="radio"
+                        name="messaging"
+                        value={option.value}
+                        checked={profile.visibilitySettings.messaging === option.value}
+                        onChange={(e) => setProfile(prev => ({
+                          ...prev,
+                          visibilitySettings: {
+                            ...prev.visibilitySettings,
+                            messaging: e.target.value as 'all' | 'logged_in' | 'subscribers_only'
+                          }
+                        }))}
+                        className="sr-only"
+                      />
+                      <span className="text-2xl mt-0.5">{option.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-white">{option.label}</span>
+                          {profile.visibilitySettings.messaging === option.value && (
+                            <span
+                              className="text-xs px-2 py-0.5 rounded-full font-medium"
+                              style={{
+                                backgroundColor: `${profile.accentColor}20`,
+                                color: profile.accentColor
+                              }}
+                            >
+                              Activo
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-white/50 mt-1">
+                          {option.description}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+
+                <p className="text-xs text-white/40 text-center mt-4">
+                  Los usuarios que no cumplan los requisitos no verán el botón de mensaje
                 </p>
               </div>
             </Card>
