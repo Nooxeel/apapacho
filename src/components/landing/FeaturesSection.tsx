@@ -69,10 +69,10 @@ export function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#5E6472] mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold text-[#2D3748] mb-4">
             La plataforma que <span className="bg-gradient-to-r from-[#FFA69E] to-[#AED9E0] bg-clip-text text-transparent">extrañabas</span>
           </h2>
-          <p className="text-lg text-[#5E6472] max-w-2xl mx-auto">
+          <p className="text-lg text-[#2D3748] max-w-2xl mx-auto">
             Donde tu creatividad no tiene límites y tu perfil es tan único como tú.
             <br />
             Bienvenido de vuelta a la era dorada de la personalización.
@@ -86,20 +86,20 @@ export function FeaturesSection() {
               key={index}
               variant="glass"
               hover
-              className="group bg-white/80 border-[#5E6472]/10"
+              className="group bg-white/95 border-gray-200"
             >
               <CardContent>
                 <div
                   className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} p-0.5 mb-5`}
                 >
-                  <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center text-[#5E6472]">
+                  <div className="w-full h-full rounded-2xl bg-white flex items-center justify-center text-gray-700">
                     {feature.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-[#5E6472] mb-2 group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#AED9E0] group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                <h3 className="text-xl font-semibold text-[#2D3748] mb-2 group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#AED9E0] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {feature.title}
                 </h3>
-                <p className="text-[#5E6472]">
+                <p className="text-[#2D3748]/80">
                   {feature.description}
                 </p>
               </CardContent>

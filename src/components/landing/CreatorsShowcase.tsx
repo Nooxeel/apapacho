@@ -85,10 +85,10 @@ export function CreatorsShowcase() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#5E6472] mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold text-[#2D3748] mb-4">
             Creadores <span className="bg-gradient-to-r from-[#FFA69E] to-[#B8F2E6] bg-clip-text text-transparent">destacados</span>
           </h2>
-          <p className="text-lg text-[#5E6472] max-w-2xl mx-auto">
+          <p className="text-lg text-[#2D3748] max-w-2xl mx-auto">
             Descubre creadores únicos con perfiles personalizables
           </p>
         </div>
@@ -100,7 +100,7 @@ export function CreatorsShowcase() {
               <Card
                 variant="solid"
                 hover
-                className="overflow-hidden cursor-pointer group bg-white/85 border-[#5E6472]/10"
+                className="overflow-hidden cursor-pointer group bg-white/95 border-gray-200"
               >
               {/* Cover Gradient */}
               <div
@@ -121,16 +121,16 @@ export function CreatorsShowcase() {
 
               {/* Info */}
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-[#5E6472] group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#B8F2E6] group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                <h3 className="text-lg font-semibold text-[#2D3748] group-hover:bg-gradient-to-r group-hover:from-[#FFA69E] group-hover:to-[#B8F2E6] group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {creator.name}
                 </h3>
-                <p className="text-[#5E6472]/70 text-sm mb-3">@{creator.username}</p>
+                <p className="text-[#2D3748]/70 text-sm mb-3">@{creator.username}</p>
 
                 <div className="flex items-center justify-center gap-3">
                   <Badge variant="primary" size="sm">
                     {creator.category}
                   </Badge>
-                  <span className="text-[#5E6472]/70 text-sm">
+                  <span className="text-[#2D3748]/70 text-sm">
                     {formatSubscribers(creator.subscribers)} subs
                   </span>
                 </div>

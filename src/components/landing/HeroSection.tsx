@@ -16,20 +16,20 @@ export function HeroSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#5E6472]/10 border border-[#5E6472]/20 mb-8">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-700/10 border border-gray-700/20 mb-8">
           <span className="w-2 h-2 rounded-full bg-[#B8F2E6] animate-pulse" />
-          <span className="text-sm text-[#5E6472]">Plataforma en crecimiento</span>
+          <span className="text-sm text-[#2D3748]">Plataforma en crecimiento</span>
         </div>
 
         {/* Main Title */}
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6">
-          <span className="text-[#5E6472]">Tu espacio,</span>
+          <span className="text-[#2D3748]">Tu espacio,</span>
           <br />
           <span className="bg-gradient-to-r from-[#FFA69E] via-[#B8F2E6] to-[#AED9E0] bg-clip-text text-transparent">tu estilo</span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-xl md:text-2xl text-[#5E6472] max-w-3xl mx-auto mb-10">
+        <p className="text-xl md:text-2xl text-[#2D3748] max-w-3xl mx-auto mb-10">
           ¿Recuerdas cuando tu perfil era realmente <span className="font-semibold">tuyo</span>?
           <br />
           Música de fondo, colores personalizados, tu propio espacio.
@@ -66,20 +66,20 @@ export function HeroSection() {
 
         {/* Features Highlight */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="text-center p-6 rounded-2xl bg-white/90 border border-[#5E6472]/20 backdrop-blur-sm shadow-lg">
+          <div className="text-center p-6 rounded-2xl bg-white/95 border border-gray-200 backdrop-blur-sm shadow-lg">
             <div className="text-3xl mb-2">🎨</div>
-            <h3 className="text-lg font-semibold text-[#5E6472] mb-2">Diseña sin límites</h3>
-            <p className="text-[#5E6472] text-sm">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
+            <h3 className="text-lg font-semibold text-[#2D3748] mb-2">Diseña sin límites</h3>
+            <p className="text-[#2D3748]/80 text-sm">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white/90 border border-[#5E6472]/20 backdrop-blur-sm shadow-lg">
+          <div className="text-center p-6 rounded-2xl bg-white/95 border border-gray-200 backdrop-blur-sm shadow-lg">
             <div className="text-3xl mb-2">🎵</div>
-            <h3 className="text-lg font-semibold text-[#5E6472] mb-2">Tu soundtrack</h3>
-            <p className="text-[#5E6472] text-sm">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
+            <h3 className="text-lg font-semibold text-[#2D3748] mb-2">Tu soundtrack</h3>
+            <p className="text-[#2D3748]/80 text-sm">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white/90 border border-[#5E6472]/20 backdrop-blur-sm shadow-lg">
+          <div className="text-center p-6 rounded-2xl bg-white/95 border border-gray-200 backdrop-blur-sm shadow-lg">
             <div className="text-3xl mb-2">💰</div>
-            <h3 className="text-lg font-semibold text-[#5E6472] mb-2">Monetiza tu arte</h3>
-            <p className="text-[#5E6472] text-sm">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
+            <h3 className="text-lg font-semibold text-[#2D3748] mb-2">Monetiza tu arte</h3>
+            <p className="text-[#2D3748]/80 text-sm">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
           </div>
         </div>
       </div>
