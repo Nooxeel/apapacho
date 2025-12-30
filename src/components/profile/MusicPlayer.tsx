@@ -28,11 +28,11 @@ declare global {
   }
 }
 
-export function MusicPlayer({ 
-  tracks, 
-  autoPlay = true, 
+export function MusicPlayer({
+  tracks,
+  autoPlay = false,
   accentColor = '#d946ef',
-  className 
+  className
 }: MusicPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
@@ -88,7 +88,7 @@ export function MusicPlayer({
       width: '1',
       videoId: currentTrack.youtubeId,
       playerVars: {
-        autoplay: 1,
+        autoplay: 0,
         controls: 0,
         disablekb: 1,
         fs: 0,
@@ -110,15 +110,17 @@ export function MusicPlayer({
   const onPlayerReady = (event: YT.PlayerEvent) => {
     setIsReady(true)
     event.target.setVolume(volume)
-    
+
     // Try to get duration
     const dur = event.target.getDuration()
     if (dur > 0) {
       setDuration(dur)
     }
-    
-    // Try to play - if blocked by browser, we'll show a play button
-    event.target.playVideo()
+
+    // Solo reproducir automáticamente si autoPlay está habilitado
+    if (autoPlay) {
+      event.target.playVideo()
+    }
   }
 
   const onPlayerStateChange = (event: YT.OnStateChangeEvent) => {
