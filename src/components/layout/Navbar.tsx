@@ -1,22 +1,44 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
+import { messageApi } from '@/lib/api'
 import { User, LogOut, Settings, FileText, MessageCircle } from 'lucide-react'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const { user, logout, hasHydrated } = useAuthStore()
+  const [unreadCount, setUnreadCount] = useState(0)
+  const { user, token, logout, hasHydrated } = useAuthStore()
   const router = useRouter()
 
   const handleLogout = () => {
     logout()
     router.push('/')
   }
+
+  // Cargar contador de mensajes no leídos
+  useEffect(() => {
+    if (!token || !user) return
+
+    const loadUnreadCount = async () => {
+      try {
+        const data = await messageApi.getUnreadCount(token) as { unread: number }
+        setUnreadCount(data.unread)
+      } catch (error) {
+        console.error('Error loading unread count:', error)
+      }
+    }
+
+    loadUnreadCount()
+
+    // Actualizar cada 30 segundos
+    const interval = setInterval(loadUnreadCount, 30000)
+    return () => clearInterval(interval)
+  }, [token, user])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-dark">
@@ -47,18 +69,33 @@ export function Navbar() {
           {hasHydrated && (
             <div className="hidden md:flex items-center gap-4">
               {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                <>
+                  {/* Ícono de mensajes con contador */}
+                  <Link
+                    href="/messages"
+                    className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
-                      <span className="text-white font-semibold text-sm">
-                        {user.displayName.charAt(0).toUpperCase()}
+                    <MessageCircle className="w-6 h-6 text-white/70 hover:text-white transition-colors" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-fuchsia-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
-                    </div>
-                    <span className="text-white font-medium">{user.displayName}</span>
-                  </button>
+                    )}
+                  </Link>
+
+                  {/* Menú de usuario */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
+                        <span className="text-white font-semibold text-sm">
+                          {user.displayName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="text-white font-medium">{user.displayName}</span>
+                    </button>
                   
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-48 bg-[#1a1a24] border border-white/10 rounded-xl shadow-xl py-2">
@@ -107,7 +144,8 @@ export function Navbar() {
                       </button>
                     </div>
                   )}
-                </div>
+                  </div>
+                </>
               ) : (
                 <>
                   <Link href="/login">
