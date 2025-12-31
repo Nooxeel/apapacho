@@ -89,11 +89,11 @@ export default function ChatModal({ conversationId, otherUser, onClose }: ChatMo
     loadMessages()
   }, [loadMessages])
 
-  // Polling for new messages
+  // Polling for new messages (cada 3 segundos para experiencia casi instantánea)
   useEffect(() => {
     const interval = setInterval(() => {
       loadMessages(true)
-    }, 15000)
+    }, 3000)
 
     return () => clearInterval(interval)
   }, [loadMessages])

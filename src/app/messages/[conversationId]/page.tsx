@@ -117,14 +117,14 @@ export default function ChatPage() {
     }
   }, [loading, messages.length])
 
-  // Poll for new messages every 15 seconds (optimized from 5s)
+  // Poll for new messages every 3 seconds for near-instant delivery
   useEffect(() => {
     if (!token || !conversationId || loading) return
 
     const interval = setInterval(() => {
       // Silent refresh - don't show loading spinner
       loadMessages(undefined, true)
-    }, 15000) // Increased from 5000ms to reduce API calls
+    }, 3000) // 3 seconds for near-instant message delivery
 
     return () => clearInterval(interval)
   }, [token, conversationId, loading])
