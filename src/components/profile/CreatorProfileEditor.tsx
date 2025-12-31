@@ -395,7 +395,7 @@ export function CreatorProfileEditor() {
               Posts
             </Button>
             <Button variant="ghost" size="sm" onClick={() => router.push('/creator/comments')}>
-              Comentarios
+              Libro de visitas
             </Button>
             <Button variant="ghost" size="sm" onClick={() => router.back()}>
               Cancelar
