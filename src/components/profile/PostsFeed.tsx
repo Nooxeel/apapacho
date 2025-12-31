@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2 } from 'lucide-react'
+import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
@@ -10,6 +10,7 @@ import type { PostVisibility, PostComment } from '@/types'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
+import { useInView } from 'react-intersection-observer'
 
 interface Post {
   id: string
@@ -39,6 +40,15 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
   const { user, token, isAuthenticated } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [hasMore, setHasMore] = useState(false)
+
+  // Infinite scroll trigger
+  const { ref, inView } = useInView({
+    threshold: 0,
+    triggerOnce: false
+  })
 
   // Like states (postId => isLiked)
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({})
@@ -53,22 +63,57 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     loadPosts()
   }, [creatorId])
 
+  // Trigger load more when scrolling to bottom
+  useEffect(() => {
+    if (inView && hasMore && !loadingMore) {
+      loadMore()
+    }
+  }, [inView, hasMore, loadingMore])
+
   const loadPosts = async () => {
     try {
-      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}`)
+      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}&limit=10`)
       if (response.ok) {
         const data = await response.json()
-        setPosts(data)
+        setPosts(data.posts)
+        setNextCursor(data.nextCursor)
+        setHasMore(data.hasMore)
 
         // Load like status for ALL posts in a single batch request (fixes N+1 query)
-        if (token && user && data.length > 0) {
-          loadBatchLikeStatus(data.map((post: Post) => post.id))
+        if (token && user && data.posts.length > 0) {
+          loadBatchLikeStatus(data.posts.map((post: Post) => post.id))
         }
       }
     } catch (error) {
       console.error('Error loading posts:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadMore = async () => {
+    if (!nextCursor || loadingMore) return
+
+    setLoadingMore(true)
+    try {
+      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}&limit=10&cursor=${nextCursor}`)
+      if (response.ok) {
+        const data = await response.json()
+        setPosts(prev => [...prev, ...data.posts])
+        setNextCursor(data.nextCursor)
+        setHasMore(data.hasMore)
+
+        // Load like status for new posts
+        if (token && user && data.posts.length > 0) {
+          const newPostIds = data.posts.map((post: Post) => post.id)
+          const likeStatuses = await postApi.getBatchLikeStatus(newPostIds, token) as Record<string, boolean>
+          setLikedPosts(prev => ({ ...prev, ...likeStatuses }))
+        }
+      }
+    } catch (error) {
+      console.error('Error loading more posts:', error)
+    } finally {
+      setLoadingMore(false)
     }
   }
 
@@ -253,7 +298,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
   return (
     <div className="space-y-4">
-      {filteredPosts.length === 0 ? (
+      {filteredPosts.length === 0 && !loading ? (
         <div className="text-center py-20 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10">
           <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
             <Video className="w-10 h-10 text-white/30" />
@@ -261,8 +306,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
           <p className="text-white/50 text-lg">No hay contenido todavía</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {filteredPosts.map((post) => {
+        <>
+          <div className="space-y-6">
+            {filteredPosts.map((post) => {
             const videoContent = post.content.find(c => c.type === 'video')
             const imageContent = post.content.find(c => c.type === 'image')
             const mediaContent = videoContent || imageContent
@@ -321,6 +367,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                           src={imageContent.url}
                           alt={post.title || 'Post image'}
                           className="w-full max-h-[500px] object-contain mx-auto"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
@@ -452,6 +499,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                                 src={comment.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.displayName)}&background=a21caf&color=fff`}
                                 alt={comment.user.displayName}
                                 className="w-8 h-8 rounded-full object-cover"
+                                loading="lazy"
                               />
                               <div className="flex-1">
                                 <div className="bg-white/10 rounded-2xl px-4 py-2">
@@ -492,7 +540,24 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
               </div>
             )
           })}
-        </div>
+          </div>
+
+          {/* Infinite Scroll Trigger */}
+          {hasMore && (
+            <div ref={ref} className="flex justify-center py-8">
+              {loadingMore && (
+                <Loader2 className="w-8 h-8 text-fuchsia-500 animate-spin" />
+              )}
+            </div>
+          )}
+
+          {/* End of posts message */}
+          {!hasMore && filteredPosts.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-white/40 text-sm">Has visto todos los posts</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
