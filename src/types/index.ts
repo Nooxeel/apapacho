@@ -174,6 +174,30 @@ export interface Conversation {
   updatedAt: Date | string
 }
 
+// Post Interaction Types
+export interface PostLike {
+  id: string
+  postId: string
+  userId: string
+  createdAt: Date | string
+}
+
+export interface PostComment {
+  id: string
+  postId: string
+  userId: string
+  content: string
+  createdAt: Date | string
+  updatedAt: Date | string
+  deletedAt?: Date | string | null
+  user: {
+    id: string
+    username: string
+    displayName: string
+    avatar: string | null
+  }
+}
+
 // Platform Configuration
 export interface PlatformConfig {
   commissionRate: number // e.g., 0.15 for 15%

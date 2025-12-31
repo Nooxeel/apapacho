@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn } from 'lucide-react'
+import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
-import type { PostVisibility } from '@/types'
+import { postApi } from '@/lib/api'
+import type { PostVisibility, PostComment } from '@/types'
 import { useRouter } from 'next/navigation'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale/es'
 
 interface Post {
   id: string
@@ -33,9 +36,18 @@ interface PostsFeedProps {
 
 export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts' }: PostsFeedProps) {
   const router = useRouter()
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, token, isAuthenticated } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Like states (postId => isLiked)
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({})
+
+  // Comments states
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({})
+  const [comments, setComments] = useState<Record<string, PostComment[]>>({})
+  const [newComment, setNewComment] = useState<Record<string, string>>({})
+  const [submittingComment, setSubmittingComment] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     loadPosts()
@@ -47,6 +59,13 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       if (response.ok) {
         const data = await response.json()
         setPosts(data)
+
+        // Load like status for each post if user is authenticated
+        if (token && user) {
+          data.forEach((post: Post) => {
+            loadLikeStatus(post.id)
+          })
+        }
       }
     } catch (error) {
       console.error('Error loading posts:', error)
@@ -55,11 +74,142 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     }
   }
 
+  const loadLikeStatus = async (postId: string) => {
+    if (!token) return
+    try {
+      const data = await postApi.getLikeStatus(postId, token) as { liked: boolean }
+      setLikedPosts(prev => ({ ...prev, [postId]: data.liked }))
+    } catch (error) {
+      console.error('Error loading like status:', error)
+    }
+  }
+
+  const handleLike = async (postId: string) => {
+    if (!token || !user) {
+      router.push('/login')
+      return
+    }
+
+    const currentLiked = likedPosts[postId] || false
+    const currentPost = posts.find(p => p.id === postId)
+    if (!currentPost) return
+
+    // Optimistic update
+    setLikedPosts(prev => ({ ...prev, [postId]: !currentLiked }))
+    setPosts(prev => prev.map(p =>
+      p.id === postId
+        ? { ...p, likes: currentLiked ? p.likes - 1 : p.likes + 1 }
+        : p
+    ))
+
+    try {
+      const data = await postApi.toggleLike(postId, token) as { liked: boolean; likes: number }
+
+      // Update with server response
+      setPosts(prev => prev.map(p =>
+        p.id === postId
+          ? { ...p, likes: data.likes }
+          : p
+      ))
+      setLikedPosts(prev => ({ ...prev, [postId]: data.liked }))
+    } catch (error) {
+      // Revert on error
+      setLikedPosts(prev => ({ ...prev, [postId]: currentLiked }))
+      setPosts(prev => prev.map(p =>
+        p.id === postId
+          ? currentPost
+          : p
+      ))
+      console.error('Error toggling like:', error)
+    }
+  }
+
+  const loadComments = async (postId: string) => {
+    try {
+      const data = await postApi.getComments(postId, 50, 0) as { comments: PostComment[]; total: number }
+      setComments(prev => ({ ...prev, [postId]: data.comments }))
+    } catch (error) {
+      console.error('Error loading comments:', error)
+    }
+  }
+
+  const toggleComments = (postId: string) => {
+    const isShowing = showComments[postId]
+    setShowComments(prev => ({ ...prev, [postId]: !isShowing }))
+
+    if (!isShowing && !comments[postId]) {
+      loadComments(postId)
+    }
+  }
+
+  const handleSubmitComment = async (postId: string) => {
+    if (!token || !user) {
+      router.push('/login')
+      return
+    }
+
+    const content = newComment[postId]?.trim()
+    if (!content) return
+
+    setSubmittingComment(prev => ({ ...prev, [postId]: true }))
+
+    try {
+      const comment = await postApi.createComment(postId, content, token) as PostComment
+
+      // Add comment to list
+      setComments(prev => ({
+        ...prev,
+        [postId]: [comment, ...(prev[postId] || [])]
+      }))
+
+      // Increment comment count
+      setPosts(prev => prev.map(p =>
+        p.id === postId
+          ? { ...p, comments: p.comments + 1 }
+          : p
+      ))
+
+      // Clear input
+      setNewComment(prev => ({ ...prev, [postId]: '' }))
+    } catch (error) {
+      console.error('Error submitting comment:', error)
+      alert('Error al enviar el comentario')
+    } finally {
+      setSubmittingComment(prev => ({ ...prev, [postId]: false }))
+    }
+  }
+
+  const handleDeleteComment = async (postId: string, commentId: string) => {
+    if (!token || !user) return
+
+    if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) return
+
+    try {
+      await postApi.deleteComment(commentId, token)
+
+      // Remove comment from list
+      setComments(prev => ({
+        ...prev,
+        [postId]: (prev[postId] || []).filter(c => c.id !== commentId)
+      }))
+
+      // Decrement comment count
+      setPosts(prev => prev.map(p =>
+        p.id === postId
+          ? { ...p, comments: Math.max(0, p.comments - 1) }
+          : p
+      ))
+    } catch (error) {
+      console.error('Error deleting comment:', error)
+      alert('Error al eliminar el comentario')
+    }
+  }
+
   const filteredPosts = posts.filter(post => {
     if (filterType === 'posts') return true
     const hasVideo = post.content.some(c => c.type === 'video')
     const hasPhoto = post.content.some(c => c.type === 'image')
-    
+
     if (filterType === 'videos') return hasVideo
     if (filterType === 'photos') return hasPhoto
     if (filterType === 'audio') return post.content.some(c => c.type === 'audio')
@@ -75,18 +225,15 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     }).format(date)
   }
 
-  // Determinar si el usuario puede ver el contenido
   const canViewPost = (post: Post): boolean => {
     if (post.visibility === 'public') return true
     if (post.visibility === 'authenticated') return isAuthenticated
     if (post.visibility === 'subscribers') {
-      // TODO: Verificar si el usuario tiene suscripción activa
-      return false
+      return false // TODO: Verificar suscripción
     }
     return false
   }
 
-  // Obtener el badge de visibilidad
   const getVisibilityBadge = (visibility: PostVisibility) => {
     switch (visibility) {
       case 'public':
@@ -108,7 +255,6 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
   return (
     <div className="space-y-4">
-      {/* Posts Feed */}
       {filteredPosts.length === 0 ? (
         <div className="text-center py-20 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10">
           <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
@@ -125,6 +271,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
             const canView = canViewPost(post)
             const visibilityBadge = getVisibilityBadge(post.visibility)
             const VisibilityIcon = visibilityBadge.icon
+            const isLiked = likedPosts[post.id] || false
+            const showingComments = showComments[post.id] || false
+            const postComments = comments[post.id] || []
 
             return (
               <div
@@ -161,7 +310,6 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                 {/* Media Section */}
                 <div className="relative bg-black">
                   {canView ? (
-                    // Contenido desbloqueado
                     <>
                       {videoContent ? (
                         <video
@@ -183,7 +331,6 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                       )}
                     </>
                   ) : (
-                    // Contenido bloqueado con blur
                     <div className="relative">
                       {videoContent ? (
                         <video
@@ -201,7 +348,6 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                         <div className="w-full h-64 bg-gradient-to-br from-gray-800 to-gray-900 blur-xl" />
                       )}
 
-                      {/* Overlay con CTA */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                         <div className="text-center space-y-4 max-w-sm px-6">
                           <div className="w-20 h-20 rounded-full bg-primary-500/20 flex items-center justify-center mx-auto">
@@ -241,12 +387,22 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                 </div>
 
                 {/* Post Footer - Stats */}
-                <div className="p-4 flex items-center gap-6">
-                  <button className="flex items-center gap-2 text-white/60 hover:text-red-400 transition-colors">
-                    <Heart className="w-5 h-5" />
+                <div className="p-4 flex items-center gap-6 border-b border-white/10">
+                  <button
+                    onClick={() => handleLike(post.id)}
+                    className={`flex items-center gap-2 transition-colors ${
+                      isLiked
+                        ? 'text-red-500'
+                        : 'text-white/60 hover:text-red-400'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
                     <span className="text-sm font-medium">{post.likes.toLocaleString()}</span>
                   </button>
-                  <button className="flex items-center gap-2 text-white/60 hover:text-blue-400 transition-colors">
+                  <button
+                    onClick={() => toggleComments(post.id)}
+                    className="flex items-center gap-2 text-white/60 hover:text-blue-400 transition-colors"
+                  >
                     <MessageCircle className="w-5 h-5" />
                     <span className="text-sm font-medium">{post.comments.toLocaleString()}</span>
                   </button>
@@ -255,6 +411,86 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                     <span className="text-sm font-medium">Propina</span>
                   </button>
                 </div>
+
+                {/* Comments Section */}
+                {showingComments && (
+                  <div className="p-4 bg-white/5 space-y-4">
+                    {/* Comment Input */}
+                    {isAuthenticated && (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newComment[post.id] || ''}
+                          onChange={(e) => setNewComment(prev => ({ ...prev, [post.id]: e.target.value }))}
+                          onKeyPress={(e) => e.key === 'Enter' && handleSubmitComment(post.id)}
+                          placeholder="Escribe un comentario..."
+                          maxLength={1000}
+                          disabled={submittingComment[post.id]}
+                          className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:border-fuchsia-500 disabled:opacity-50"
+                        />
+                        <button
+                          onClick={() => handleSubmitComment(post.id)}
+                          disabled={!newComment[post.id]?.trim() || submittingComment[post.id]}
+                          className="p-2 bg-fuchsia-500 hover:bg-fuchsia-600 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-full transition-colors"
+                        >
+                          <Send className="w-5 h-5 text-white" />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Comments List */}
+                    <div className="space-y-3">
+                      {postComments.length === 0 ? (
+                        <p className="text-white/50 text-sm text-center py-4">
+                          No hay comentarios aún
+                        </p>
+                      ) : (
+                        postComments.map((comment) => {
+                          const canDelete = user && (comment.userId === user.id || creatorId === user.id)
+
+                          return (
+                            <div key={comment.id} className="flex gap-3">
+                              <img
+                                src={comment.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.displayName)}&background=a21caf&color=fff`}
+                                alt={comment.user.displayName}
+                                className="w-8 h-8 rounded-full object-cover"
+                              />
+                              <div className="flex-1">
+                                <div className="bg-white/10 rounded-2xl px-4 py-2">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="font-semibold text-white text-sm">
+                                      {comment.user.displayName}
+                                    </span>
+                                    <span className="text-xs text-white/40">
+                                      @{comment.user.username}
+                                    </span>
+                                  </div>
+                                  <p className="text-white text-sm whitespace-pre-wrap break-words">
+                                    {comment.content}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-3 mt-1 px-2">
+                                  <span className="text-xs text-white/40">
+                                    {format(new Date(comment.createdAt), "d 'de' MMM 'a las' HH:mm", { locale: es })}
+                                  </span>
+                                  {canDelete && (
+                                    <button
+                                      onClick={() => handleDeleteComment(post.id, comment.id)}
+                                      className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                      Eliminar
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
