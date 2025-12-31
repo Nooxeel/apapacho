@@ -234,6 +234,10 @@ export const postApi = {
   getLikeStatus: (postId: string, token: string) =>
     api(`/posts/${postId}/like-status`, { token }),
 
+  // Batch like status (fixes N+1 query problem)
+  getBatchLikeStatus: (postIds: string[], token: string) =>
+    api(`/posts/like-status/batch?postIds=${postIds.join(',')}`, { token }),
+
   // Comments
   getComments: (postId: string, limit = 50, offset = 0) =>
     api(`/posts/${postId}/comments?limit=${limit}&offset=${offset}`, {}),

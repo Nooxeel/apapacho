@@ -60,11 +60,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
         const data = await response.json()
         setPosts(data)
 
-        // Load like status for each post if user is authenticated
-        if (token && user) {
-          data.forEach((post: Post) => {
-            loadLikeStatus(post.id)
-          })
+        // Load like status for ALL posts in a single batch request (fixes N+1 query)
+        if (token && user && data.length > 0) {
+          loadBatchLikeStatus(data.map((post: Post) => post.id))
         }
       }
     } catch (error) {
@@ -74,13 +72,13 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     }
   }
 
-  const loadLikeStatus = async (postId: string) => {
-    if (!token) return
+  const loadBatchLikeStatus = async (postIds: string[]) => {
+    if (!token || postIds.length === 0) return
     try {
-      const data = await postApi.getLikeStatus(postId, token) as { liked: boolean }
-      setLikedPosts(prev => ({ ...prev, [postId]: data.liked }))
+      const data = await postApi.getBatchLikeStatus(postIds, token) as Record<string, boolean>
+      setLikedPosts(data)
     } catch (error) {
-      console.error('Error loading like status:', error)
+      console.error('Error loading batch like status:', error)
     }
   }
 

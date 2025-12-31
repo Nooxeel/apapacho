@@ -133,65 +133,56 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     if (!token) return;
-    
+
     setIsLoading(true);
-    
+
     try {
-      // Cargar estadísticas
-      const statsRes = await fetch(`${API_URL}/users/me/stats`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      // Ejecutar TODAS las llamadas en paralelo para reducir tiempo de carga
+      const [statsRes, subsRes, favsRes, paymentsRes, commentsRes, pendingRes] = await Promise.all([
+        fetch(`${API_URL}/users/me/stats`, { headers }),
+        fetch(`${API_URL}/users/me/subscriptions`, { headers }),
+        fetch(`${API_URL}/favorites`, { headers }),
+        fetch(`${API_URL}/users/me/payments`, { headers }),
+        fetch(`${API_URL}/comments/user/my-comments`, { headers }),
+        // Solo cargar comentarios pendientes si es creador
+        user?.isCreator
+          ? fetch(`${API_URL}/comments/creator/pending`, { headers })
+          : Promise.resolve(null)
+      ]);
+
+      // Procesar respuestas
       if (statsRes.ok) {
-        setStats(await statsRes.json());
+        const statsData = await statsRes.json();
+        setStats(statsData);
       }
 
-      // Cargar suscripciones
-      const subsRes = await fetch(`${API_URL}/users/me/subscriptions`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
       if (subsRes.ok) {
         setSubscriptions(await subsRes.json());
       }
 
-      // Cargar favoritos
-      const favsRes = await fetch(`${API_URL}/favorites`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
       if (favsRes.ok) {
         setFavorites(await favsRes.json());
       }
 
-      // Cargar historial de pagos
-      const paymentsRes = await fetch(`${API_URL}/users/me/payments`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
       if (paymentsRes.ok) {
         const data = await paymentsRes.json();
         setPayments(data.payments || []);
       }
 
-      // Cargar comentarios del usuario
-      const commentsRes = await fetch(`${API_URL}/comments/user/my-comments`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
       if (commentsRes.ok) {
         const commentsData = await commentsRes.json();
         setComments(commentsData);
         // Actualizar stats con el conteo de comentarios
         if (stats) {
-          setStats({ ...stats, comments: commentsData.length });
+          setStats(prev => prev ? { ...prev, comments: commentsData.length } : prev);
         }
       }
 
-      // Si es creador, cargar comentarios pendientes
-      if (user?.isCreator) {
-        const pendingRes = await fetch(`${API_URL}/comments/creator/pending`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (pendingRes.ok) {
-          const pendingData = await pendingRes.json();
-          setPendingCommentsCount(pendingData.length || 0);
-        }
+      if (pendingRes && pendingRes.ok) {
+        const pendingData = await pendingRes.json();
+        setPendingCommentsCount(pendingData.length || 0);
       }
     } catch (error) {
       console.error('Error cargando datos:', error);
