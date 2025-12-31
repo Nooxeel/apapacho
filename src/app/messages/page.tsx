@@ -8,6 +8,7 @@ import { Navbar } from '@/components/layout'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { MessageCircle, Search, ArrowLeft } from 'lucide-react'
+import { socketService } from '@/lib/socket'
 
 interface Conversation {
   id: string
@@ -39,16 +40,33 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!hasHydrated) return
-    if (!token) {
+    if (!token || !user) {
       router.push('/login')
       return
     }
     loadConversations()
 
-    // Auto-refresh every 30 seconds (less aggressive than chat polling)
-    const interval = setInterval(loadConversations, 30000)
-    return () => clearInterval(interval)
-  }, [token, hasHydrated, router])
+    // Connect to WebSocket for real-time conversation updates
+    socketService.connect(user.id)
+
+    // Listen for new messages - reload conversation list when any message arrives
+    const handleMessageNew = () => {
+      loadConversations()
+    }
+
+    // Listen for unread count updates
+    const handleUnreadUpdate = () => {
+      loadConversations()
+    }
+
+    socketService.on('message:new', handleMessageNew)
+    socketService.on('unread:update', handleUnreadUpdate)
+
+    return () => {
+      socketService.off('message:new', handleMessageNew)
+      socketService.off('unread:update', handleUnreadUpdate)
+    }
+  }, [token, hasHydrated, user, router])
 
   const loadConversations = async () => {
     try {

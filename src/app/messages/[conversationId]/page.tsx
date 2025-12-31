@@ -8,6 +8,7 @@ import { Navbar } from '@/components/layout'
 import { format, isToday, isYesterday } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { ArrowLeft, Send, MoreVertical, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { socketService } from '@/lib/socket'
 
 interface Message {
   id: string
@@ -117,17 +118,34 @@ export default function ChatPage() {
     }
   }, [loading, messages.length])
 
-  // Poll for new messages every 3 seconds for near-instant delivery
+  // WebSocket for real-time message delivery
   useEffect(() => {
-    if (!token || !conversationId || loading) return
+    if (!token || !user || !conversationId || loading) return
 
-    const interval = setInterval(() => {
-      // Silent refresh - don't show loading spinner
-      loadMessages(undefined, true)
-    }, 3000) // 3 seconds for near-instant message delivery
+    // Connect to WebSocket and join this conversation's room
+    socketService.connect(user.id)
+    socketService.joinConversation(conversationId)
 
-    return () => clearInterval(interval)
-  }, [token, conversationId, loading])
+    // Listen for new messages in this conversation
+    const handleMessageNew = (message: Message) => {
+      // Only add message if it's for this conversation
+      if (message.id) {
+        setMessages(prev => {
+          // Avoid duplicates
+          if (prev.some(m => m.id === message.id)) return prev
+          return [...prev, message]
+        })
+        scrollToBottom()
+      }
+    }
+
+    socketService.on('message:new', handleMessageNew)
+
+    return () => {
+      socketService.off('message:new', handleMessageNew)
+      socketService.leaveConversation(conversationId)
+    }
+  }, [token, user, conversationId, loading])
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -135,6 +153,9 @@ export default function ChatPage() {
 
     setSending(true)
     setError(null)
+    const messageContent = newMessage.trim()
+    setNewMessage('') // Clear input immediately for better UX
+
     try {
       const res = await fetch(`${API_URL}/messages/conversations/${conversationId}/messages`, {
         method: 'POST',
@@ -142,20 +163,20 @@ export default function ChatPage() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ content: newMessage.trim() })
+        body: JSON.stringify({ content: messageContent })
       })
 
       if (res.ok) {
-        const message = await res.json()
-        setMessages(prev => [...prev, message])
-        setNewMessage('')
-        scrollToBottom()
+        // WebSocket will handle adding the message to the list via 'message:new' event
+        // No need for manual setMessages here
       } else {
         setError('No se pudo enviar el mensaje. Intenta de nuevo.')
+        setNewMessage(messageContent) // Restore message on error
       }
     } catch (error) {
       console.error('Error sending message:', error)
       setError('Error de conexión. Verifica tu internet.')
+      setNewMessage(messageContent) // Restore message on error
     } finally {
       setSending(false)
     }

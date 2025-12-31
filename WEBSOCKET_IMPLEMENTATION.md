@@ -24,48 +24,43 @@
    - ✅ `Navbar.tsx` - WebSocket para contador de no leídos (elimina polling de 3s)
    - ✅ `[username]/page.tsx` - WebSocket para stats updates (elimina polling de 3s)
 
-## 🚧 Pendiente (Opcional - Mensajes)
-
-### Páginas de Mensajes
-Estas aún usan polling, pero se puede dejar así si prefieres:
+## ✅ Páginas de Mensajes Actualizadas
 
 1. **`/messages/page.tsx`** - Lista de conversaciones
-   - Actualmente: Polling cada 3s
-   - Con WebSocket: Escuchar `message:new` y actualizar lista
+   - ✅ Eliminado polling de 30s
+   - ✅ Actualización en tiempo real con WebSocket (`message:new`, `unread:update`)
 
 2. **`/messages/[conversationId]/page.tsx`** - Chat individual
-   - Actualmente: Polling cada 3s
-   - Con WebSocket: Escuchar `message:new` en tiempo real
+   - ✅ Eliminado polling de 3s
+   - ✅ Mensajes en tiempo real con WebSocket (`message:new`)
+   - ✅ Join/leave conversation rooms automático
 
-## 📊 Impacto Actual
+## 📊 Impacto Final
 
 ### Antes (Polling):
 ```
 Usuario en perfil de creador: 1200 requests/hora (stats cada 3s)
 Usuario con navbar abierta: 1200 requests/hora (unread cada 3s)
-Total: 2400 requests/hora/usuario
+Usuario en lista de mensajes: 120 requests/hora (conversaciones cada 30s)
+Usuario en chat: 1200 requests/hora (mensajes cada 3s)
+Total: 3720 requests/hora/usuario
 ```
 
 ### Después (WebSocket):
 ```
-Usuario en perfil de creador: 1 conexión persistente + eventos solo cuando hay cambios
-Usuario con navbar abierta: Mismo socket, eventos push
-Total: ~5-10 requests/hora/usuario (solo eventos reales)
+Todas las funciones: 1 conexión persistente + eventos solo cuando hay cambios reales
+Total: ~10-20 eventos/hora/usuario (solo cuando hay actividad real)
 ```
 
-**Reducción: ~99% menos requests** para stats y unread counts
+**Reducción: ~99.5% menos requests** - De 3720 req/hora a 10-20 eventos/hora
 
-## 🔥 Siguientes Pasos Recomendados
+## ✅ Implementación Completa
 
-### Opción A: Dejar como está
-- Stats y unread ya usan WebSocket ✅
-- Mensajes siguen con polling (no es crítico, solo 3s)
-- Deploy y probar
-
-### Opción B: Completar mensajes con WebSocket
-- Actualizar `/messages/page.tsx` para lista en tiempo real
-- Actualizar `/messages/[conversationId]/page.tsx` para chat en tiempo real
-- Requiere ~30 minutos más
+Todas las funciones ahora usan WebSocket en tiempo real:
+- ✅ Stats de creador (likes, comentarios)
+- ✅ Contador de mensajes no leídos (navbar)
+- ✅ Lista de conversaciones
+- ✅ Chat en tiempo real
 
 ## 🚀 Para Desplegar
 
