@@ -108,6 +108,14 @@ export function Navbar() {
                         Dashboard
                       </Link>
                       <Link
+                        href={`/${user.username}`}
+                        className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        Mi Perfil
+                      </Link>
+                      <Link
                         href="/messages"
                         className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
                         onClick={() => setShowUserMenu(false)}
