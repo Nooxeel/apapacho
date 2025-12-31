@@ -198,6 +198,46 @@ export interface PostComment {
   }
 }
 
+// Interest/Tags Types
+export type InterestCategory =
+  | 'ENTERTAINMENT'
+  | 'LIFESTYLE'
+  | 'ADULT'
+  | 'ART'
+  | 'GAMING'
+  | 'MUSIC'
+  | 'FITNESS'
+  | 'OTHER'
+
+export interface Interest {
+  id: string
+  slug: string
+  name: string
+  description?: string
+  icon?: string
+  category: InterestCategory
+  isNSFW: boolean
+  usageCount: number
+  createdAt: Date | string
+  updatedAt: Date | string
+}
+
+export interface UserInterest {
+  id: string
+  userId: string
+  interestId: string
+  interest: Interest
+  createdAt: Date | string
+}
+
+export interface CreatorInterest {
+  id: string
+  creatorId: string
+  interestId: string
+  interest: Interest
+  createdAt: Date | string
+}
+
 // Platform Configuration
 export interface PlatformConfig {
   commissionRate: number // e.g., 0.15 for 15%
