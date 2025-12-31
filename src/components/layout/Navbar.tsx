@@ -35,8 +35,8 @@ export function Navbar() {
 
     loadUnreadCount()
 
-    // Actualizar cada 5 segundos para notificaciones rápidas
-    const interval = setInterval(loadUnreadCount, 5000)
+    // Actualizar cada 3 segundos (sincronizado con el polling de mensajes)
+    const interval = setInterval(loadUnreadCount, 3000)
     return () => clearInterval(interval)
   }, [token, user])
 
