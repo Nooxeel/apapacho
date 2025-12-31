@@ -8,6 +8,7 @@ import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/p
 import { Navbar } from '@/components/layout'
 import ChatModal from '@/components/messages/ChatModal'
 import { useAuthStore } from '@/stores/authStore'
+import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
 import {
   Heart,
@@ -183,10 +184,21 @@ export default function CreatorPublicProfile() {
     // Cargar stats iniciales
     loadStats()
 
-    // Actualizar cada 3 segundos (sincronizado con polling de mensajes)
-    const interval = setInterval(loadStats, 3000)
-    return () => clearInterval(interval)
-  }, [creator?.creatorProfile?.id])
+    // Listen for stats updates via WebSocket (only if user is authenticated)
+    if (user) {
+      socketService.connect(user.id)
+
+      const handleStatsUpdate = () => {
+        loadStats() // Reload stats when likes/comments change
+      }
+
+      socketService.on('stats:update', handleStatsUpdate)
+
+      return () => {
+        socketService.off('stats:update', handleStatsUpdate)
+      }
+    }
+  }, [creator?.creatorProfile?.id, user])
 
   // Verificar si el usuario puede enviar mensajes según la configuración de privacidad
   const canSendMessage = () => {

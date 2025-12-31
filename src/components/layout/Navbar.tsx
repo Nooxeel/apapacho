@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
 import { messageApi } from '@/lib/api'
+import { socketService } from '@/lib/socket'
 import { User, LogOut, Settings, FileText, MessageCircle } from 'lucide-react'
 
 export function Navbar() {
@@ -20,10 +21,11 @@ export function Navbar() {
     router.push('/')
   }
 
-  // Cargar contador de mensajes no leídos
+  // WebSocket connection and unread count tracking
   useEffect(() => {
     if (!token || !user) return
 
+    // Initial load
     const loadUnreadCount = async () => {
       try {
         const data = await messageApi.getUnreadCount(token) as { unread: number }
@@ -35,9 +37,20 @@ export function Navbar() {
 
     loadUnreadCount()
 
-    // Actualizar cada 3 segundos (sincronizado con el polling de mensajes)
-    const interval = setInterval(loadUnreadCount, 3000)
-    return () => clearInterval(interval)
+    // Connect to WebSocket
+    socketService.connect(user.id)
+
+    // Listen for unread count updates via WebSocket
+    const handleUnreadUpdate = () => {
+      loadUnreadCount() // Reload full count when any conversation updates
+    }
+
+    socketService.on('unread:update', handleUnreadUpdate)
+
+    return () => {
+      socketService.off('unread:update', handleUnreadUpdate)
+      socketService.disconnect()
+    }
   }, [token, user])
 
   return (
