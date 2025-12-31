@@ -193,6 +193,9 @@ export const creatorApi = {
 
   deleteMusicTrack: (trackId: string, token: string) =>
     api(`/creators/music/${trackId}`, { method: 'DELETE', token }),
+
+  getStats: (creatorId: string) =>
+    api(`/creators/${creatorId}/stats`, {}),
 }
 
 // Message API

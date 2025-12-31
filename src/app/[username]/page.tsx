@@ -108,6 +108,10 @@ export default function CreatorPublicProfile() {
   const [showChat, setShowChat] = useState(false)
   const [chatConversationId, setChatConversationId] = useState<string | null>(null)
 
+  // Real-time stats (sincronizado con polling de mensajes)
+  const [totalLikes, setTotalLikes] = useState(0)
+  const [totalPostComments, setTotalPostComments] = useState(0)
+
   // Set initial active tab based on visibility settings
   useEffect(() => {
     if (creator?.creatorProfile?.visibilitySettings?.tabs) {
@@ -161,6 +165,28 @@ export default function CreatorPublicProfile() {
       fetchCreator()
     }
   }, [username, token, user])
+
+  // Polling para actualizar stats en tiempo real (sincronizado con mensajes - cada 3 segundos)
+  useEffect(() => {
+    if (!creator?.creatorProfile?.id) return
+
+    const loadStats = async () => {
+      try {
+        const stats = await creatorApi.getStats(creator.creatorProfile.id) as { totalLikes: number; totalPostComments: number }
+        setTotalLikes(stats.totalLikes)
+        setTotalPostComments(stats.totalPostComments)
+      } catch (error) {
+        console.error('Error loading stats:', error)
+      }
+    }
+
+    // Cargar stats iniciales
+    loadStats()
+
+    // Actualizar cada 3 segundos (sincronizado con polling de mensajes)
+    const interval = setInterval(loadStats, 3000)
+    return () => clearInterval(interval)
+  }, [creator?.creatorProfile?.id])
 
   // Verificar si el usuario puede enviar mensajes según la configuración de privacidad
   const canSendMessage = () => {
@@ -360,21 +386,30 @@ export default function CreatorPublicProfile() {
             {/* Stats */}
             <div className="mt-8 flex flex-wrap justify-center gap-6 md:gap-12">
               {(profile.visibilitySettings?.tabs?.likes !== false) && (
-                <StatItem 
-                  icon={<Heart className="w-5 h-5" />} 
-                  value={formatNumber(stats.totalLikes)} 
-                  label="Likes" 
+                <StatItem
+                  icon={<Heart className="w-5 h-5" />}
+                  value={formatNumber(totalLikes || stats.totalLikes)}
+                  label="Likes"
                   accentColor={profile.accentColor}
                 />
               )}
               {(profile.visibilitySettings?.tabs?.posts !== false) && (
-                <StatItem 
-                  icon={<FileText className="w-5 h-5" />} 
-                  value={formatNumber(stats.postsCount)} 
-                  label="Posts" 
+                <StatItem
+                  icon={<FileText className="w-5 h-5" />}
+                  value={formatNumber(stats.postsCount)}
+                  label="Posts"
                   accentColor={profile.accentColor}
                   active={activeTab === 'posts'}
                   onClick={() => setActiveTab('posts')}
+                />
+              )}
+              {/* Nuevo: Contador de comentarios de posts */}
+              {(profile.visibilitySettings?.tabs?.posts !== false) && totalPostComments > 0 && (
+                <StatItem
+                  icon={<MessageCircle className="w-5 h-5" />}
+                  value={formatNumber(totalPostComments)}
+                  label="Comentarios"
+                  accentColor={profile.accentColor}
                 />
               )}
               {(profile.visibilitySettings?.tabs?.photos !== false) && (
