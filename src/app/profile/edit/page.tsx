@@ -170,7 +170,7 @@ export default function ProfileEditPage() {
     try {
       // 1. Upload cover image if changed
       if (coverImageFile && token) {
-        await uploadApi.cover(coverImageFile, token)
+        await uploadApi.userCover(coverImageFile, token)
       }
 
       // 2. Update profile data

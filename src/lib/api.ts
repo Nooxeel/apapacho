@@ -257,6 +257,8 @@ export const uploadApi = {
 
   cover: (file: File, token: string) => uploadFile('/upload/cover', file, 'cover', token),
 
+  userCover: (file: File, token: string) => uploadFile('/upload/user/cover', file, 'coverImage', token),
+
   content: async (files: File[], token: string, signal?: AbortSignal) => {
     const formData = new FormData()
     files.forEach((file) => formData.append('files', file))
