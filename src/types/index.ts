@@ -200,14 +200,10 @@ export interface PostComment {
 
 // Interest/Tags Types
 export type InterestCategory =
-  | 'ENTERTAINMENT'
-  | 'LIFESTYLE'
-  | 'ADULT'
-  | 'ART'
-  | 'GAMING'
-  | 'MUSIC'
-  | 'FITNESS'
-  | 'OTHER'
+  | 'CONTENT_TYPE'
+  | 'AESTHETIC'
+  | 'THEMES'
+  | 'NICHE'
 
 export interface Interest {
   id: string

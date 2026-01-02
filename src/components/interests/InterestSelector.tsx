@@ -16,25 +16,17 @@ interface InterestSelectorProps {
 }
 
 const CATEGORY_LABELS: Record<InterestCategory, string> = {
-  ENTERTAINMENT: 'Entretenimiento',
-  GAMING: 'Gaming',
-  MUSIC: 'Música',
-  ART: 'Arte',
-  FITNESS: 'Fitness',
-  LIFESTYLE: 'Estilo de Vida',
-  ADULT: 'Adulto (18+)',
-  OTHER: 'Otros'
+  CONTENT_TYPE: 'Tipo de Contenido',
+  AESTHETIC: 'Estética',
+  THEMES: 'Temáticas',
+  NICHE: 'Nichos'
 }
 
 const CATEGORY_COLORS: Record<InterestCategory, string> = {
-  ENTERTAINMENT: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  GAMING: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  MUSIC: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
-  ART: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
-  FITNESS: 'bg-green-500/20 text-green-300 border-green-500/30',
-  LIFESTYLE: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-  ADULT: 'bg-red-500/20 text-red-300 border-red-500/30',
-  OTHER: 'bg-gray-500/20 text-gray-300 border-gray-500/30'
+  CONTENT_TYPE: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30',
+  AESTHETIC: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+  THEMES: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+  NICHE: 'bg-red-500/20 text-red-300 border-red-500/30'
 }
 
 export function InterestSelector({
@@ -123,14 +115,10 @@ export function InterestSelector({
 
   const categories: (InterestCategory | 'ALL')[] = [
     'ALL',
-    'ENTERTAINMENT',
-    'GAMING',
-    'MUSIC',
-    'ART',
-    'FITNESS',
-    'LIFESTYLE',
-    ...(showNSFW ? ['ADULT' as InterestCategory] : []),
-    'OTHER'
+    'CONTENT_TYPE',
+    'AESTHETIC',
+    'THEMES',
+    'NICHE'
   ]
 
   const selectedCount = selectedInterests.length
