@@ -173,7 +173,7 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
 
   const getUserAvatar = (comment: Comment) => {
     if (comment.user.avatar) {
-      return `/images/${comment.userId}/profile.jpeg`;
+      return comment.user.avatar;
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.displayName)}&background=random`;
   };

@@ -270,7 +270,7 @@ export default function DashboardPage() {
 
   const getUserAvatar = () => {
     if (user?.avatar) {
-      return `/images/${user.id}/profile.jpeg`;
+      return user.avatar;
     }
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=random&size=150`;
   };
