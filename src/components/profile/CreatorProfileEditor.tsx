@@ -3,10 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
-import { creatorApi, uploadApi, authApi, ApiError } from '@/lib/api'
+import { creatorApi, uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
-import { LayoutDashboard, ImagePlus } from 'lucide-react'
+import { LayoutDashboard, ImagePlus, Tag } from 'lucide-react'
+import { InterestSelector } from '@/components/interests'
+import type { Interest } from '@/types'
 
 // Opciones de colores de fondo predefinidos
 const backgroundColors = [
@@ -102,7 +104,9 @@ export function CreatorProfileEditor() {
   const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([])
   const [newYoutubeUrl, setNewYoutubeUrl] = useState('')
   const [isAddingTrack, setIsAddingTrack] = useState(false)
-  
+  const [selectedInterests, setSelectedInterests] = useState<Interest[]>([])
+  const [initialInterests, setInitialInterests] = useState<Interest[]>([])
+
   const profileImageInputRef = useRef<HTMLInputElement>(null)
   const coverInputRef = useRef<HTMLInputElement>(null)
 
@@ -151,6 +155,16 @@ export function CreatorProfileEditor() {
       // Load music tracks
       if (userData.creatorProfile.musicTracks) {
         setMusicTracks(userData.creatorProfile.musicTracks)
+      }
+
+      // Load creator interests
+      try {
+        const interests = await interestsApi.getMyCreatorInterests(authToken)
+        setSelectedInterests(interests)
+        setInitialInterests(interests) // Save initial state for diff calculation
+      } catch (err) {
+        console.error('Error loading interests:', err)
+        // Non-fatal error, just log it
       }
     } catch (err) {
       if (err instanceof ApiError && err.statusCode === 401) {
@@ -243,6 +257,22 @@ export function CreatorProfileEditor() {
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || 'Failed to update profile')
+      }
+
+      // 3. Update interests if changed
+      const currentInterestIds = selectedInterests.map(i => i.id)
+      const initialInterestIds = initialInterests.map(i => i.id)
+      const toAdd = currentInterestIds.filter(id => !initialInterestIds.includes(id))
+      const toRemove = initialInterestIds.filter(id => !currentInterestIds.includes(id))
+
+      // Add new interests
+      if (toAdd.length > 0) {
+        await interestsApi.addMyCreatorInterests(toAdd, token)
+      }
+
+      // Remove old interests
+      for (const interestId of toRemove) {
+        await interestsApi.removeMyCreatorInterest(interestId, token)
       }
 
       setSuccess('¡Perfil actualizado correctamente!')
@@ -720,6 +750,28 @@ export function CreatorProfileEditor() {
                 <p className="text-xs text-white/40 text-center mt-4">
                   Los usuarios que no cumplan los requisitos no verán el botón de mensaje
                 </p>
+              </div>
+            </Card>
+
+            {/* Interests Section */}
+            <Card variant="glass">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Tag className="w-5 h-5 text-white" />
+                  <h2 className="text-xl font-bold text-white">Intereses</h2>
+                </div>
+                <p className="text-sm text-white/50 mb-6">
+                  Selecciona los temas que representan tu contenido (5-15 intereses)
+                </p>
+
+                <InterestSelector
+                  selectedInterests={selectedInterests}
+                  onSelectionChange={setSelectedInterests}
+                  minInterests={5}
+                  maxInterests={15}
+                  mode="creator"
+                  showNSFW={true}
+                />
               </div>
             </Card>
           </div>
