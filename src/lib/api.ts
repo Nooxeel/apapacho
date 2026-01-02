@@ -257,7 +257,7 @@ export const uploadApi = {
 
   cover: (file: File, token: string) => uploadFile('/upload/cover', file, 'cover', token),
 
-  userCover: (file: File, token: string) => uploadFile('/upload/user/cover', file, 'coverImage', token),
+  // Note: userCover removed - fans should only be able to upload avatar, not cover
 
   content: async (files: File[], token: string, signal?: AbortSignal) => {
     const formData = new FormData()

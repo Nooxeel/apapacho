@@ -59,14 +59,14 @@ export default function ProfileEditPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
-  const [previewCover, setPreviewCover] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [previewAvatar, setPreviewAvatar] = useState<string | null>(null)
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([])
   const [initialInterests, setInitialInterests] = useState<Interest[]>([])
   const [selectedColorId, setSelectedColorId] = useState('dark')
   const [selectedAccentId, setSelectedAccentId] = useState('fuchsia')
 
-  const coverInputRef = useRef<HTMLInputElement>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!hasHydrated) return
@@ -89,15 +89,15 @@ export default function ProfileEditPage() {
         username: userData.username || '',
         bio: userData.bio || '',
         avatar: userData.avatar,
-        coverImage: userData.coverImage,
+        coverImage: null,
         backgroundColor: userData.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.accentColor || accentColors[0].color,
       })
 
-      // Set previews
-      if (userData.coverImage) {
-        setPreviewCover(userData.coverImage)
+      // Set avatar preview
+      if (userData.avatar) {
+        setPreviewAvatar(userData.avatar)
       }
 
       // Find matching color IDs
@@ -128,13 +128,19 @@ export default function ProfileEditPage() {
     }
   }
 
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setCoverImageFile(file)
+      // Validar tamaño (máx 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('La imagen no debe superar los 5MB')
+        return
+      }
+      
+      setAvatarFile(file)
       const reader = new FileReader()
       reader.onloadend = () => {
-        setPreviewCover(reader.result as string)
+        setPreviewAvatar(reader.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -168,9 +174,9 @@ export default function ProfileEditPage() {
     setSuccess(null)
 
     try {
-      // 1. Upload cover image if changed
-      if (coverImageFile && token) {
-        await uploadApi.userCover(coverImageFile, token)
+      // 1. Upload avatar if changed
+      if (avatarFile && token) {
+        await uploadApi.avatar(avatarFile, token)
       }
 
       // 2. Update profile data
@@ -193,7 +199,7 @@ export default function ProfileEditPage() {
         throw new Error(error.error || 'Failed to update profile')
       }
 
-      // 3. Update interests if changed
+      // 2. Update interests if changed
       const currentInterestIds = selectedInterests.map(i => i.id)
       const initialInterestIds = initialInterests.map(i => i.id)
       const toAdd = currentInterestIds.filter(id => !initialInterestIds.includes(id))
@@ -208,7 +214,7 @@ export default function ProfileEditPage() {
       }
 
       setSuccess('¡Perfil actualizado correctamente!')
-      setCoverImageFile(null)
+      setAvatarFile(null)
 
       // Reload to get updated data
       await loadProfile(token)
@@ -269,39 +275,51 @@ export default function ProfileEditPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Profile Info & Interests */}
           <div className="space-y-6">
-            {/* Cover Image */}
+            {/* Avatar / Profile Picture */}
             <Card variant="glass">
               <div className="p-6">
                 <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <ImagePlus className="w-5 h-5" />
-                  Imagen de Portada
+                  <UserIcon className="w-5 h-5" />
+                  Foto de Perfil
                 </h2>
 
-                <div
-                  className="relative w-full h-48 rounded-xl overflow-hidden cursor-pointer group"
-                  onClick={() => coverInputRef.current?.click()}
-                >
-                  {previewCover ? (
-                    <img
-                      src={previewCover}
-                      alt="Cover preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center">
-                      <ImagePlus className="w-12 h-12 text-white/30" />
+                <div className="flex items-center gap-6">
+                  <div
+                    className="relative w-32 h-32 rounded-full overflow-hidden cursor-pointer group flex-shrink-0"
+                    onClick={() => avatarInputRef.current?.click()}
+                  >
+                    {previewAvatar ? (
+                      <img
+                        src={previewAvatar}
+                        alt="Avatar preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center">
+                        <UserIcon className="w-12 h-12 text-white/30" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <ImagePlus className="w-8 h-8 text-white" />
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white font-medium">Cambiar portada</span>
+                  </div>
+
+                  <div className="flex-1">
+                    <p className="text-white/70 text-sm mb-3">
+                      Haz clic en la imagen para cambiar tu foto de perfil
+                    </p>
+                    <p className="text-white/50 text-xs">
+                      Tamaño máximo: 5MB<br />
+                      Formatos: JPG, PNG, GIF
+                    </p>
                   </div>
                 </div>
 
                 <input
-                  ref={coverInputRef}
+                  ref={avatarInputRef}
                   type="file"
                   accept="image/*"
-                  onChange={handleCoverChange}
+                  onChange={handleAvatarChange}
                   className="hidden"
                 />
               </div>
@@ -431,17 +449,25 @@ export default function ProfileEditPage() {
                     background: `linear-gradient(to bottom right, ${profile.backgroundColor}, ${profile.backgroundColor}dd)`
                   }}
                 >
-                  {/* Cover */}
-                  <div className="h-24 bg-gradient-to-r from-white/5 to-white/10 relative">
-                    {previewCover && (
-                      <img src={previewCover} alt="Cover" className="w-full h-full object-cover opacity-50" />
-                    )}
-                  </div>
-
                   {/* Content */}
                   <div className="p-4">
-                    <h3 className="font-bold text-white mb-1">{profile.displayName || 'Tu Nombre'}</h3>
-                    <p className="text-sm text-white/60 mb-3">@{profile.username}</p>
+                    {/* Avatar */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+                        {previewAvatar ? (
+                          <img src={previewAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <UserIcon className="w-8 h-8 text-white/30" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-white mb-0.5 truncate">{profile.displayName || 'Tu Nombre'}</h3>
+                        <p className="text-sm text-white/60 truncate">@{profile.username}</p>
+                      </div>
+                    </div>
+
                     {profile.bio && (
                       <p className="text-sm text-white/70 mb-3 line-clamp-2">{profile.bio}</p>
                     )}
