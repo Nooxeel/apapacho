@@ -6,8 +6,9 @@ import { Button, Input, Card } from '@/components/ui'
 import { uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
-import { User as UserIcon, ImagePlus, Save, ArrowLeft, Tag, Palette } from 'lucide-react'
+import { User as UserIcon, ImagePlus, Save, ArrowLeft, Tag, Palette, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
+import FontSelector from '@/components/ui/FontSelector'
 import type { Interest } from '@/types'
 
 // Colores de fondo predefinidos
@@ -39,6 +40,7 @@ interface ProfileData {
   backgroundColor: string
   backgroundGradient: string
   accentColor: string
+  fontFamily: string
 }
 
 export default function ProfileEditPage() {
@@ -53,6 +55,7 @@ export default function ProfileEditPage() {
     backgroundColor: backgroundColors[0].color,
     backgroundGradient: backgroundColors[0].gradient,
     accentColor: accentColors[0].color,
+    fontFamily: 'Inter',
   })
 
   const [isLoading, setIsLoading] = useState(true)
@@ -93,6 +96,7 @@ export default function ProfileEditPage() {
         backgroundColor: userData.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.accentColor || accentColors[0].color,
+        fontFamily: userData.fontFamily || 'Inter',
       })
 
       // Set avatar preview
@@ -195,6 +199,7 @@ export default function ProfileEditPage() {
           backgroundColor: profile.backgroundColor,
           backgroundGradient: profile.backgroundGradient,
           accentColor: profile.accentColor,
+          fontFamily: profile.fontFamily,
         }),
       })
 
@@ -472,6 +477,22 @@ export default function ProfileEditPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </Card>
+
+            {/* Font Selector */}
+            <Card variant="glass">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                  <Type className="w-5 h-5" />
+                  Fuente del Sitio
+                </h2>
+
+                <FontSelector
+                  value={profile.fontFamily}
+                  onChange={(font) => setProfile({ ...profile, fontFamily: font })}
+                  disabled={isSaving}
+                />
               </div>
             </Card>
 

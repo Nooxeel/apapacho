@@ -8,6 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        inter: ['var(--font-inter)'],
+        roboto: ['var(--font-roboto)'],
+        'open-sans': ['var(--font-open-sans)'],
+        lato: ['var(--font-lato)'],
+        poppins: ['var(--font-poppins)'],
+      },
       colors: {
         primary: {
           50: '#fdf4ff',

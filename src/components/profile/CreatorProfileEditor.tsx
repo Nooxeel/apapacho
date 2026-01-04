@@ -6,9 +6,10 @@ import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
-import { LayoutDashboard, ImagePlus, Tag } from 'lucide-react'
+import { LayoutDashboard, ImagePlus, Tag, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
 import SocialLinksManager from '@/components/social/SocialLinksManager'
+import FontSelector from '@/components/ui/FontSelector'
 import type { Interest } from '@/types'
 
 // Opciones de colores de fondo predefinidos
@@ -65,6 +66,7 @@ interface ProfileData {
   backgroundColor: string
   backgroundGradient: string
   accentColor: string
+  fontFamily: string
   visibilitySettings: VisibilitySettings
 }
 
@@ -91,6 +93,7 @@ export function CreatorProfileEditor() {
     backgroundColor: backgroundColors[0].color,
     backgroundGradient: backgroundColors[0].gradient,
     accentColor: accentColors[0].color,
+    fontFamily: 'Inter',
     visibilitySettings: defaultVisibility,
   })
   
@@ -143,6 +146,7 @@ export function CreatorProfileEditor() {
         backgroundColor: userData.creatorProfile.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.creatorProfile.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.creatorProfile.accentColor || accentColors[0].color,
+        fontFamily: userData.fontFamily || 'Inter',
         visibilitySettings: userData.creatorProfile.visibilitySettings || defaultVisibility,
       })
 
@@ -269,6 +273,23 @@ export function CreatorProfileEditor() {
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || 'Failed to update profile')
+      }
+
+      // 2b. Update user font preference
+      const userResponse = await fetch(`${API_URL}/users/me`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fontFamily: profile.fontFamily,
+        }),
+      })
+
+      if (!userResponse.ok) {
+        const error = await userResponse.json()
+        throw new Error(error.error || 'Failed to update font preference')
       }
 
       // 3. Update interests if changed
@@ -899,6 +920,22 @@ export function CreatorProfileEditor() {
                     </span>
                   </div>
                 </div>
+              </div>
+            </Card>
+
+            {/* Font Selector */}
+            <Card variant="glass">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                  <Type className="w-5 h-5" />
+                  Fuente del Sitio
+                </h2>
+
+                <FontSelector
+                  value={profile.fontFamily}
+                  onChange={(font) => setProfile({ ...profile, fontFamily: font })}
+                  disabled={isSaving}
+                />
               </div>
             </Card>
 
