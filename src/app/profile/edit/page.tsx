@@ -43,7 +43,7 @@ interface ProfileData {
 
 export default function ProfileEditPage() {
   const router = useRouter()
-  const { token, logout, hasHydrated } = useAuthStore()
+  const { token, logout, hasHydrated, updateUser } = useAuthStore()
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
     username: '',
@@ -175,8 +175,12 @@ export default function ProfileEditPage() {
 
     try {
       // 1. Upload avatar if changed
+      let newAvatarUrl = profile.avatar
       if (avatarFile && token) {
-        await uploadApi.avatar(avatarFile, token)
+        const data = await uploadApi.avatar(avatarFile, token)
+        newAvatarUrl = data.url
+        // Update user in authStore immediately
+        updateUser({ avatar: newAvatarUrl })
       }
 
       // 2. Update profile data
