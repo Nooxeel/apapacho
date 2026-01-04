@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface FontOption {
   value: string
@@ -16,6 +16,14 @@ const FONT_OPTIONS: FontOption[] = [
   { value: 'Poppins', label: 'Poppins', className: 'font-poppins' },
 ]
 
+const FONT_CLASS_MAP: Record<string, string> = {
+  'Inter': 'font-inter',
+  'Roboto': 'font-roboto',
+  'Open Sans': 'font-open-sans',
+  'Lato': 'font-lato',
+  'Poppins': 'font-poppins',
+}
+
 interface FontSelectorProps {
   value: string
   onChange: (font: string) => void
@@ -24,6 +32,19 @@ interface FontSelectorProps {
 
 export default function FontSelector({ value, onChange, disabled }: FontSelectorProps) {
   const [selectedFont, setSelectedFont] = useState(value)
+
+  // Apply font to body immediately for live preview
+  useEffect(() => {
+    const fontClass = FONT_CLASS_MAP[selectedFont] || 'font-inter'
+
+    // Remove all font classes from body
+    Object.values(FONT_CLASS_MAP).forEach(className => {
+      document.body.classList.remove(className)
+    })
+
+    // Add the selected font class
+    document.body.classList.add(fontClass)
+  }, [selectedFont])
 
   const handleSelect = (fontValue: string) => {
     setSelectedFont(fontValue)
@@ -79,7 +100,7 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
 
       <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
         <p className="text-xs text-blue-200">
-          💡 <strong>Tip:</strong> Esta fuente se aplicará en todo el sitio cuando inicies sesión.
+          💡 <strong>Tip:</strong> Los cambios se aplican instantáneamente. Guarda para mantener tu selección.
         </p>
       </div>
     </div>
