@@ -54,9 +54,21 @@ export interface YouTubeTrack {
 
 export interface SocialLink {
   id: string
-  platform: 'twitter' | 'instagram' | 'tiktok' | 'youtube' | 'twitch' | 'discord' | 'other'
+  creatorId: string
+  platform: string // 'instagram', 'twitter', 'onlyfans', 'custom', etc.
   url: string
   label?: string
+  icon?: string
+  order: number
+  isVisible: boolean
+  createdAt: Date | string
+  updatedAt: Date | string
+}
+
+export interface SocialPlatform {
+  value: string
+  label: string
+  icon: string
 }
 
 export interface CreatorStats {

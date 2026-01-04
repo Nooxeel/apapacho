@@ -102,10 +102,18 @@ export function Navbar() {
                       onClick={() => setShowUserMenu(!showUserMenu)}
                       className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">
-                          {user.displayName.charAt(0).toUpperCase()}
-                        </span>
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.displayName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-white font-semibold text-sm">
+                            {user.displayName.charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <span className="text-white font-medium">{user.displayName}</span>
                     </button>

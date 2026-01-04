@@ -359,4 +359,35 @@ export const discoverApi = {
     api<any[]>(`/discover/search${params ? `?${new URLSearchParams(params as any).toString()}` : ''}`),
 }
 
+// Social Links API
+export const socialLinksApi = {
+  // Get public social links for a creator
+  getByUsername: (username: string) =>
+    api<any[]>(`/sociallinks/${username}`),
+
+  // Get all social links for authenticated creator
+  getMySocialLinks: (token: string) =>
+    api<any[]>('/sociallinks/me/all', { token }),
+
+  // Get available platforms
+  getPlatforms: () =>
+    api<any[]>('/sociallinks/platforms/list'),
+
+  // Create new social link
+  create: (data: { platform: string; url: string; label?: string; icon?: string }, token: string) =>
+    api<any>('/sociallinks', { method: 'POST', body: data, token }),
+
+  // Update social link
+  update: (id: string, data: { platform?: string; url?: string; label?: string; icon?: string; isVisible?: boolean }, token: string) =>
+    api<any>(`/sociallinks/${id}`, { method: 'PUT', body: data, token }),
+
+  // Reorder social links
+  reorder: (linkIds: string[], token: string) =>
+    api<any[]>('/sociallinks/reorder/batch', { method: 'PUT', body: { linkIds }, token }),
+
+  // Delete social link
+  delete: (id: string, token: string) =>
+    api<{ message: string }>(`/sociallinks/${id}`, { method: 'DELETE', token }),
+}
+
 export default api
