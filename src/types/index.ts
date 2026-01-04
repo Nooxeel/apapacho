@@ -6,6 +6,7 @@ export interface User {
   displayName: string
   avatar?: string
   bio?: string
+  fontFamily?: string
   isCreator: boolean
   createdAt: Date
   updatedAt: Date

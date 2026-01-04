@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
 import { uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
+import { useFontContext } from '@/contexts/FontContext'
 import { API_URL } from '@/lib/config'
 import { User as UserIcon, ImagePlus, Save, ArrowLeft, Tag, Palette, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
@@ -45,6 +46,7 @@ interface ProfileData {
 export default function ProfileEditPage() {
   const router = useRouter()
   const { token, logout, hasHydrated, updateUser } = useAuthStore()
+  const { clearPreviewFont } = useFontContext()
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
     username: '',
@@ -220,6 +222,12 @@ export default function ProfileEditPage() {
 
       setSuccess('¡Perfil actualizado correctamente!')
       setAvatarFile(null)
+
+      // Update auth store with new font family
+      updateUser({ fontFamily: profile.fontFamily })
+
+      // Clear preview font since we saved it
+      clearPreviewFont()
 
       // Reload to get updated data
       await loadProfile(token)

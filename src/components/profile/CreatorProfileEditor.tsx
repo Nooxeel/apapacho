@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
+import { useFontContext } from '@/contexts/FontContext'
 import { API_URL } from '@/lib/config'
 import { LayoutDashboard, ImagePlus, Tag, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
@@ -82,7 +83,8 @@ interface MusicTrack {
 
 export function CreatorProfileEditor() {
   const router = useRouter()
-  const { token, logout, hasHydrated } = useAuthStore()
+  const { token, logout, hasHydrated, updateUser } = useAuthStore()
+  const { clearPreviewFont } = useFontContext()
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
     username: '',
@@ -311,6 +313,12 @@ export function CreatorProfileEditor() {
       setSuccess('¡Perfil actualizado correctamente!')
       setProfileImageFile(null)
       setCoverImageFile(null)
+
+      // Update auth store with new font family
+      updateUser({ fontFamily: profile.fontFamily })
+
+      // Clear preview font since we saved it
+      clearPreviewFont()
 
       // Reload to get updated data
       await loadProfile(token)
