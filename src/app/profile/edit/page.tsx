@@ -180,7 +180,7 @@ export default function ProfileEditPage() {
         const data = await uploadApi.avatar(avatarFile, token)
         newAvatarUrl = data.url
         // Update user in authStore immediately
-        updateUser({ avatar: newAvatarUrl })
+        updateUser({ avatar: newAvatarUrl || undefined })
       }
 
       // 2. Update profile data
@@ -264,6 +264,38 @@ export default function ProfileEditPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 mt-8">
+        {/* Action Buttons */}
+        <div className="mb-6 flex justify-end gap-3">
+          <Button
+            variant="secondary"
+            onClick={() => router.push('/dashboard')}
+            disabled={isSaving}
+            size="sm"
+            className="px-4 py-2 text-sm"
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleSave}
+            disabled={isSaving}
+            size="sm"
+            className="px-4 py-2 text-sm min-w-[140px]"
+          >
+            {isSaving ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                Guardando...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Save className="w-4 h-4" />
+                Guardar
+              </div>
+            )}
+          </Button>
+        </div>
+
         {/* Messages */}
         {error && (
           <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200">
@@ -491,35 +523,6 @@ export default function ProfileEditPage() {
               </div>
             </Card>
           </div>
-        </div>
-
-        {/* Save Button */}
-        <div className="mt-8 flex justify-end gap-4">
-          <Button
-            variant="secondary"
-            onClick={() => router.push('/dashboard')}
-            disabled={isSaving}
-          >
-            Cancelar
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="min-w-[200px]"
-          >
-            {isSaving ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                Guardando...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Save className="w-4 h-4" />
-                Guardar Cambios
-              </div>
-            )}
-          </Button>
         </div>
       </div>
     </div>
