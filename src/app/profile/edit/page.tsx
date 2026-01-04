@@ -34,7 +34,6 @@ const accentColors = [
 interface ProfileData {
   displayName: string
   username: string
-  bio: string
   avatar: string | null
   coverImage: string | null
   backgroundColor: string
@@ -49,7 +48,6 @@ export default function ProfileEditPage() {
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
     username: '',
-    bio: '',
     avatar: null,
     coverImage: null,
     backgroundColor: backgroundColors[0].color,
@@ -90,7 +88,6 @@ export default function ProfileEditPage() {
       setProfile({
         displayName: userData.displayName || '',
         username: userData.username || '',
-        bio: userData.bio || '',
         avatar: userData.avatar,
         coverImage: null,
         backgroundColor: userData.backgroundColor || backgroundColors[0].color,
@@ -195,7 +192,6 @@ export default function ProfileEditPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bio: profile.bio,
           backgroundColor: profile.backgroundColor,
           backgroundGradient: profile.backgroundGradient,
           accentColor: profile.accentColor,
@@ -366,24 +362,6 @@ export default function ProfileEditPage() {
               </div>
             </Card>
 
-            {/* Bio */}
-            <Card variant="glass">
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-white mb-4">Biografía</h2>
-                <textarea
-                  value={profile.bio}
-                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  placeholder="Cuéntanos sobre ti..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-fuchsia-500/50 resize-none"
-                  rows={4}
-                  maxLength={500}
-                />
-                <p className="text-xs text-white/40 mt-2">
-                  {profile.bio.length}/500 caracteres
-                </p>
-              </div>
-            </Card>
-
             {/* Interests */}
             <Card variant="glass">
               <div className="p-6">
@@ -525,9 +503,6 @@ export default function ProfileEditPage() {
                       </div>
                     </div>
 
-                    {profile.bio && (
-                      <p className="text-sm text-white/70 mb-3 line-clamp-2">{profile.bio}</p>
-                    )}
                     <div className="flex gap-2">
                       <span
                         className="px-3 py-1 rounded-full text-xs font-medium"
