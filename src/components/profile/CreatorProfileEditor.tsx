@@ -107,6 +107,7 @@ export function CreatorProfileEditor() {
   const [isAddingTrack, setIsAddingTrack] = useState(false)
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([])
   const [initialInterests, setInitialInterests] = useState<Interest[]>([])
+  const [socialLinksCount, setSocialLinksCount] = useState(0)
 
   const profileImageInputRef = useRef<HTMLInputElement>(null)
   const coverInputRef = useRef<HTMLInputElement>(null)
@@ -165,6 +166,16 @@ export function CreatorProfileEditor() {
         setInitialInterests(interests) // Save initial state for diff calculation
       } catch (err) {
         console.error('Error loading interests:', err)
+        // Non-fatal error, just log it
+      }
+
+      // Load social links count
+      try {
+        const { socialLinksApi } = await import('@/lib/api')
+        const links = await socialLinksApi.getMySocialLinks(authToken)
+        setSocialLinksCount(links.length)
+      } catch (err) {
+        console.error('Error loading social links:', err)
         // Non-fatal error, just log it
       }
     } catch (err) {
@@ -601,7 +612,7 @@ export function CreatorProfileEditor() {
             </Card>
 
             {/* Social Links */}
-            {token && <SocialLinksManager token={token} />}
+            {token && <SocialLinksManager token={token} onLinksChange={setSocialLinksCount} />}
 
             {/* Visibility Settings */}
             <Card variant="glass">
@@ -1000,6 +1011,18 @@ export function CreatorProfileEditor() {
                     <span className="text-white/50">Bio</span>
                     <span className={profile.bio ? 'text-green-400' : 'text-white/30'}>
                       {profile.bio ? '✓ Completado' : 'Pendiente'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/50">Intereses</span>
+                    <span className={selectedInterests.length >= 3 ? 'text-green-400' : 'text-yellow-400'}>
+                      {selectedInterests.length >= 3 ? `✓ ${selectedInterests.length} seleccionados` : `${selectedInterests.length}/3 mínimo`}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/50">Enlaces sociales</span>
+                    <span className={socialLinksCount > 0 ? 'text-green-400' : 'text-white/30'}>
+                      {socialLinksCount > 0 ? `${socialLinksCount}/10 enlaces` : 'Sin enlaces'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">

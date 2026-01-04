@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/Button'
 
 interface SocialLinksManagerProps {
   token: string
+  onLinksChange?: (count: number) => void
 }
 
-export default function SocialLinksManager({ token }: SocialLinksManagerProps) {
+export default function SocialLinksManager({ token, onLinksChange }: SocialLinksManagerProps) {
   const [links, setLinks] = useState<SocialLink[]>([])
   const [platforms, setPlatforms] = useState<SocialPlatform[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -31,6 +32,12 @@ export default function SocialLinksManager({ token }: SocialLinksManagerProps) {
   useEffect(() => {
     loadData()
   }, [token])
+
+  useEffect(() => {
+    if (onLinksChange) {
+      onLinksChange(links.length)
+    }
+  }, [links.length, onLinksChange])
 
   const loadData = async () => {
     setIsLoading(true)
