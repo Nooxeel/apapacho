@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useFontContext } from '@/contexts/FontContext'
 
 interface FontOption {
   value: string
@@ -16,14 +16,6 @@ const FONT_OPTIONS: FontOption[] = [
   { value: 'Poppins', label: 'Poppins', className: 'font-poppins' },
 ]
 
-const FONT_CLASS_MAP: Record<string, string> = {
-  'Inter': 'font-inter',
-  'Roboto': 'font-roboto',
-  'Open Sans': 'font-open-sans',
-  'Lato': 'font-lato',
-  'Poppins': 'font-poppins',
-}
-
 interface FontSelectorProps {
   value: string
   onChange: (font: string) => void
@@ -31,23 +23,12 @@ interface FontSelectorProps {
 }
 
 export default function FontSelector({ value, onChange, disabled }: FontSelectorProps) {
-  const [selectedFont, setSelectedFont] = useState(value)
-
-  // Apply font to body immediately for live preview
-  useEffect(() => {
-    const fontClass = FONT_CLASS_MAP[selectedFont] || 'font-inter'
-
-    // Remove all font classes from body
-    Object.values(FONT_CLASS_MAP).forEach(className => {
-      document.body.classList.remove(className)
-    })
-
-    // Add the selected font class
-    document.body.classList.add(fontClass)
-  }, [selectedFont])
+  const { currentFont, setPreviewFont } = useFontContext()
 
   const handleSelect = (fontValue: string) => {
-    setSelectedFont(fontValue)
+    // Update the preview font globally
+    setPreviewFont(fontValue)
+    // Update the parent component state
     onChange(fontValue)
   }
 
@@ -62,7 +43,7 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
             disabled={disabled}
             className={`
               relative p-4 rounded-lg border-2 transition-all text-left
-              ${selectedFont === font.value
+              ${currentFont === font.value
                 ? 'border-fuchsia-500 bg-fuchsia-500/10'
                 : 'border-white/10 bg-white/5 hover:border-white/20'
               }
@@ -73,12 +54,12 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
             <div className="absolute top-3 right-3">
               <div className={`
                 w-5 h-5 rounded-full border-2 flex items-center justify-center
-                ${selectedFont === font.value
+                ${currentFont === font.value
                   ? 'border-fuchsia-500 bg-fuchsia-500'
                   : 'border-white/30'
                 }
               `}>
-                {selectedFont === font.value && (
+                {currentFont === font.value && (
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                 )}
               </div>

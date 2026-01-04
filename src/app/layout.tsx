@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Roboto, Open_Sans, Lato, Poppins } from 'next/font/google'
 import './globals.css'
-import FontProvider from '@/components/providers/FontProvider'
+import { FontProvider } from '@/contexts/FontContext'
 
 // Top 5 most popular web fonts 2025
 const inter = Inter({
