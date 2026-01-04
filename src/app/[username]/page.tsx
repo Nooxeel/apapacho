@@ -7,6 +7,7 @@ import { creatorApi } from '@/lib/api'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { Navbar } from '@/components/layout'
 import ChatModal from '@/components/messages/ChatModal'
+import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
 import { useAuthStore } from '@/stores/authStore'
 import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
@@ -60,9 +61,15 @@ interface CreatorProfile {
     }>
     socialLinks: Array<{
       id: string
+      creatorId: string
       platform: string
       url: string
       label?: string
+      icon?: string
+      order: number
+      isVisible: boolean
+      createdAt: string
+      updatedAt: string
     }>
     subscriptionTiers: Array<{
       id: string
@@ -483,20 +490,11 @@ export default function CreatorPublicProfile() {
               {/* Social Links */}
               {profile.socialLinks.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-white/10">
-                  <h4 className="font-medium text-sm mb-3">Redes Sociales</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {profile.socialLinks.map(link => (
-                      <a
-                        key={link.id}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 bg-white/10 rounded-full text-sm hover:bg-white/20 transition-colors"
-                      >
-                        {link.platform}
-                      </a>
-                    ))}
-                  </div>
+                  <h4 className="font-medium text-sm mb-3">Enlaces</h4>
+                  <SocialLinksDisplay
+                    links={profile.socialLinks}
+                    variant="default"
+                  />
                 </div>
               )}
 

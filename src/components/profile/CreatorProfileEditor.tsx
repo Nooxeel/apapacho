@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { API_URL } from '@/lib/config'
 import { LayoutDashboard, ImagePlus, Tag } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
+import SocialLinksManager from '@/components/social/SocialLinksManager'
 import type { Interest } from '@/types'
 
 // Opciones de colores de fondo predefinidos
@@ -968,6 +969,9 @@ export function CreatorProfileEditor() {
                 )}
               </div>
             </Card>
+
+            {/* Social Links */}
+            {token && <SocialLinksManager token={token} />}
 
             {/* Quick Stats Preview */}
             <Card variant="glass">
