@@ -600,6 +600,9 @@ export function CreatorProfileEditor() {
               </div>
             </Card>
 
+            {/* Social Links */}
+            {token && <SocialLinksManager token={token} />}
+
             {/* Visibility Settings */}
             <Card variant="glass">
               <div className="p-6">
@@ -969,9 +972,6 @@ export function CreatorProfileEditor() {
                 )}
               </div>
             </Card>
-
-            {/* Social Links */}
-            {token && <SocialLinksManager token={token} />}
 
             {/* Quick Stats Preview */}
             <Card variant="glass">
