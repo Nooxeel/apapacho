@@ -40,7 +40,7 @@ export function FontProvider({ children }: { children: ReactNode }) {
 
     // Add the selected font class
     document.body.classList.add(fontClass)
-  }, [currentFont, hasHydrated])
+  }, [currentFont, hasHydrated, user])
 
   const clearPreviewFont = () => {
     setPreviewFont(null)

@@ -1,34 +1,26 @@
 @import "tailwindcss";
 
-/* ===== Tailwind v4 Theme Configuration ===== */
-@theme {
-  /* Font Families - mapped from Next.js Google Fonts */
-  --font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-roboto: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
-  --font-open-sans: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-lato: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
-  --font-poppins: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
-}
+/* ===== Tailwind v4 Custom Font Utilities ===== */
+/* Next.js Google Fonts define CSS variables that we use here */
 
-/* Custom utility classes for fonts */
 @utility font-inter {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-inter);
 }
 
 @utility font-roboto {
-  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-roboto);
 }
 
 @utility font-open-sans {
-  font-family: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-open-sans);
 }
 
 @utility font-lato {
-  font-family: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-lato);
 }
 
 @utility font-poppins {
-  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-poppins);
 }
 
 :root {
