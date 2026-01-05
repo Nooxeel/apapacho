@@ -299,7 +299,7 @@ export default function DashboardPage() {
                   width={128}
                   height={128}
                   className="object-cover w-full h-full"
-                  unoptimized
+                  />
                 />
               </div>
               <button
@@ -589,7 +589,7 @@ export default function DashboardPage() {
                         width={64}
                         height={64}
                         className="object-cover w-full h-full"
-                        unoptimized
+                        />
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -647,7 +647,7 @@ export default function DashboardPage() {
                         width={64}
                         height={64}
                         className="object-cover w-full h-full"
-                        unoptimized
+                        />
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -700,7 +700,7 @@ export default function DashboardPage() {
                           width={48}
                           height={48}
                           className="object-cover w-full h-full"
-                          unoptimized
+                          />
                         />
                       </div>
                       <div className="flex-1 min-w-0">

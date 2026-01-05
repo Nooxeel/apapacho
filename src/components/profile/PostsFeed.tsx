@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { useInView } from 'react-intersection-observer'
+import Image from 'next/image'
 
 interface Post {
   id: string
@@ -363,12 +364,16 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                           preload="metadata"
                         />
                       ) : imageContent ? (
-                        <img
-                          src={imageContent.url}
-                          alt={post.title || 'Post image'}
-                          className="w-full max-h-[500px] object-contain mx-auto"
-                          loading="lazy"
-                        />
+                        <div className="relative w-full" style={{ maxHeight: '500px', aspectRatio: '16/9' }}>
+                          <Image
+                            src={imageContent.url}
+                            alt={post.title || 'Post image'}
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
+                            priority={false}
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
                           <Video className="w-16 h-16 text-white/30" />
@@ -384,11 +389,16 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                           preload="metadata"
                         />
                       ) : imageContent ? (
-                        <img
-                          src={imageContent.url}
-                          alt={post.title || 'Post image'}
-                          className="w-full max-h-[500px] object-contain mx-auto blur-2xl"
-                        />
+                        <div className="relative w-full" style={{ maxHeight: '500px', aspectRatio: '16/9' }}>
+                          <Image
+                            src={imageContent.url}
+                            alt={post.title || 'Post image'}
+                            fill
+                            className="object-contain blur-2xl"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
+                            priority={false}
+                          />
+                        </div>
                       ) : (
                         <div className="w-full h-64 bg-gradient-to-br from-gray-800 to-gray-900 blur-xl" />
                       )}
@@ -495,11 +505,12 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
                           return (
                             <div key={comment.id} className="flex gap-3">
-                              <img
+                              <Image
                                 src={comment.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.displayName)}&background=a21caf&color=fff`}
                                 alt={comment.user.displayName}
+                                width={32}
+                                height={32}
                                 className="w-8 h-8 rounded-full object-cover"
-                                loading="lazy"
                               />
                               <div className="flex-1">
                                 <div className="bg-white/10 rounded-2xl px-4 py-2">

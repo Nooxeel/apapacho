@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface MusicTrack {
   id: string
@@ -309,9 +310,11 @@ export function MusicPlayer({
                   {/* Thumbnail */}
                   <div className="w-14 h-14 rounded-lg overflow-hidden bg-white/10 flex-shrink-0 relative">
                     {currentTrack?.thumbnail && (
-                      <img
+                      <Image
                         src={currentTrack.thumbnail}
                         alt={currentTrack.title}
+                        width={56}
+                        height={56}
                         className="w-full h-full object-cover"
                       />
                     )}
@@ -442,9 +445,11 @@ export function MusicPlayer({
                           )}
                           style={index === currentTrackIndex ? { backgroundColor: `${accentColor}30` } : {}}
                         >
-                          <img 
-                            src={track.thumbnail} 
-                            alt="" 
+                          <Image
+                            src={track.thumbnail}
+                            alt={track.title}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded object-cover"
                           />
                           <div className="flex-1 min-w-0">

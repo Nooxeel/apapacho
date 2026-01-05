@@ -6,11 +6,12 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Card, Button } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
-import { Edit2, Trash2, Eye, Heart, MessageCircle, Image, Video, Plus } from 'lucide-react';
+import { Edit2, Trash2, Eye, Heart, MessageCircle, Image as ImageIcon, Video, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { API_URL } from '@/lib/config';
 import { VisibilitySelector } from '@/components/profile/VisibilitySelector';
 import type { PostVisibility } from '@/types';
+import Image from 'next/image';
 
 interface PostContent {
   type: 'text' | 'image' | 'video';
@@ -143,7 +144,7 @@ export default function CreatorPostsPage() {
       <div className="flex gap-2 text-sm text-white/60">
         {images.length > 0 && (
           <div className="flex items-center gap-1">
-            <Image className="w-4 h-4" />
+            <ImageIcon className="w-4 h-4" />
             <span>{images.length}</span>
           </div>
         )}
@@ -258,9 +259,11 @@ export default function CreatorPostsPage() {
                       <div className="flex-shrink-0">
                         {post.content[0]?.type === 'image' && post.content[0].url && (
                           <div className="w-32 h-32 rounded-lg overflow-hidden bg-white/5">
-                            <img 
+                            <Image
                               src={post.content[0].url}
                               alt="Post preview"
+                              width={128}
+                              height={128}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -272,7 +275,7 @@ export default function CreatorPostsPage() {
                         )}
                         {!post.content[0] && (
                           <div className="w-32 h-32 rounded-lg bg-white/5 flex items-center justify-center">
-                            <Image className="w-8 h-8 text-white/40" />
+                            <ImageIcon className="w-8 h-8 text-white/40" />
                           </div>
                         )}
                       </div>

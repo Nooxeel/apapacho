@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/lib/config';
+import Image from 'next/image';
 
 interface CommentUser {
   id: string;
@@ -214,9 +215,11 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
             {pendingComments.map(comment => (
               <div key={comment.id} className="bg-black/20 rounded-lg p-3">
                 <div className="flex items-start gap-3">
-                  <img
+                  <Image
                     src={getUserAvatar(comment)}
                     alt={comment.user.displayName}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div className="flex-1 min-w-0">
@@ -252,9 +255,11 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
       {user && token ? (
         <form onSubmit={handleSubmit} className="mb-4">
           <div className="flex gap-3">
-            <img
+            <Image
               src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=random`}
               alt={user.displayName}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex-1">
@@ -303,9 +308,11 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
         <div className="space-y-4">
           {comments.map(comment => (
             <div key={comment.id} className="flex items-start gap-3 group">
-              <img
+              <Image
                 src={getUserAvatar(comment)}
                 alt={comment.user.displayName}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div className="flex-1 min-w-0">

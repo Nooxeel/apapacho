@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { messageApi } from '@/lib/api'
 import { socketService } from '@/lib/socket'
 import { User, LogOut, Settings, FileText, MessageCircle } from 'lucide-react'
+import Image from 'next/image'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -104,9 +105,11 @@ export function Navbar() {
                     >
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
                         {user.avatar ? (
-                          <img
+                          <Image
                             src={user.avatar}
                             alt={user.displayName}
+                            width={32}
+                            height={32}
                             className="w-full h-full object-cover"
                           />
                         ) : (

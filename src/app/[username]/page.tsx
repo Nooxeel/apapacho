@@ -336,7 +336,7 @@ export default function CreatorPublicProfile() {
                 alt={creator.displayName}
                 fill
                 className="object-cover"
-                unoptimized
+                sizes="(max-width: 768px) 150px, 200px"
               />
             </div>
 

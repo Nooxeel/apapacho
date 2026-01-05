@@ -12,6 +12,7 @@ import { InterestSelector } from '@/components/interests'
 import SocialLinksManager from '@/components/social/SocialLinksManager'
 import FontSelector from '@/components/ui/FontSelector'
 import type { Interest } from '@/types'
+import Image from 'next/image'
 
 // Opciones de colores de fondo predefinidos
 const backgroundColors = [
@@ -521,7 +522,7 @@ export function CreatorProfileEditor() {
             onClick={() => coverInputRef.current?.click()}
           >
             {previewCover ? (
-              <img src={previewCover} alt="Cover" className="w-full h-full object-cover" />
+              <Image src={previewCover} alt="Cover" fill className="object-cover" sizes="(max-width: 1200px) 100vw, 1200px" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <div className="text-center">
@@ -559,7 +560,7 @@ export function CreatorProfileEditor() {
               onClick={() => profileImageInputRef.current?.click()}
             >
               {previewProfileImage ? (
-                <img src={previewProfileImage} alt="Profile" className="w-full h-full object-cover" />
+                <Image src={previewProfileImage} alt="Profile" fill className="object-cover" sizes="200px" />
               ) : (
                 <div 
                   className="w-full h-full flex items-center justify-center"
@@ -964,9 +965,11 @@ export function CreatorProfileEditor() {
                         className="flex items-center gap-3 p-3 rounded-lg bg-white/5 group"
                       >
                         <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                          <img
+                          <Image
                             src={track.thumbnail}
                             alt={track.title}
+                            width={48}
+                            height={48}
                             className="w-full h-full object-cover"
                           />
                         </div>

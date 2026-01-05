@@ -10,6 +10,7 @@ import { Button } from '@/components/ui'
 import { InterestBadges } from '@/components/interests'
 import { discoverApi, interestsApi } from '@/lib/api'
 import type { Interest } from '@/types'
+import Image from 'next/image'
 
 interface Creator {
   id: string
@@ -252,9 +253,11 @@ export default function DiscoverPage() {
                 >
                   {/* Avatar & Name */}
                   <div className="flex items-start gap-4 mb-4">
-                    <img
+                    <Image
                       src={creator.profileImage || creator.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.displayName)}&background=a21caf&color=fff`}
                       alt={creator.displayName}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 rounded-full object-cover"
                     />
 

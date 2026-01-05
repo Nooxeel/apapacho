@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button, Card } from '@/components/ui';
 import { MessageCircle, Check, X, Trash2, Clock, CheckCircle } from 'lucide-react';
 import { API_URL } from '@/lib/config';
+import Image from 'next/image';
 
 interface Comment {
   id: string;
@@ -177,7 +178,7 @@ export default function CreatorCommentsPage() {
         {/* Avatar */}
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center flex-shrink-0">
           {comment.user.avatar ? (
-            <img src={comment.user.avatar} alt={comment.user.displayName} className="w-full h-full rounded-full object-cover" />
+            <Image src={comment.user.avatar} alt={comment.user.displayName} width={40} height={40} className="w-full h-full rounded-full object-cover" />
           ) : (
             <span className="text-white font-semibold">
               {comment.user.displayName.charAt(0).toUpperCase()}

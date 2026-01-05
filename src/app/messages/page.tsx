@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { MessageCircle, Search, ArrowLeft } from 'lucide-react'
 import { socketService } from '@/lib/socket'
+import Image from 'next/image'
 
 interface Conversation {
   id: string
@@ -170,9 +171,11 @@ export default function MessagesPage() {
                 <div className="relative">
                   <div className="w-14 h-14 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center overflow-hidden">
                     {conv.otherUser.avatar ? (
-                      <img 
-                        src={conv.otherUser.avatar} 
+                      <Image
+                        src={conv.otherUser.avatar}
                         alt={conv.otherUser.displayName}
+                        width={56}
+                        height={56}
                         className="w-full h-full object-cover"
                       />
                     ) : (

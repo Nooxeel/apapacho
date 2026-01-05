@@ -11,6 +11,7 @@ import { User as UserIcon, ImagePlus, Save, ArrowLeft, Tag, Palette, Type } from
 import { InterestSelector } from '@/components/interests'
 import FontSelector from '@/components/ui/FontSelector'
 import type { Interest } from '@/types'
+import Image from 'next/image'
 
 // Colores de fondo predefinidos
 const backgroundColors = [
@@ -334,10 +335,12 @@ export default function ProfileEditPage() {
                     onClick={() => avatarInputRef.current?.click()}
                   >
                     {previewAvatar ? (
-                      <img
+                      <Image
                         src={previewAvatar}
                         alt="Avatar preview"
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="128px"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center">
@@ -498,7 +501,7 @@ export default function ProfileEditPage() {
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-16 h-16 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
                         {previewAvatar ? (
-                          <img src={previewAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                          <Image src={previewAvatar} alt="Avatar" width={64} height={64} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <UserIcon className="w-8 h-8 text-white/30" />

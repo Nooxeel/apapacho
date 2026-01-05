@@ -127,9 +127,11 @@ export default function CreatorsPage() {
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
                         <div className="relative w-20 h-20 rounded-full border-4 border-[#0f0f14] overflow-hidden bg-white/10">
                           {creator.profileImage ? (
-                            <img
+                            <Image
                               src={creator.profileImage}
                               alt={creator.user?.displayName || 'Creator'}
+                              width={80}
+                              height={80}
                               className="w-full h-full object-cover"
                             />
                           ) : (

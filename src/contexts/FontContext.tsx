@@ -5,9 +5,6 @@ import { useAuthStore } from '@/stores/authStore'
 
 const FONT_CLASS_MAP: Record<string, string> = {
   'Inter': 'font-[var(--font-inter)]',
-  'Roboto': 'font-[var(--font-roboto)]',
-  'Open Sans': 'font-[var(--font-open-sans)]',
-  'Lato': 'font-[var(--font-lato)]',
   'Poppins': 'font-[var(--font-poppins)]',
 }
 

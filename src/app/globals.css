@@ -7,18 +7,6 @@
   font-family: var(--font-inter);
 }
 
-@utility font-roboto {
-  font-family: var(--font-roboto);
-}
-
-@utility font-open-sans {
-  font-family: var(--font-open-sans);
-}
-
-@utility font-lato {
-  font-family: var(--font-lato);
-}
-
 @utility font-poppins {
   font-family: var(--font-poppins);
 }
