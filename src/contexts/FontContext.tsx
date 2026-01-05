@@ -3,9 +3,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 
+// Map font names to Tailwind v4 utility classes defined in globals.css
 const FONT_CLASS_MAP: Record<string, string> = {
-  'Inter': 'font-[var(--font-inter)]',
-  'Poppins': 'font-[var(--font-poppins)]',
+  'Inter': 'font-inter',
+  'Poppins': 'font-poppins',
 }
 
 interface FontContextType {
@@ -28,7 +29,7 @@ export function FontProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasHydrated) return
 
-    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-[var(--font-inter)]'
+    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-inter'
 
     // Remove all font classes from body
     Object.values(FONT_CLASS_MAP).forEach(className => {

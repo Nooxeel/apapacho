@@ -16,12 +16,10 @@ const presetThemes = [
   { name: 'Retro', primary: '#ec4899', secondary: '#f472b6', bg: 'from-pink-900 via-black to-rose-900' },
 ]
 
+// Only fonts loaded in layout.tsx via next/font/google
 const fontOptions = [
   { name: 'Inter', value: 'Inter' },
   { name: 'Poppins', value: 'Poppins' },
-  { name: 'Roboto', value: 'Roboto' },
-  { name: 'Playfair', value: 'Playfair Display' },
-  { name: 'Comic Sans', value: 'Comic Sans MS' },
 ]
 
 export function ProfileCustomizer() {

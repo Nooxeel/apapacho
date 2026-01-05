@@ -6,12 +6,12 @@ interface FontOption {
   value: string
   label: string
   description: string
-  cssVar: string
+  fontFamily: string  // Actual font-family value for inline styles
 }
 
 const FONT_OPTIONS: FontOption[] = [
-  { value: 'Inter', label: 'Inter', description: 'Moderna y limpia', cssVar: 'var(--font-inter)' },
-  { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna', cssVar: 'var(--font-poppins)' },
+  { value: 'Inter', label: 'Inter', description: 'Moderna y limpia', fontFamily: 'Inter, system-ui, sans-serif' },
+  { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna', fontFamily: 'Poppins, system-ui, sans-serif' },
 ]
 
 interface FontSelectorProps {
@@ -61,13 +61,13 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                 {/* Font preview */}
                 <p
                   className="text-xl text-white/90 leading-tight mb-1"
-                  style={{ fontFamily: `${font.cssVar}, system-ui, sans-serif` }}
+                  style={{ fontFamily: font.fontFamily }}
                 >
                   Apapacho
                 </p>
                 <p
                   className="text-sm text-white/60"
-                  style={{ fontFamily: `${font.cssVar}, system-ui, sans-serif` }}
+                  style={{ fontFamily: font.fontFamily }}
                 >
                   AaBbCc 123
                 </p>
