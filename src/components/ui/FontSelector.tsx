@@ -32,13 +32,13 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
 
   const getFontClass = (fontName: string) => {
     const fontMap: Record<string, string> = {
-      'Inter': 'font-[Inter,sans-serif]',
-      'Roboto': 'font-[Roboto,sans-serif]',
-      'Open Sans': 'font-[\'Open_Sans\',sans-serif]',
-      'Lato': 'font-[Lato,sans-serif]',
-      'Poppins': 'font-[Poppins,sans-serif]',
+      'Inter': 'font-inter',
+      'Roboto': 'font-roboto',
+      'Open Sans': 'font-open-sans',
+      'Lato': 'font-lato',
+      'Poppins': 'font-poppins',
     }
-    return fontMap[fontName] || 'font-sans'
+    return fontMap[fontName] || 'font-inter'
   }
 
   return (
@@ -93,26 +93,22 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                   {/* Font preview with inline style */}
                   <div className="space-y-2">
                     <p
-                      className="text-2xl text-white leading-tight"
-                      style={{ fontFamily: font.value }}
+                      className={`text-2xl text-white leading-tight ${getFontClass(font.value)}`}
                     >
                       The quick brown fox
                     </p>
                     <p
-                      className="text-base text-white/70"
-                      style={{ fontFamily: font.value }}
+                      className={`text-base text-white/70 ${getFontClass(font.value)}`}
                     >
                       jumps over the lazy dog
                     </p>
                     <p
-                      className="text-sm text-white/50"
-                      style={{ fontFamily: font.value }}
+                      className={`text-sm text-white/50 ${getFontClass(font.value)}`}
                     >
                       ABCDEFGHIJKLMNOPQRSTUVWXYZ
                     </p>
                     <p
-                      className="text-sm text-white/50"
-                      style={{ fontFamily: font.value }}
+                      className={`text-sm text-white/50 ${getFontClass(font.value)}`}
                     >
                       0123456789
                     </p>
