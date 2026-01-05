@@ -7,6 +7,9 @@ import { useAuthStore } from '@/stores/authStore'
 const FONT_CLASS_MAP: Record<string, string> = {
   'Inter': 'font-inter',
   'Poppins': 'font-poppins',
+  'Roboto': 'font-roboto',
+  'Open Sans': 'font-open-sans',
+  'Montserrat': 'font-montserrat',
 }
 
 interface FontContextType {

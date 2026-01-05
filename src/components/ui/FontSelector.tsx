@@ -12,6 +12,9 @@ interface FontOption {
 const FONT_OPTIONS: FontOption[] = [
   { value: 'Inter', label: 'Inter', description: 'Moderna y limpia', fontFamily: 'Inter, system-ui, sans-serif' },
   { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna', fontFamily: 'Poppins, system-ui, sans-serif' },
+  { value: 'Roboto', label: 'Roboto', description: 'Profesional y versátil', fontFamily: 'Roboto, system-ui, sans-serif' },
+  { value: 'Open Sans', label: 'Open Sans', description: 'Amigable y legible', fontFamily: 'Open Sans, system-ui, sans-serif' },
+  { value: 'Montserrat', label: 'Montserrat', description: 'Elegante y urbana', fontFamily: 'Montserrat, system-ui, sans-serif' },
 ]
 
 interface FontSelectorProps {

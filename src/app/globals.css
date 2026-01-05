@@ -11,6 +11,18 @@
   font-family: var(--font-poppins);
 }
 
+@utility font-roboto {
+  font-family: var(--font-roboto);
+}
+
+@utility font-open-sans {
+  font-family: var(--font-open-sans);
+}
+
+@utility font-montserrat {
+  font-family: var(--font-montserrat);
+}
+
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 15, 15, 20;

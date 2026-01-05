@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+import { Inter, Poppins, Roboto, Open_Sans, Montserrat } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 
-// Top 2 web fonts optimized for performance
+// Top 5 web fonts optimized for performance
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -16,6 +16,27 @@ const poppins = Poppins({
   subsets: ['latin'],
   variable: '--font-poppins',
   display: 'swap'
+})
+
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-roboto',
+  display: 'swap'
+})
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  variable: '--font-open-sans',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -31,7 +52,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${poppins.variable} font-inter`}>
+      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} ${openSans.variable} ${montserrat.variable} font-inter`}>
         <FontProvider>
           {children}
         </FontProvider>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { creatorApi } from '@/lib/api'
+import { getFontClass } from '@/lib/fonts'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { Navbar } from '@/components/layout'
 import ChatModal from '@/components/messages/ChatModal'
@@ -304,11 +305,10 @@ export default function CreatorPublicProfile() {
     <>
       <Navbar />
       <div 
-        className="min-h-screen"
+        className={`min-h-screen ${getFontClass(profile.fontFamily)}`}
         style={{ 
           backgroundColor: profile.backgroundColor,
           color: profile.textColor,
-          fontFamily: profile.fontFamily 
         }}
       >
         {/* Cover Image */}

@@ -20,6 +20,9 @@ const presetThemes = [
 const fontOptions = [
   { name: 'Inter', value: 'Inter' },
   { name: 'Poppins', value: 'Poppins' },
+  { name: 'Roboto', value: 'Roboto' },
+  { name: 'Open Sans', value: 'Open Sans' },
+  { name: 'Montserrat', value: 'Montserrat' },
 ]
 
 export function ProfileCustomizer() {
