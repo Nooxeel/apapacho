@@ -4,11 +4,11 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useAuthStore } from '@/stores/authStore'
 
 const FONT_CLASS_MAP: Record<string, string> = {
-  'Inter': 'font-inter',
-  'Roboto': 'font-roboto',
-  'Open Sans': 'font-open-sans',
-  'Lato': 'font-lato',
-  'Poppins': 'font-poppins',
+  'Inter': 'font-[var(--font-inter)]',
+  'Roboto': 'font-[var(--font-roboto)]',
+  'Open Sans': 'font-[var(--font-open-sans)]',
+  'Lato': 'font-[var(--font-lato)]',
+  'Poppins': 'font-[var(--font-poppins)]',
 }
 
 interface FontContextType {
@@ -31,7 +31,7 @@ export function FontProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasHydrated) return
 
-    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-inter'
+    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-[var(--font-inter)]'
 
     // Remove all font classes from body
     Object.values(FONT_CLASS_MAP).forEach(className => {
