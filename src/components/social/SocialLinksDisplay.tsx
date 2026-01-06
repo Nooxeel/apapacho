@@ -20,14 +20,25 @@ export default function SocialLinksDisplay({
     return null
   }
 
+  // Helper para generar el href correcto
+  const getLinkHref = (link: SocialLink) => {
+    if (link.platform.toLowerCase() === 'email') {
+      // Si es email y no tiene mailto:, agregarlo
+      return link.url.includes('@') && !link.url.startsWith('mailto:') 
+        ? `mailto:${link.url}` 
+        : link.url
+    }
+    return link.url
+  }
+
   if (variant === 'compact') {
     return (
       <div className={`flex flex-wrap gap-3 ${className}`}>
         {visibleLinks.map(link => (
           <a
             key={link.id}
-            href={link.url}
-            target="_blank"
+            href={getLinkHref(link)}
+            target={link.platform.toLowerCase() === 'email' ? '_self' : '_blank'}
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors group"
             title={link.label || link.platform}
@@ -49,8 +60,8 @@ export default function SocialLinksDisplay({
         {visibleLinks.map(link => (
           <a
             key={link.id}
-            href={link.url}
-            target="_blank"
+            href={getLinkHref(link)}
+            target={link.platform.toLowerCase() === 'email' ? '_self' : '_blank'}
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 hover:border-white/20 transition-all group"
           >
@@ -62,7 +73,9 @@ export default function SocialLinksDisplay({
                 {link.label || link.platform}
               </div>
               <div className="text-xs text-white/50 truncate">
-                {link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                {link.platform.toLowerCase() === 'email' 
+                  ? link.url 
+                  : link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
               </div>
             </div>
             <ExternalLink className="w-4 h-4 text-white/30 group-hover:text-white/60 flex-shrink-0" />
@@ -78,8 +91,8 @@ export default function SocialLinksDisplay({
       {visibleLinks.map(link => (
         <a
           key={link.id}
-          href={link.url}
-          target="_blank"
+          href={getLinkHref(link)}
+          target={link.platform.toLowerCase() === 'email' ? '_self' : '_blank'}
           rel="noopener noreferrer"
           className="flex items-center justify-between gap-4 p-4 bg-white/10 hover:bg-white/15 rounded-xl border border-white/10 hover:border-fuchsia-500/50 transition-all group w-full"
         >

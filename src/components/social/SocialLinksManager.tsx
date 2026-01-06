@@ -69,13 +69,24 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
     setError(null)
 
     try {
-      // Validar URL
-      try {
-        new URL(newLink.url)
-      } catch {
-        setError('URL inválida')
-        setIsSaving(false)
-        return
+      // Validar URL (excepto para Email donde aceptamos correos electrónicos)
+      if (newLink.platform.toLowerCase() === 'email') {
+        // Validar que sea un email válido
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(newLink.url)) {
+          setError('Correo electrónico inválido')
+          setIsSaving(false)
+          return
+        }
+      } else {
+        // Validar URL normal para otras plataformas
+        try {
+          new URL(newLink.url)
+        } catch {
+          setError('URL inválida')
+          setIsSaving(false)
+          return
+        }
       }
 
       const created = await socialLinksApi.create(
@@ -254,10 +265,10 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
                   URL *
                 </label>
                 <input
-                  type="url"
+                  type={newLink.platform.toLowerCase() === 'email' ? 'email' : 'url'}
                   value={newLink.url}
                   onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
-                  placeholder="https://..."
+                  placeholder={newLink.platform.toLowerCase() === 'email' ? 'ejemplo@correo.com' : 'https://...'}
                   className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-fuchsia-500"
                 />
               </div>
