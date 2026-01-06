@@ -629,7 +629,7 @@ export function CreatorProfileEditor() {
                       onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
                       rows={4}
                       maxLength={500}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 resize-none"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 resize-none whitespace-pre-wrap"
                       style={{
                         '--tw-ring-color': `${profile.accentColor}50`
                       } as any}

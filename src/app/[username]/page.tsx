@@ -155,16 +155,13 @@ export default function CreatorPublicProfile() {
         } catch {}
 
         // Verificar si el usuario actual es suscriptor
-        if (token && user) {
+        if (token && user && data.creatorProfile?.id) {
           try {
-            const subRes = await fetch(`${API_URL}/subscriptions/check/${data.id}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            })
-            if (subRes.ok) {
-              const { isSubscribed } = await subRes.json()
-              setIsSubscriber(isSubscribed)
-            }
-          } catch {}
+            const subCheck = await subscriptionsApi.checkSubscription(data.creatorProfile.id, token)
+            setIsSubscriber(subCheck.isSubscribed)
+          } catch (error) {
+            console.error('Error checking subscription:', error)
+          }
         }
       } catch (err) {
         setError('Creador no encontrado')
@@ -253,12 +250,32 @@ export default function CreatorPublicProfile() {
 
     setSubscribing(true)
     try {
-      await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
+      // TODO: Integrar con pasarela de pago (Flow, Transbank, etc.)
+      // 1. Crear orden de pago con monto y detalles del tier
+      // 2. Redirigir a pasarela o mostrar formulario de pago
+      // 3. Webhook de confirmación de pago
+      // 4. Crear suscripción en base de datos
+      
+      // Por ahora: Aprobación automática para desarrollo
+      const response = await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
+      
+      // Actualizar estado local inmediatamente
       setIsSubscriber(true)
       setShowSubscribeModal(false)
-      alert('¡Te has suscrito exitosamente!')
+      
+      // Mostrar mensaje de éxito con más contexto
+      const tier = profile.subscriptionTiers.find(t => t.id === tierId)
+      if (tier) {
+        alert(`¡Suscripción exitosa! 🎉\n\nAhora eres suscriptor de ${creator.displayName}.\nPlan: ${tier.name}\nAcceso válido hasta: ${new Date(response.subscription.endDate).toLocaleDateString('es-CL')}\n\nDisfruta del contenido exclusivo.`)
+      }
+      
+      // Recargar perfil para actualizar contadores
+      const updatedCreator = await creatorApi.getByUsername(username)
+      setCreator(updatedCreator as CreatorProfile)
+      
     } catch (error: any) {
-      alert(error.message || 'Error al suscribirse')
+      console.error('Error al suscribirse:', error)
+      alert(error.message || 'Error al procesar la suscripción. Intenta de nuevo.')
     } finally {
       setSubscribing(false)
     }
@@ -387,7 +404,7 @@ export default function CreatorPublicProfile() {
 
             {/* Bio */}
             {profile.bio && (
-              <p className="mt-2 text-center text-gray-300 max-w-md">
+              <p className="mt-2 text-center text-gray-300 max-w-md whitespace-pre-line">
                 {profile.bio}
               </p>
             )}
