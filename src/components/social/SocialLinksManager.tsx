@@ -69,7 +69,9 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
     setError(null)
 
     try {
-      // Validar URL (excepto para Email donde aceptamos correos electrónicos)
+      let finalUrl = newLink.url
+
+      // Validar y procesar según la plataforma
       if (newLink.platform.toLowerCase() === 'email') {
         // Validar que sea un email válido
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -77,6 +79,10 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
           setError('Correo electrónico inválido')
           setIsSaving(false)
           return
+        }
+        // Agregar mailto: si no lo tiene
+        if (!newLink.url.startsWith('mailto:')) {
+          finalUrl = `mailto:${newLink.url}`
         }
       } else {
         // Validar URL normal para otras plataformas
@@ -92,7 +98,7 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
       const created = await socialLinksApi.create(
         {
           platform: newLink.platform,
-          url: newLink.url,
+          url: finalUrl,
           label: newLink.label || undefined,
           icon: newLink.icon || undefined
         },

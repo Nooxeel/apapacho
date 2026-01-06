@@ -23,12 +23,19 @@ export default function SocialLinksDisplay({
   // Helper para generar el href correcto
   const getLinkHref = (link: SocialLink) => {
     if (link.platform.toLowerCase() === 'email') {
-      // Si es email y no tiene mailto:, agregarlo
-      return link.url.includes('@') && !link.url.startsWith('mailto:') 
-        ? `mailto:${link.url}` 
-        : link.url
+      // Si ya tiene mailto:, usarlo directamente; si no, agregarlo
+      return link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`
     }
     return link.url
+  }
+
+  // Helper para mostrar el texto del link
+  const getLinkDisplayText = (link: SocialLink) => {
+    if (link.platform.toLowerCase() === 'email') {
+      // Mostrar solo el email sin el mailto:
+      return link.url.replace('mailto:', '')
+    }
+    return link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
   }
 
   if (variant === 'compact') {
@@ -73,9 +80,7 @@ export default function SocialLinksDisplay({
                 {link.label || link.platform}
               </div>
               <div className="text-xs text-white/50 truncate">
-                {link.platform.toLowerCase() === 'email' 
-                  ? link.url 
-                  : link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                {getLinkDisplayText(link)}
               </div>
             </div>
             <ExternalLink className="w-4 h-4 text-white/30 group-hover:text-white/60 flex-shrink-0" />
