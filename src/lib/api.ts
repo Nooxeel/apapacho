@@ -390,4 +390,47 @@ export const socialLinksApi = {
     api<{ message: string }>(`/sociallinks/${id}`, { method: 'DELETE', token }),
 }
 
+// Subscriptions API
+export const subscriptionsApi = {
+  // Get tiers for a creator (public)
+  getTiers: (creatorId: string) =>
+    api<any[]>(`/subscriptions/tiers/${creatorId}`),
+
+  // Get my tiers as creator
+  getMyTiers: (token: string) =>
+    api<any[]>('/subscriptions/my-tiers', { token }),
+
+  // Create tier
+  createTier: (data: { name: string; description?: string; price: number; currency?: string; benefits?: string }, token: string) =>
+    api<any>('/subscriptions/tiers', { method: 'POST', body: data, token }),
+
+  // Update tier
+  updateTier: (tierId: string, data: { name?: string; description?: string; price?: number; currency?: string; benefits?: string; isActive?: boolean }, token: string) =>
+    api<any>(`/subscriptions/tiers/${tierId}`, { method: 'PUT', body: data, token }),
+
+  // Delete tier
+  deleteTier: (tierId: string, token: string) =>
+    api<{ message: string }>(`/subscriptions/tiers/${tierId}`, { method: 'DELETE', token }),
+
+  // Check if user is subscribed to a creator
+  checkSubscription: (creatorId: string, token: string) =>
+    api<{ isSubscribed: boolean; subscription: any | null }>(`/subscriptions/check/${creatorId}`, { token }),
+
+  // Subscribe to a creator
+  subscribe: (creatorId: string, tierId: string, token: string) =>
+    api<{ message: string; subscription: any }>('/subscriptions/subscribe', { method: 'POST', body: { creatorId, tierId }, token }),
+
+  // Unsubscribe from a creator
+  unsubscribe: (creatorId: string, token: string) =>
+    api<{ message: string }>(`/subscriptions/unsubscribe/${creatorId}`, { method: 'POST', token }),
+
+  // Get my subscriptions as fan
+  getMySubscriptions: (token: string) =>
+    api<any[]>('/subscriptions/my-subscriptions', { token }),
+
+  // Get my subscribers as creator
+  getMySubscribers: (token: string) =>
+    api<any[]>('/subscriptions/subscribers', { token }),
+}
+
 export default api

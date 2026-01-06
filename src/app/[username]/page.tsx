@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { creatorApi } from '@/lib/api'
+import { creatorApi, subscriptionsApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { Navbar } from '@/components/layout'
@@ -79,6 +79,7 @@ interface CreatorProfile {
       currency: string
       description?: string
       benefits: string
+      isActive: boolean
     }>
     stats: {
       totalLikes: number
@@ -116,6 +117,8 @@ export default function CreatorPublicProfile() {
   const [isSubscriber, setIsSubscriber] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const [chatConversationId, setChatConversationId] = useState<string | null>(null)
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false)
+  const [subscribing, setSubscribing] = useState(false)
 
   // Real-time stats (sincronizado con polling de mensajes)
   const [totalLikes, setTotalLikes] = useState(0)
@@ -230,6 +233,35 @@ export default function CreatorPublicProfile() {
     }
 
     return false
+  }
+
+  // Formatear precio en CLP
+  const formatPriceCLP = (price: number) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      minimumFractionDigits: 0
+    }).format(price)
+  }
+
+  // Handler para suscribirse
+  const handleSubscribe = async (tierId: string) => {
+    if (!token || !creator) {
+      router.push('/login')
+      return
+    }
+
+    setSubscribing(true)
+    try {
+      await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
+      setIsSubscriber(true)
+      setShowSubscribeModal(false)
+      alert('¡Te has suscrito exitosamente!')
+    } catch (error: any) {
+      alert(error.message || 'Error al suscribirse')
+    } finally {
+      setSubscribing(false)
+    }
   }
 
   // Handler para enviar mensaje
@@ -362,14 +394,27 @@ export default function CreatorPublicProfile() {
 
             {/* Action Buttons */}
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              {mainTier && (
+              {/* Botón de Suscripción */}
+              {mainTier && !isOwner && !isSubscriber && (
                 <button
+                  onClick={() => setShowSubscribeModal(true)}
                   className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-transform hover:scale-105"
                   style={{ backgroundColor: profile.accentColor }}
                 >
                   <Lock className="w-5 h-5" />
-                  Suscribirse ${mainTier.price.toFixed(2)} por mes
+                  Suscribirse {formatPriceCLP(mainTier.price)}/mes
                 </button>
+              )}
+
+              {/* Badge si ya está suscrito */}
+              {isSubscriber && !isOwner && (
+                <div 
+                  className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white"
+                  style={{ backgroundColor: profile.accentColor }}
+                >
+                  <BadgeCheck className="w-5 h-5" />
+                  Suscrito
+                </div>
               )}
 
               <button className="flex items-center gap-2 px-5 py-3 rounded-full border border-gray-600 bg-transparent hover:bg-white/5 transition-colors">
@@ -573,6 +618,72 @@ export default function CreatorPublicProfile() {
             setChatConversationId(null)
           }}
         />
+      )}
+
+      {/* Subscribe Modal */}
+      {showSubscribeModal && creator && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setShowSubscribeModal(false)}
+        >
+          <div 
+            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {creator.displayName}</h2>
+              <p className="text-white/60 text-sm mb-6">Elige un plan para acceder a contenido exclusivo</p>
+              
+              <div className="space-y-4">
+                {profile.subscriptionTiers.filter(t => t.isActive).map((tier) => (
+                  <div
+                    key={tier.id}
+                    className="p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-white">{tier.name}</h3>
+                      <span className="text-xl font-bold" style={{ color: profile.accentColor }}>
+                        {formatPriceCLP(tier.price)}
+                        <span className="text-sm font-normal text-white/50">/mes</span>
+                      </span>
+                    </div>
+                    
+                    {tier.description && (
+                      <p className="text-sm text-white/60 mb-3">{tier.description}</p>
+                    )}
+                    
+                    {tier.benefits && (
+                      <div className="text-sm text-white/50 mb-4 space-y-1">
+                        {tier.benefits.split('\n').filter(b => b.trim()).map((benefit, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="text-green-400 text-xs">✓</span>
+                            <span>{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={() => handleSubscribe(tier.id)}
+                      disabled={subscribing}
+                      className="w-full py-2.5 rounded-lg font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+                      style={{ backgroundColor: profile.accentColor }}
+                    >
+                      {subscribing ? 'Procesando...' : 'Suscribirse'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => setShowSubscribeModal(false)}
+                className="w-full mt-4 py-2 text-white/50 hover:text-white transition-colors text-sm"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   )

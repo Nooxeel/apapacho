@@ -10,6 +10,7 @@ import { API_URL } from '@/lib/config'
 import { LayoutDashboard, ImagePlus, Tag, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
 import SocialLinksManager from '@/components/social/SocialLinksManager'
+import SubscriptionTiersManager from '@/components/subscriptions/SubscriptionTiersManager'
 import FontSelector from '@/components/ui/FontSelector'
 import type { Interest } from '@/types'
 import Image from 'next/image'
@@ -643,6 +644,9 @@ export function CreatorProfileEditor() {
 
             {/* Social Links */}
             {token && <SocialLinksManager token={token} onLinksChange={setSocialLinksCount} />}
+
+            {/* Subscription Tiers */}
+            {token && <SubscriptionTiersManager token={token} />}
 
             {/* Visibility Settings */}
             <Card variant="glass">
