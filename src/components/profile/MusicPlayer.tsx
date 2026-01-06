@@ -122,6 +122,8 @@ export function MusicPlayer({
     if (!autoPlay) {
       // Pausar inmediatamente para prevenir cualquier autoplay
       event.target.pauseVideo()
+      // Extra seguridad: detener el video completamente
+      event.target.stopVideo()
     } else {
       // Solo reproducir automáticamente si autoPlay está habilitado
       event.target.playVideo()

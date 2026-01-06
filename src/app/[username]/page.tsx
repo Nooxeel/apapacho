@@ -613,6 +613,7 @@ export default function CreatorPublicProfile() {
                 creatorId={profile.id}
                 accentColor={profile.accentColor}
                 filterType={activeTab}
+                onSubscribeClick={() => setShowSubscribeModal(true)}
               />
             )}
           </div>

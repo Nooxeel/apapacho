@@ -34,9 +34,10 @@ interface PostsFeedProps {
   creatorId: string
   accentColor?: string
   filterType?: string
+  onSubscribeClick?: () => void
 }
 
-export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts' }: PostsFeedProps) {
+export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
@@ -420,7 +421,15 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                           </div>
                           <Button
                             variant="primary"
-                            onClick={() => router.push(post.visibility === 'authenticated' ? '/login' : '/pricing')}
+                            onClick={() => {
+                              if (post.visibility === 'authenticated') {
+                                router.push('/login')
+                              } else if (onSubscribeClick) {
+                                onSubscribeClick()
+                              } else {
+                                router.push('/pricing')
+                              }
+                            }}
                             className="w-full"
                           >
                             {post.visibility === 'authenticated' ? (
@@ -431,7 +440,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                             ) : (
                               <>
                                 <Star className="w-4 h-4 mr-2" />
-                                Ver Planes
+                                Suscribirse
                               </>
                             )}
                           </Button>
