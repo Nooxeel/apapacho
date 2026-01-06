@@ -121,6 +121,10 @@ export default function CreatorPublicProfile() {
   const [subscribing, setSubscribing] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState<{ tierName: string; endDate: string } | null>(null)
+  const [showManageModal, setShowManageModal] = useState(false)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [subscriptionDetails, setSubscriptionDetails] = useState<any>(null)
 
   // Real-time stats (sincronizado con polling de mensajes)
   const [totalLikes, setTotalLikes] = useState(0)
@@ -287,6 +291,48 @@ export default function CreatorPublicProfile() {
     }
   }
 
+  // Handler para cancelar suscripción
+  const handleCancelSubscription = async () => {
+    if (!token || !creator) return
+
+    setCancelling(true)
+    try {
+      await subscriptionsApi.unsubscribe(creator.creatorProfile.id, token)
+      
+      // Actualizar estado local
+      setIsSubscriber(false)
+      setShowCancelConfirm(false)
+      setShowManageModal(false)
+      
+      // Mostrar mensaje de éxito
+      alert('✅ Suscripción cancelada. Mantendrás acceso hasta el fin del período pagado.')
+      
+      // Recargar perfil
+      const updatedCreator = await creatorApi.getByUsername(username)
+      setCreator(updatedCreator as CreatorProfile)
+      
+    } catch (error: any) {
+      console.error('Error al cancelar suscripción:', error)
+      alert(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.')
+    } finally {
+      setCancelling(false)
+    }
+  }
+
+  // Cargar detalles de suscripción cuando se abre el modal
+  const loadSubscriptionDetails = async () => {
+    if (!token || !creator) return
+    
+    try {
+      const result = await subscriptionsApi.checkSubscription(creator.creatorProfile.id, token)
+      if (result.subscription) {
+        setSubscriptionDetails(result.subscription)
+      }
+    } catch (error) {
+      console.error('Error loading subscription:', error)
+    }
+  }
+
   // Handler para enviar mensaje
   const handleSendMessage = async () => {
     if (!token || !creator) {
@@ -429,15 +475,19 @@ export default function CreatorPublicProfile() {
                 </button>
               )}
 
-              {/* Badge si ya está suscrito */}
+              {/* Botón de gestión si ya está suscrito */}
               {isSubscriber && !isOwner && (
-                <div 
-                  className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white"
+                <button
+                  onClick={() => {
+                    loadSubscriptionDetails()
+                    setShowManageModal(true)
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
                   style={{ backgroundColor: profile.accentColor }}
                 >
                   <BadgeCheck className="w-5 h-5" />
                   Suscrito
-                </div>
+                </button>
               )}
 
               <button className="flex items-center gap-2 px-5 py-3 rounded-full border border-gray-600 bg-transparent hover:bg-white/5 transition-colors">
@@ -755,6 +805,156 @@ export default function CreatorPublicProfile() {
               >
                 Continuar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manage Subscription Modal */}
+      {showManageModal && subscriptionDetails && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setShowManageModal(false)}
+        >
+          <div 
+            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-white/10">
+              <h2 className="text-xl font-bold text-white">Gestionar Suscripción</h2>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Subscription Info */}
+              <div className="bg-white/5 rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Creador</span>
+                  <span className="font-semibold text-white">{creator.displayName}</span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Plan</span>
+                  <span className="font-semibold text-white">{subscriptionDetails.tier?.name}</span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Precio</span>
+                  <span className="font-semibold" style={{ color: profile.accentColor }}>
+                    {formatPriceCLP(subscriptionDetails.tier?.price)}/mes
+                  </span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Fecha de inicio</span>
+                  <span className="text-white">{new Date(subscriptionDetails.startDate).toLocaleDateString('es-CL')}</span>
+                </div>
+                {subscriptionDetails.endDate && (
+                  <div className="flex justify-between items-start">
+                    <span className="text-white/50 text-sm">Válido hasta</span>
+                    <span className="text-white">{new Date(subscriptionDetails.endDate).toLocaleDateString('es-CL')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Estado</span>
+                  <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
+                    {subscriptionDetails.status === 'active' ? 'Activa' : subscriptionDetails.status}
+                  </span>
+                </div>
+                {subscriptionDetails.autoRenew !== undefined && (
+                  <div className="flex justify-between items-start">
+                    <span className="text-white/50 text-sm">Renovación automática</span>
+                    <span className={subscriptionDetails.autoRenew ? "text-green-400" : "text-yellow-400"}>
+                      {subscriptionDetails.autoRenew ? 'Activada' : 'Desactivada'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Benefits */}
+              {subscriptionDetails.tier?.benefits && (
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-white/70">Beneficios incluidos:</h3>
+                  <div className="bg-white/5 rounded-lg p-3 text-sm text-white/80 whitespace-pre-line">
+                    {subscriptionDetails.tier.benefits}
+                  </div>
+                </div>
+              )}
+
+              {/* Cancel Button */}
+              <button
+                onClick={() => {
+                  setShowManageModal(false)
+                  setShowCancelConfirm(true)
+                }}
+                className="w-full py-3 rounded-lg font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
+              >
+                Cancelar Suscripción
+              </button>
+
+              <button
+                onClick={() => setShowManageModal(false)}
+                className="w-full py-2 text-white/50 hover:text-white transition-colors text-sm"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => !cancelling && setShowCancelConfirm(false)}
+        >
+          <div 
+            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center space-y-4">
+              {/* Warning Icon */}
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
+                <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-xl font-bold text-white">
+                ¿Cancelar suscripción?
+              </h2>
+
+              {/* Message */}
+              <div className="space-y-2 text-white/70 text-sm">
+                <p>Estás a punto de cancelar tu suscripción a <span className="font-semibold text-white">{creator?.displayName}</span></p>
+                {subscriptionDetails?.endDate && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-yellow-200">
+                    <p className="font-medium">ℹ️ Importante:</p>
+                    <p className="mt-1">Mantendrás acceso al contenido exclusivo hasta el <span className="font-semibold">{new Date(subscriptionDetails.endDate).toLocaleDateString('es-CL')}</span></p>
+                  </div>
+                )}
+                <p className="text-white/50 text-xs mt-3">Podrás volver a suscribirte en cualquier momento</p>
+              </div>
+
+              {/* Buttons */}
+              <div className="space-y-2">
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={cancelling}
+                  className="w-full py-3 rounded-lg font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelling ? 'Cancelando...' : 'Sí, cancelar suscripción'}
+                </button>
+                <button
+                  onClick={() => setShowCancelConfirm(false)}
+                  disabled={cancelling}
+                  className="w-full py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                  style={{ 
+                    backgroundColor: `${profile.accentColor}20`,
+                    color: profile.accentColor 
+                  }}
+                >
+                  No, mantener suscripción
+                </button>
+              </div>
             </div>
           </div>
         </div>
