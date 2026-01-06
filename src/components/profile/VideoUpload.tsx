@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { Button, Card } from '@/components/ui'
@@ -27,6 +27,37 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [subscriptionTiers, setSubscriptionTiers] = useState<any[]>([])
+  const [loadingTiers, setLoadingTiers] = useState(true)
+
+  // Cargar subscription tiers del creador
+  useEffect(() => {
+    const loadTiers = async () => {
+      if (!token || !user?.isCreator) {
+        setLoadingTiers(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/subscriptions/my-tiers`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (response.ok) {
+          const tiers = await response.json()
+          setSubscriptionTiers(tiers)
+        }
+      } catch (error) {
+        console.error('Error loading tiers:', error)
+      } finally {
+        setLoadingTiers(false)
+      }
+    }
+
+    loadTiers()
+  }, [token, user])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -227,8 +258,8 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
             <VisibilitySelector
               value={visibility}
               onChange={setVisibility}
-              disabled={uploading}
-              hasSubscriptionTiers={user?.isCreator && 'subscriptionTiers' in user ? user.subscriptionTiers.length > 0 : false}
+              disabled={uploading || loadingTiers}
+              hasSubscriptionTiers={subscriptionTiers.length > 0}
             />
           </div>
         )}
