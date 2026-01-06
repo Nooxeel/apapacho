@@ -119,6 +119,8 @@ export default function CreatorPublicProfile() {
   const [chatConversationId, setChatConversationId] = useState<string | null>(null)
   const [showSubscribeModal, setShowSubscribeModal] = useState(false)
   const [subscribing, setSubscribing] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<{ tierName: string; endDate: string } | null>(null)
 
   // Real-time stats (sincronizado con polling de mensajes)
   const [totalLikes, setTotalLikes] = useState(0)
@@ -263,10 +265,14 @@ export default function CreatorPublicProfile() {
       setIsSubscriber(true)
       setShowSubscribeModal(false)
       
-      // Mostrar mensaje de éxito con más contexto
+      // Mostrar mensaje de éxito con modal personalizado
       const tier = profile.subscriptionTiers.find(t => t.id === tierId)
       if (tier) {
-        alert(`¡Suscripción exitosa! 🎉\n\nAhora eres suscriptor de ${creator.displayName}.\nPlan: ${tier.name}\nAcceso válido hasta: ${new Date(response.subscription.endDate).toLocaleDateString('es-CL')}\n\nDisfruta del contenido exclusivo.`)
+        setSuccessMessage({
+          tierName: tier.name,
+          endDate: new Date(response.subscription.endDate).toLocaleDateString('es-CL')
+        })
+        setShowSuccessModal(true)
       }
       
       // Recargar perfil para actualizar contadores
@@ -698,6 +704,56 @@ export default function CreatorPublicProfile() {
                 className="w-full mt-4 py-2 text-white/50 hover:text-white transition-colors text-sm"
               >
                 Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && successMessage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setShowSuccessModal(false)}
+        >
+          <div 
+            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center space-y-4">
+              {/* Success Icon */}
+              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
+                style={{ backgroundColor: `${profile.accentColor}20` }}
+              >
+                <BadgeCheck 
+                  className="w-10 h-10" 
+                  style={{ color: profile.accentColor }}
+                  fill={profile.accentColor}
+                />
+              </div>
+
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-white">
+                ¡Suscripción exitosa! 🎉
+              </h2>
+
+              {/* Message */}
+              <div className="space-y-2 text-white/80">
+                <p>Ahora eres suscriptor de <span className="font-semibold text-white">{creator.displayName}</span></p>
+                <div className="bg-white/5 rounded-lg p-3 space-y-1 text-sm">
+                  <p><span className="text-white/50">Plan:</span> <span className="font-medium">{successMessage.tierName}</span></p>
+                  <p><span className="text-white/50">Válido hasta:</span> <span className="font-medium">{successMessage.endDate}</span></p>
+                </div>
+                <p className="text-sm text-white/60 mt-3">Disfruta del contenido exclusivo</p>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90 mt-4"
+                style={{ backgroundColor: profile.accentColor }}
+              >
+                Continuar
               </button>
             </div>
           </div>
