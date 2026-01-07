@@ -7,7 +7,7 @@ import { creatorApi, uploadApi, authApi, ApiError, interestsApi } from '@/lib/ap
 import { useAuthStore } from '@/stores/authStore'
 import { useFontContext } from '@/contexts/FontContext'
 import { API_URL } from '@/lib/config'
-import { LayoutDashboard, ImagePlus, Tag, Type } from 'lucide-react'
+import { LayoutDashboard, ImagePlus, Tag, Type, Menu, X } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
 import SocialLinksManager from '@/components/social/SocialLinksManager'
 import SubscriptionTiersManager from '@/components/subscriptions/SubscriptionTiersManager'
@@ -115,6 +115,7 @@ export function CreatorProfileEditor() {
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([])
   const [initialInterests, setInitialInterests] = useState<Interest[]>([])
   const [socialLinksCount, setSocialLinksCount] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const profileImageInputRef = useRef<HTMLInputElement>(null)
   const coverInputRef = useRef<HTMLInputElement>(null)
@@ -448,49 +449,148 @@ export function CreatorProfileEditor() {
     >
       {/* Live Preview Banner */}
       <div 
-        className="border-b px-4 py-2"
+        className="sticky top-0 z-50 border-b px-4 py-2"
         style={{ 
           backgroundColor: `${profile.accentColor}15`,
-          borderColor: `${profile.accentColor}30`
+          borderColor: `${profile.accentColor}30`,
+          backdropFilter: 'blur(10px)'
         }}
       >
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <span className="text-sm" style={{ color: profile.accentColor }}>
-            ✨ Vista previa en vivo - Los cambios se reflejan automáticamente
-          </span>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
-              <LayoutDashboard className="w-4 h-4 mr-1.5" />
-              Dashboard
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => router.push('/creator/posts')}>
-              <ImagePlus className="w-4 h-4 mr-1.5" />
-              Posts
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => router.push('/creator/comments')}>
-              Libro de visitas
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => router.back()}>
-              Cancelar
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleViewProfile}
-              disabled={!profile.username}
-            >
-              Ver Perfil
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleSave}
-              isLoading={isSaving}
-              style={{ backgroundColor: profile.accentColor }}
-            >
-              Guardar Perfil
-            </Button>
+        <div className="max-w-4xl mx-auto">
+          {/* Mobile Layout */}
+          <div className="flex items-center justify-between md:hidden">
+            <span className="text-xs truncate flex-1 mr-2" style={{ color: profile.accentColor }}>
+              ✨ Vista previa
+            </span>
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSave}
+                isLoading={isSaving}
+                style={{ backgroundColor: profile.accentColor }}
+                className="text-xs px-2 py-1"
+              >
+                Guardar
+              </Button>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                style={{ color: profile.accentColor }}
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden md:flex items-center justify-between">
+            <span className="text-sm" style={{ color: profile.accentColor }}>
+              ✨ Vista previa en vivo - Los cambios se reflejan automáticamente
+            </span>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')}>
+                <LayoutDashboard className="w-4 h-4 mr-1.5" />
+                Dashboard
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => router.push('/creator/posts')}>
+                <ImagePlus className="w-4 h-4 mr-1.5" />
+                Posts
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => router.push('/creator/comments')}>
+                Libro de visitas
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => router.back()}>
+                Cancelar
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleViewProfile}
+                disabled={!profile.username}
+              >
+                Ver Perfil
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSave}
+                isLoading={isSaving}
+                style={{ backgroundColor: profile.accentColor }}
+              >
+                Guardar Perfil
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Menu Dropdown */}
+          {isMobileMenuOpen && (
+            <div 
+              className="md:hidden mt-2 py-2 border-t"
+              style={{ borderColor: `${profile.accentColor}30` }}
+            >
+              <div className="flex flex-col gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    router.push('/dashboard')
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="justify-start"
+                >
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    router.push('/creator/posts')
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="justify-start"
+                >
+                  <ImagePlus className="w-4 h-4 mr-2" />
+                  Posts
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    router.push('/creator/comments')
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="justify-start"
+                >
+                  Libro de visitas
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    handleViewProfile()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  disabled={!profile.username}
+                  className="justify-start"
+                >
+                  Ver Perfil
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    router.back()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="justify-start"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -510,11 +610,11 @@ export function CreatorProfileEditor() {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
         {/* Cover Image Section */}
-        <div className="relative mb-20">
+        <div className="relative mb-16 md:mb-20">
           <div 
-            className="h-48 md:h-64 rounded-2xl overflow-hidden cursor-pointer group"
+            className="h-40 sm:h-48 md:h-64 rounded-2xl overflow-hidden cursor-pointer group"
             style={{ 
               background: previewCover 
                 ? 'none' 
@@ -526,11 +626,11 @@ export function CreatorProfileEditor() {
               <Image src={previewCover} alt="Cover" fill className="object-cover" sizes="(max-width: 1200px) 100vw, 1200px" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center">
-                  <svg className="w-12 h-12 mx-auto text-white/30 group-hover:text-white/50 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="text-center px-4">
+                  <svg className="w-8 h-8 sm:w-12 sm:h-12 mx-auto text-white/30 group-hover:text-white/50 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-white/30 mt-2 group-hover:text-white/50 transition-colors">
+                  <p className="text-white/30 mt-2 text-sm sm:text-base group-hover:text-white/50 transition-colors">
                     Click para subir imagen de portada
                   </p>
                 </div>
@@ -538,7 +638,7 @@ export function CreatorProfileEditor() {
             )}
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
-              <span className="text-white font-medium">Cambiar portada</span>
+              <span className="text-white font-medium text-sm sm:text-base">Cambiar portada</span>
             </div>
           </div>
           <input
@@ -550,9 +650,9 @@ export function CreatorProfileEditor() {
           />
 
           {/* Profile Picture */}
-          <div className="absolute -bottom-16 left-8">
+          <div className="absolute -bottom-12 md:-bottom-16 left-4 sm:left-8">
             <div 
-              className="relative w-32 h-32 rounded-full overflow-hidden cursor-pointer group"
+              className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden cursor-pointer group"
               style={{ 
                 borderWidth: '4px',
                 borderStyle: 'solid',
@@ -569,14 +669,14 @@ export function CreatorProfileEditor() {
                     background: `linear-gradient(135deg, ${profile.accentColor}, ${profile.accentColor}80)`
                   }}
                 >
-                  <svg className="w-12 h-12 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 sm:w-12 sm:h-12 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
               )}
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
