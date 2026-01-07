@@ -12,6 +12,7 @@ interface SubscriptionTier {
   description?: string
   price: number
   currency: string
+  durationDays: number
   benefits: string
   isActive: boolean
   order: number
@@ -33,18 +34,28 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
     name: '',
     description: '',
     price: '',
+    durationDays: 30,
     benefits: ''
   })
   const [editData, setEditData] = useState({
     name: '',
     description: '',
     price: '',
+    durationDays: 30,
     benefits: ''
   })
 
   useEffect(() => {
     loadTiers()
   }, [token])
+
+  // Helper function to format billing period
+  const formatBillingPeriod = (days: number) => {
+    if (days === 30) return '/mes'
+    if (days === 90) return '/trimestre'
+    if (days === 365) return '/año'
+    return `/${days} días`
+  }
 
   const loadTiers = async () => {
     setIsLoading(true)
@@ -81,11 +92,12 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
         description: newTier.description || undefined,
         price,
         currency: 'CLP',
+        durationDays: newTier.durationDays,
         benefits: newTier.benefits || ''
       }, token)
 
       setTiers([...tiers, created])
-      setNewTier({ name: '', description: '', price: '', benefits: '' })
+      setNewTier({ name: '', description: '', price: '', durationDays: 30, benefits: '' })
       setIsAdding(false)
       setSuccess('Plan creado correctamente')
       setTimeout(() => setSuccess(null), 3000)
@@ -102,6 +114,7 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
       name: tier.name,
       description: tier.description || '',
       price: tier.price.toString(),
+      durationDays: tier.durationDays || 30,
       benefits: tier.benefits
     })
   }
@@ -126,6 +139,7 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
         name: editData.name,
         description: editData.description || undefined,
         price,
+        durationDays: editData.durationDays,
         benefits: editData.benefits
       }, token)
 
@@ -241,7 +255,7 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
 
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-2">
-                  Precio mensual (CLP) *
+                  Precio (CLP) *
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">$</span>
@@ -255,6 +269,24 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
                   />
                 </div>
                 <p className="text-xs text-white/40 mt-1">El precio debe ser en pesos chilenos</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Período de facturación *
+                </label>
+                <select
+                  value={newTier.durationDays}
+                  onChange={(e) => setNewTier({ ...newTier, durationDays: parseInt(e.target.value) })}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-fuchsia-500"
+                >
+                  <option value={30}>Mensual (30 días)</option>
+                  <option value={90}>Trimestral (90 días)</option>
+                  <option value={365}>Anual (365 días)</option>
+                </select>
+                <p className="text-xs text-white/40 mt-1">
+                  Los suscriptores pagarán cada {newTier.durationDays === 30 ? 'mes' : newTier.durationDays === 90 ? 'trimestre' : 'año'}
+                </p>
               </div>
 
               <div>
@@ -333,6 +365,15 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
                         className="w-full pl-8 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-fuchsia-500"
                       />
                     </div>
+                    <select
+                      value={editData.durationDays}
+                      onChange={(e) => setEditData({ ...editData, durationDays: parseInt(e.target.value) })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-fuchsia-500"
+                    >
+                      <option value={30}>Mensual (30 días)</option>
+                      <option value={90}>Trimestral (90 días)</option>
+                      <option value={365}>Anual (365 días)</option>
+                    </select>
                     <input
                       type="text"
                       value={editData.description}
@@ -370,7 +411,7 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
                       </div>
                       <p className="text-2xl font-bold text-fuchsia-400 mt-1">
                         {formatPrice(tier.price)}
-                        <span className="text-sm font-normal text-white/50">/mes</span>
+                        <span className="text-sm font-normal text-white/50">{formatBillingPeriod(tier.durationDays)}</span>
                       </p>
                       {tier.description && (
                         <p className="text-sm text-white/60 mt-1">{tier.description}</p>

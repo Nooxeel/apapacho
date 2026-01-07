@@ -401,11 +401,11 @@ export const subscriptionsApi = {
     api<any[]>('/subscriptions/my-tiers', { token }),
 
   // Create tier
-  createTier: (data: { name: string; description?: string; price: number; currency?: string; benefits?: string }, token: string) =>
+  createTier: (data: { name: string; description?: string; price: number; currency?: string; durationDays?: number; benefits?: string }, token: string) =>
     api<any>('/subscriptions/tiers', { method: 'POST', body: data, token }),
 
   // Update tier
-  updateTier: (tierId: string, data: { name?: string; description?: string; price?: number; currency?: string; benefits?: string; isActive?: boolean }, token: string) =>
+  updateTier: (tierId: string, data: { name?: string; description?: string; price?: number; currency?: string; durationDays?: number; benefits?: string; isActive?: boolean }, token: string) =>
     api<any>(`/subscriptions/tiers/${tierId}`, { method: 'PUT', body: data, token }),
 
   // Delete tier
