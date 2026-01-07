@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
-import { uploadApi, ApiError } from '@/lib/api';
+import { uploadApi, ApiError, subscriptionsApi } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import {
   User,
@@ -118,6 +118,10 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
+  const [showManageModal, setShowManageModal] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     // Esperar a que el store se hidrate desde localStorage
@@ -234,6 +238,33 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error eliminando favorito:', error);
+    }
+  };
+
+  // Handler para cancelar suscripción
+  const handleCancelSubscription = async () => {
+    if (!token || !selectedSubscription) return;
+
+    setCancelling(true);
+    try {
+      await subscriptionsApi.unsubscribe(selectedSubscription.creator.id, token);
+      
+      // Actualizar lista de suscripciones
+      setSubscriptions(prev => prev.filter(s => s.id !== selectedSubscription.id));
+      setShowCancelConfirm(false);
+      setShowManageModal(false);
+      setSelectedSubscription(null);
+      
+      alert('✅ Suscripción cancelada. Mantendrás acceso hasta el fin del período pagado.');
+      
+      // Recargar datos
+      loadData();
+      
+    } catch (error: any) {
+      console.error('Error al cancelar suscripción:', error);
+      alert(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.');
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -657,12 +688,23 @@ export default function DashboardPage() {
                       <p className="text-white/50 text-sm">@{sub.creator.username}</p>
                     </div>
                   </Link>
-                  <div className="text-right">
-                    <p className="font-semibold text-fuchsia-400">
-                      ${sub.tier.price.toFixed(2)}/{sub.tier.currency}
-                    </p>
-                    <p className="text-xs text-white/40">{sub.tier.name}</p>
-                    <p className="text-xs text-green-400 mt-1">Activa</p>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="text-right">
+                      <p className="font-semibold text-fuchsia-400">
+                        ${sub.tier.price.toFixed(2)}/{sub.tier.currency}
+                      </p>
+                      <p className="text-xs text-white/40">{sub.tier.name}</p>
+                      <p className="text-xs text-green-400 mt-1">Activa</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedSubscription(sub);
+                        setShowManageModal(true);
+                      }}
+                      className="px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white"
+                    >
+                      Gestionar
+                    </button>
                   </div>
                 </div>
               ))}
@@ -825,6 +867,134 @@ export default function DashboardPage() {
           )
         ) : null}
       </div>
+
+      {/* Manage Subscription Modal */}
+      {showManageModal && selectedSubscription && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setShowManageModal(false)}
+        >
+          <div 
+            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-white/10">
+              <h2 className="text-xl font-bold text-white">Gestionar Suscripción</h2>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Subscription Info */}
+              <div className="bg-white/5 rounded-lg p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Creador</span>
+                  <span className="font-semibold text-white">{selectedSubscription.creator.displayName}</span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Plan</span>
+                  <span className="font-semibold text-white">{selectedSubscription.tier.name}</span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Precio</span>
+                  <span className="font-semibold text-fuchsia-400">
+                    ${selectedSubscription.tier.price.toFixed(2)}/{selectedSubscription.tier.currency}
+                  </span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Fecha de inicio</span>
+                  <span className="text-white">{new Date(selectedSubscription.startDate).toLocaleDateString('es-CL')}</span>
+                </div>
+                {selectedSubscription.endDate && (
+                  <div className="flex justify-between items-start">
+                    <span className="text-white/50 text-sm">Válido hasta</span>
+                    <span className="text-white">{new Date(selectedSubscription.endDate).toLocaleDateString('es-CL')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Estado</span>
+                  <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
+                    {selectedSubscription.status === 'active' ? 'Activa' : selectedSubscription.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Cancel Button */}
+              <button
+                onClick={() => {
+                  setShowManageModal(false);
+                  setShowCancelConfirm(true);
+                }}
+                className="w-full py-3 rounded-lg font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
+              >
+                Cancelar Suscripción
+              </button>
+
+              <button
+                onClick={() => setShowManageModal(false)}
+                className="w-full py-2 text-white/50 hover:text-white transition-colors text-sm"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && selectedSubscription && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => !cancelling && setShowCancelConfirm(false)}
+        >
+          <div 
+            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center space-y-4">
+              {/* Warning Icon */}
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
+                <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-xl font-bold text-white">
+                ¿Cancelar suscripción?
+              </h2>
+
+              {/* Message */}
+              <div className="space-y-2 text-white/70 text-sm">
+                <p>Estás a punto de cancelar tu suscripción a <span className="font-semibold text-white">{selectedSubscription.creator.displayName}</span></p>
+                {selectedSubscription.endDate && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-yellow-200">
+                    <p className="font-medium">ℹ️ Importante:</p>
+                    <p className="mt-1">Mantendrás acceso al contenido exclusivo hasta el <span className="font-semibold">{new Date(selectedSubscription.endDate).toLocaleDateString('es-CL')}</span></p>
+                  </div>
+                )}
+                <p className="text-white/50 text-xs mt-3">Podrás volver a suscribirte en cualquier momento</p>
+              </div>
+
+              {/* Buttons */}
+              <div className="space-y-2">
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={cancelling}
+                  className="w-full py-3 rounded-lg font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelling ? 'Cancelando...' : 'Sí, cancelar suscripción'}
+                </button>
+                <button
+                  onClick={() => setShowCancelConfirm(false)}
+                  disabled={cancelling}
+                  className="w-full py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 bg-fuchsia-500/20 text-fuchsia-400 hover:bg-fuchsia-500/30"
+                >
+                  No, mantener suscripción
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
