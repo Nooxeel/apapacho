@@ -32,6 +32,7 @@ interface CreatorProfile {
   creatorProfile: {
     id: string
     bio?: string
+    bioTitle?: string
     profileImage?: string
     coverImage?: string
     backgroundColor: string
@@ -601,8 +602,8 @@ export default function CreatorPublicProfile() {
           {/* About Me */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white/5 rounded-xl p-5 backdrop-blur-sm border border-white/10">
-              <h3 className="font-semibold text-lg mb-3">Acerca de mí</h3>
-              <p className="text-gray-300 text-sm">
+              <h3 className="font-semibold text-lg mb-3">{profile.bioTitle || 'Acerca de mí'}</h3>
+              <p className="text-gray-300 text-sm whitespace-pre-line">
                 {profile.bio || 'Este creador aún no ha agregado una descripción.'}
               </p>
               

@@ -253,9 +253,9 @@ export const postApi = {
 export const uploadApi = {
   avatar: (file: File, token: string) => uploadFile('/upload/avatar', file, 'avatar', token),
 
-  profile: (file: File, token: string) => uploadFile('/upload/profile', file, 'profile', token),
+  profile: (file: File, token: string) => uploadFile('/upload/profile', file, 'profileImage', token),
 
-  cover: (file: File, token: string) => uploadFile('/upload/cover', file, 'cover', token),
+  cover: (file: File, token: string) => uploadFile('/upload/cover', file, 'coverImage', token),
 
   // Note: userCover removed - fans should only be able to upload avatar, not cover
 

@@ -63,6 +63,7 @@ interface ProfileData {
   displayName: string
   username: string
   bio: string
+  bioTitle: string
   avatar: string | null
   profileImage: string | null
   coverImage: string | null
@@ -91,6 +92,7 @@ export function CreatorProfileEditor() {
     displayName: '',
     username: '',
     bio: '',
+    bioTitle: 'Acerca de mí',
     avatar: null,
     profileImage: null,
     coverImage: null,
@@ -145,6 +147,7 @@ export function CreatorProfileEditor() {
         displayName: userData.displayName || '',
         username: userData.username || '',
         bio: userData.creatorProfile.bio || '',
+        bioTitle: userData.creatorProfile.bioTitle || 'Acerca de mí',
         avatar: userData.avatar,
         profileImage: userData.creatorProfile.profileImage,
         coverImage: userData.creatorProfile.coverImage,
@@ -268,6 +271,7 @@ export function CreatorProfileEditor() {
         },
         body: JSON.stringify({
           bio: profile.bio,
+          bioTitle: profile.bioTitle,
           backgroundColor: profile.backgroundColor,
           backgroundGradient: profile.backgroundGradient,
           accentColor: profile.accentColor,
@@ -719,12 +723,21 @@ export function CreatorProfileEditor() {
                     disabled
                   />
 
+                  <Input
+                    label="Título de la biografía"
+                    type="text"
+                    placeholder="Acerca de mí"
+                    value={profile.bioTitle}
+                    onChange={(e) => setProfile(prev => ({ ...prev, bioTitle: e.target.value }))}
+                    helperText="Personaliza el título que aparece sobre tu biografía"
+                  />
+
                   <div>
                     <label className="block text-sm font-medium text-white/80 mb-1.5">
                       Biografía
                     </label>
                     <textarea
-                      placeholder="Cuéntale al mundo sobre ti..."
+                      placeholder="Cuéntale al mundo sobre ti... (usa Enter para saltos de línea)"
                       value={profile.bio}
                       onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
                       rows={4}
