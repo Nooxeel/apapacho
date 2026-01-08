@@ -49,6 +49,7 @@ interface CreatorProfile {
         videos: boolean
         audio: boolean
         guestbook: boolean
+        tipping: boolean
       }
       messaging?: 'all' | 'logged_in' | 'subscribers_only'
     }
@@ -492,7 +493,7 @@ export default function CreatorPublicProfile() {
               )}
 
               {/* Botón de Propina - Configurable */}
-              {(profile.visibilitySettings?.tipping !== false) && (
+              {(profile.visibilitySettings?.tabs?.tipping !== false) && (
                 <button className="flex items-center gap-2 px-5 py-3 rounded-full border border-gray-600 bg-transparent hover:bg-white/5 transition-colors">
                   <span className="text-lg">💰</span>
                   Propina

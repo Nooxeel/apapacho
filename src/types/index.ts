@@ -39,9 +39,9 @@ export interface CreatorProfile {
       exclusive?: boolean
       about?: boolean
       collections?: boolean
+      tipping?: boolean
     }
     messaging?: 'everyone' | 'subscribers' | 'logged_in' | 'disabled'
-    tipping?: boolean
   }
 }
 

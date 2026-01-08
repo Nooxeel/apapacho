@@ -43,9 +43,9 @@ interface VisibilitySettings {
     videos: boolean
     audio: boolean
     guestbook: boolean
+    tipping: boolean
   }
   messaging: 'all' | 'logged_in' | 'subscribers_only'
-  tipping: boolean
 }
 
 const defaultVisibility: VisibilitySettings = {
@@ -56,9 +56,9 @@ const defaultVisibility: VisibilitySettings = {
     videos: true,
     audio: true,
     guestbook: true,
+    tipping: true,
   },
-  messaging: 'logged_in',
-  tipping: true
+  messaging: 'logged_in'
 }
 
 interface ProfileData {
@@ -779,6 +779,7 @@ export function CreatorProfileEditor() {
                     { key: 'videos', label: 'Videos', icon: '🎬' },
                     { key: 'audio', label: 'Audio', icon: '🎵' },
                     { key: 'guestbook', label: 'Libro de visitas', icon: '📖' },
+                    { key: 'tipping', label: 'Botón de Propina', icon: '💰' },
                   ].map((item) => (
                     <label
                       key={item.key}
@@ -829,59 +830,6 @@ export function CreatorProfileEditor() {
                 <p className="text-xs text-white/40 text-center mt-4">
                   Las secciones ocultas no aparecerán en tu perfil público
                 </p>
-              </div>
-            </Card>
-
-            {/* Tipping Settings */}
-            <Card variant="glass">
-              <div className="p-6">
-                <h2 className="text-xl font-bold text-white mb-2">💰 Botón de Propina</h2>
-                <p className="text-sm text-white/50 mb-6">
-                  Activa o desactiva el botón de propina en tu perfil
-                </p>
-
-                <label
-                  className="flex items-center justify-between p-4 rounded-lg bg-white/5 cursor-pointer hover:bg-white/10 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="text-lg">💸</span>
-                    <div>
-                      <span className="text-white block">Mostrar botón de propina</span>
-                      <span className="text-xs text-white/50">Los usuarios podrán enviarte propinas</span>
-                    </div>
-                  </span>
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      checked={profile.visibilitySettings.tipping ?? true}
-                      onChange={(e) => setProfile(prev => ({
-                        ...prev,
-                        visibilitySettings: {
-                          ...prev.visibilitySettings,
-                          tipping: e.target.checked
-                        }
-                      }))}
-                      className="sr-only peer"
-                    />
-                    <div
-                      className="w-11 h-6 rounded-full transition-colors peer-checked:bg-opacity-100"
-                      style={{
-                        backgroundColor: profile.visibilitySettings.tipping ?? true
-                          ? profile.accentColor
-                          : 'rgba(255,255,255,0.2)'
-                      }}
-                    >
-                      <div
-                        className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"
-                        style={{
-                          transform: profile.visibilitySettings.tipping ?? true
-                            ? 'translateX(20px)'
-                            : 'translateX(0)'
-                        }}
-                      />
-                    </div>
-                  </div>
-                </label>
               </div>
             </Card>
 
