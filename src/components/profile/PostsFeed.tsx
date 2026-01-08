@@ -6,6 +6,7 @@ import { Button } from '@/components/ui'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
 import { postApi } from '@/lib/api'
+import { sanitizePostDescription, sanitizeComment } from '@/lib/sanitize'
 import type { PostVisibility, PostComment } from '@/types'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
@@ -348,7 +349,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                   </div>
                   {post.description && (
                     <p className="text-white/70 text-sm mt-3 leading-relaxed">
-                      {post.description}
+                      {sanitizePostDescription(post.description)}
                     </p>
                   )}
                 </div>
@@ -532,7 +533,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                                     </span>
                                   </div>
                                   <p className="text-white text-sm whitespace-pre-wrap break-words">
-                                    {comment.content}
+                                    {sanitizeComment(comment.content)}
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-3 mt-1 px-2">
