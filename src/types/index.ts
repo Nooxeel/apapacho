@@ -33,6 +33,16 @@ export interface CreatorProfile {
   socialLinks: SocialLink[]
   customCSS?: string
   theme: ProfileTheme
+  visibilitySettings?: {
+    tabs?: {
+      posts?: boolean
+      exclusive?: boolean
+      about?: boolean
+      collections?: boolean
+    }
+    messaging?: 'everyone' | 'subscribers' | 'logged_in' | 'disabled'
+    tipping?: boolean
+  }
 }
 
 export interface ProfileTheme {
