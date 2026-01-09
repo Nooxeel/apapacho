@@ -5,13 +5,20 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 class SocketService {
   private socket: Socket | null = null
   private listeners: Map<string, Set<Function>> = new Map()
+  private connectionCount = 0 // Track number of components using the socket
 
   connect(userId: string) {
+    this.connectionCount++
+    console.log(`[Socket] Connection count: ${this.connectionCount}`)
+    
     if (this.socket?.connected) {
-      console.log('Socket already connected')
+      console.log('[Socket] Already connected')
+      // Re-join user room in case of reconnection
+      this.socket.emit('join:user', userId)
       return
     }
 
+    console.log('[Socket] Connecting to:', API_URL)
     this.socket = io(API_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -48,10 +55,16 @@ class SocketService {
   }
 
   disconnect() {
-    if (this.socket) {
+    this.connectionCount--
+    console.log(`[Socket] Disconnect called, connection count: ${this.connectionCount}`)
+    
+    // Only actually disconnect if no components are using it
+    if (this.connectionCount <= 0 && this.socket) {
+      console.log('[Socket] Actually disconnecting')
       this.socket.disconnect()
       this.socket = null
       this.listeners.clear()
+      this.connectionCount = 0
     }
   }
 

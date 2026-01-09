@@ -24,33 +24,51 @@ export function Navbar() {
 
   // WebSocket connection and unread count tracking
   useEffect(() => {
-    if (!token || !user) return
+    if (!token || !user) {
+      console.log('[Navbar] No token or user, skipping unread count')
+      return
+    }
+
+    console.log('[Navbar] Setting up unread count tracking for user:', user.id)
 
     // Initial load
     const loadUnreadCount = async () => {
       try {
+        console.log('[Navbar] Loading unread count...')
         const data = await messageApi.getUnreadCount(token) as { unread: number }
+        console.log('[Navbar] Unread count:', data.unread)
         setUnreadCount(data.unread)
       } catch (error) {
-        console.error('Error loading unread count:', error)
+        console.error('[Navbar] Error loading unread count:', error)
       }
     }
 
     loadUnreadCount()
 
     // Connect to WebSocket
+    console.log('[Navbar] Connecting to WebSocket...')
     socketService.connect(user.id)
 
     // Listen for unread count updates via WebSocket
-    const handleUnreadUpdate = () => {
+    const handleUnreadUpdate = (data: any) => {
+      console.log('[Navbar] Received unread:update event:', data)
       loadUnreadCount() // Reload full count when any conversation updates
     }
 
+    const handleNewMessage = (data: any) => {
+      console.log('[Navbar] Received message:new event:', data)
+      loadUnreadCount() // Reload count on new message
+    }
+
     socketService.on('unread:update', handleUnreadUpdate)
+    socketService.on('message:new', handleNewMessage)
 
     return () => {
+      console.log('[Navbar] Cleaning up WebSocket listeners')
       socketService.off('unread:update', handleUnreadUpdate)
-      socketService.disconnect()
+      socketService.off('message:new', handleNewMessage)
+      // Don't disconnect - other components might be using it
+      // socketService.disconnect()
     }
   }, [token, user])
 
