@@ -446,9 +446,9 @@ export default function CreatorPublicProfile() {
               />
             </div>
 
-            {/* Username with verification */}
+            {/* Title with verification */}
             <div className="mt-4 flex items-center gap-2">
-              <h1 className="text-2xl font-bold">{creator.username}</h1>
+              <h1 className="text-2xl font-bold">{profile.extendedInfoTitle || creator.username}</h1>
               {profile.isVerified && (
                 <BadgeCheck 
                   className="w-6 h-6" 

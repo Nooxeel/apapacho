@@ -768,7 +768,7 @@ export function CreatorProfileEditor() {
                     placeholder="Información Adicional"
                     value={profile.extendedInfoTitle}
                     onChange={(e) => setProfile(prev => ({ ...prev, extendedInfoTitle: e.target.value }))}
-                    helperText="No se muestra, solo para referencia"
+                    helperText="Título grande y centrado que aparece bajo tu foto de perfil"
                   />
 
                   <div>
