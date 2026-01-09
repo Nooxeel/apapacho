@@ -33,6 +33,8 @@ interface CreatorProfile {
     id: string
     bio?: string
     bioTitle?: string
+    extendedInfo?: string
+    extendedInfoTitle?: string
     profileImage?: string
     coverImage?: string
     backgroundColor: string
@@ -610,6 +612,16 @@ export default function CreatorPublicProfile() {
               <p className="text-gray-300 text-sm whitespace-pre-line">
                 {profile.bio || 'Este creador aún no ha agregado una descripción.'}
               </p>
+              
+              {/* Extended Info Section */}
+              {profile.extendedInfo && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <h4 className="font-semibold text-base mb-2">{profile.extendedInfoTitle || 'Información Adicional'}</h4>
+                  <p className="text-gray-300 text-sm whitespace-pre-line">
+                    {profile.extendedInfo}
+                  </p>
+                </div>
+              )}
               
               {/* Social Links */}
               {profile.socialLinks.length > 0 && (

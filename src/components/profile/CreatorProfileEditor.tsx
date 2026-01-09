@@ -66,6 +66,8 @@ interface ProfileData {
   username: string
   bio: string
   bioTitle: string
+  extendedInfo: string
+  extendedInfoTitle: string
   avatar: string | null
   profileImage: string | null
   coverImage: string | null
@@ -95,6 +97,8 @@ export function CreatorProfileEditor() {
     username: '',
     bio: '',
     bioTitle: 'Acerca de mí',
+    extendedInfo: '',
+    extendedInfoTitle: 'Información Adicional',
     avatar: null,
     profileImage: null,
     coverImage: null,
@@ -150,6 +154,8 @@ export function CreatorProfileEditor() {
         username: userData.username || '',
         bio: userData.creatorProfile.bio || '',
         bioTitle: userData.creatorProfile.bioTitle || 'Acerca de mí',
+        extendedInfo: userData.creatorProfile.extendedInfo || '',
+        extendedInfoTitle: userData.creatorProfile.extendedInfoTitle || 'Información Adicional',
         avatar: userData.avatar,
         profileImage: userData.creatorProfile.profileImage,
         coverImage: userData.creatorProfile.coverImage,
@@ -274,6 +280,8 @@ export function CreatorProfileEditor() {
         body: JSON.stringify({
           bio: profile.bio,
           bioTitle: profile.bioTitle,
+          extendedInfo: profile.extendedInfo,
+          extendedInfoTitle: profile.extendedInfoTitle,
           backgroundColor: profile.backgroundColor,
           backgroundGradient: profile.backgroundGradient,
           accentColor: profile.accentColor,
@@ -751,6 +759,35 @@ export function CreatorProfileEditor() {
                     />
                     <p className="text-white/40 text-sm mt-1">
                       {profile.bio.length}/500 caracteres
+                    </p>
+                  </div>
+
+                  <Input
+                    label="Título de Información Adicional"
+                    type="text"
+                    placeholder="Información Adicional"
+                    value={profile.extendedInfoTitle}
+                    onChange={(e) => setProfile(prev => ({ ...prev, extendedInfoTitle: e.target.value }))}
+                    helperText="Título para la sección de información extendida (servicios, horarios, etc.)"
+                  />
+
+                  <div>
+                    <label className="block text-sm font-medium text-white/80 mb-1.5">
+                      Información Adicional
+                    </label>
+                    <textarea
+                      placeholder="Servicios, horarios, precios, marcas, o cualquier información relevante... (usa Enter para saltos de línea)"
+                      value={profile.extendedInfo}
+                      onChange={(e) => setProfile(prev => ({ ...prev, extendedInfo: e.target.value }))}
+                      rows={8}
+                      maxLength={2000}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 resize-none whitespace-pre-wrap"
+                      style={{
+                        '--tw-ring-color': `${profile.accentColor}50`
+                      } as any}
+                    />
+                    <p className="text-white/40 text-sm mt-1">
+                      {profile.extendedInfo.length}/2000 caracteres • Visible como sección separada
                     </p>
                   </div>
                 </div>
