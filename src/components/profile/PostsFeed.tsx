@@ -36,9 +36,10 @@ interface PostsFeedProps {
   accentColor?: string
   filterType?: string
   onSubscribeClick?: () => void
+  isSubscriber?: boolean
 }
 
-export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick }: PostsFeedProps) {
+export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
@@ -275,7 +276,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     if (post.visibility === 'public') return true
     if (post.visibility === 'authenticated') return isAuthenticated
     if (post.visibility === 'subscribers') {
-      return false // TODO: Verificar suscripción
+      return isSubscriber
     }
     return false
   }
