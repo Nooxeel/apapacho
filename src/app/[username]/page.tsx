@@ -766,7 +766,11 @@ export default function CreatorPublicProfile() {
                     )}
                     
                     <button
-                      onClick={() => handleSubscribe(tier.id)}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleSubscribe(tier.id)
+                      }}
                       disabled={subscribing}
                       className="w-full py-2.5 rounded-lg font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
                       style={{ backgroundColor: profile.accentColor }}
