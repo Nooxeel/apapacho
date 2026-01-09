@@ -22,20 +22,50 @@ export default function SocialLinksDisplay({
 
   // Helper para generar el href correcto
   const getLinkHref = (link: SocialLink) => {
-    if (link.platform.toLowerCase() === 'email') {
+    const platform = link.platform.toLowerCase()
+    
+    if (platform === 'email') {
       // Si ya tiene mailto:, usarlo directamente; si no, agregarlo
       return link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`
     }
+    
+    if (platform === 'whatsapp' || platform === 'telefono' || platform === 'teléfono' || platform === 'phone') {
+      // Extraer solo números del link.url
+      const phoneNumber = link.url.replace(/\D/g, '')
+      
+      if (platform === 'whatsapp') {
+        // Para WhatsApp, usar el formato wa.me
+        return `https://wa.me/${phoneNumber}`
+      } else {
+        // Para teléfono, usar tel:
+        return `tel:+${phoneNumber}`
+      }
+    }
+    
     return link.url
   }
 
   // Helper para mostrar el texto del link
   const getLinkDisplayText = (link: SocialLink) => {
-    if (link.platform.toLowerCase() === 'email') {
+    const platform = link.platform.toLowerCase()
+    
+    if (platform === 'email') {
       // Mostrar solo el email sin el mailto:
       return link.url.replace('mailto:', '')
     }
+    
+    if (platform === 'whatsapp' || platform === 'telefono' || platform === 'teléfono' || platform === 'phone') {
+      // Para WhatsApp y teléfono, mostrar el número formateado
+      return link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    }
+    
     return link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+  }
+
+  // Helper para determinar si debe abrir en nueva pestaña
+  const shouldOpenInNewTab = (link: SocialLink) => {
+    const platform = link.platform.toLowerCase()
+    return platform !== 'email' && platform !== 'telefono' && platform !== 'teléfono' && platform !== 'phone'
   }
 
   if (variant === 'compact') {
@@ -45,7 +75,7 @@ export default function SocialLinksDisplay({
           <a
             key={link.id}
             href={getLinkHref(link)}
-            target={link.platform.toLowerCase() === 'email' ? '_self' : '_blank'}
+            target={shouldOpenInNewTab(link) ? '_blank' : '_self'}
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors group"
             title={link.label || link.platform}
@@ -68,7 +98,7 @@ export default function SocialLinksDisplay({
           <a
             key={link.id}
             href={getLinkHref(link)}
-            target={link.platform.toLowerCase() === 'email' ? '_self' : '_blank'}
+            target={shouldOpenInNewTab(link) ? '_blank' : '_self'}
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 hover:border-white/20 transition-all group"
           >
@@ -97,7 +127,7 @@ export default function SocialLinksDisplay({
         <a
           key={link.id}
           href={getLinkHref(link)}
-          target={link.platform.toLowerCase() === 'email' ? '_self' : '_blank'}
+          target={shouldOpenInNewTab(link) ? '_blank' : '_self'}
           rel="noopener noreferrer"
           className="flex items-center justify-between gap-4 p-4 bg-white/10 hover:bg-white/15 rounded-xl border border-white/10 hover:border-fuchsia-500/50 transition-all group w-full"
         >
