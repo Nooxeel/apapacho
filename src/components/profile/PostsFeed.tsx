@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { API_URL } from '@/lib/config'
@@ -121,7 +121,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     }
   }
 
-  const loadBatchLikeStatus = async (postIds: string[]) => {
+  const loadBatchLikeStatus = useCallback(async (postIds: string[]) => {
     if (!token || postIds.length === 0) return
     try {
       const data = await postApi.getBatchLikeStatus(postIds, token) as Record<string, boolean>
@@ -129,9 +129,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     } catch (error) {
       console.error('Error loading batch like status:', error)
     }
-  }
+  }, [token])
 
-  const handleLike = async (postId: string) => {
+  const handleLike = useCallback(async (postId: string) => {
     if (!token || !user) {
       router.push('/login')
       return
@@ -169,27 +169,28 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       ))
       console.error('Error toggling like:', error)
     }
-  }
+  }, [token, user, router, likedPosts, posts])
 
-  const loadComments = async (postId: string) => {
+  const loadComments = useCallback(async (postId: string) => {
     try {
       const data = await postApi.getComments(postId, 50, 0) as { comments: PostComment[]; total: number }
       setComments(prev => ({ ...prev, [postId]: data.comments }))
     } catch (error) {
       console.error('Error loading comments:', error)
     }
-  }
+  }, [])
 
-  const toggleComments = (postId: string) => {
-    const isShowing = showComments[postId]
-    setShowComments(prev => ({ ...prev, [postId]: !isShowing }))
+  const toggleComments = useCallback((postId: string) => {
+    setShowComments(prev => {
+      const isShowing = prev[postId]
+      if (!isShowing && !comments[postId]) {
+        loadComments(postId)
+      }
+      return { ...prev, [postId]: !isShowing }
+    })
+  }, [comments, loadComments])
 
-    if (!isShowing && !comments[postId]) {
-      loadComments(postId)
-    }
-  }
-
-  const handleSubmitComment = async (postId: string) => {
+  const handleSubmitComment = useCallback(async (postId: string) => {
     if (!token || !user) {
       router.push('/login')
       return
@@ -224,9 +225,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     } finally {
       setSubmittingComment(prev => ({ ...prev, [postId]: false }))
     }
-  }
+  }, [token, user, router, newComment])
 
-  const handleDeleteComment = async (postId: string, commentId: string) => {
+  const handleDeleteComment = useCallback(async (postId: string, commentId: string) => {
     if (!token || !user) return
 
     if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) return
@@ -250,9 +251,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       console.error('Error deleting comment:', error)
       alert('Error al eliminar el comentario')
     }
-  }
+  }, [token, user])
 
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = useMemo(() => posts.filter(post => {
     if (filterType === 'posts') return true
     const hasVideo = post.content.some(c => c.type === 'video')
     const hasPhoto = post.content.some(c => c.type === 'image')
@@ -261,27 +262,27 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     if (filterType === 'photos') return hasPhoto
     if (filterType === 'audio') return post.content.some(c => c.type === 'audio')
     return true
-  })
+  }), [posts, filterType])
 
-  const formatDate = (dateString: string) => {
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString)
     return new Intl.DateTimeFormat('es', {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
     }).format(date)
-  }
+  }, [])
 
-  const canViewPost = (post: Post): boolean => {
+  const canViewPost = useCallback((post: Post): boolean => {
     if (post.visibility === 'public') return true
     if (post.visibility === 'authenticated') return isAuthenticated
     if (post.visibility === 'subscribers') {
       return isSubscriber
     }
     return false
-  }
+  }, [isAuthenticated, isSubscriber])
 
-  const getVisibilityBadge = (visibility: PostVisibility) => {
+  const getVisibilityBadge = useCallback((visibility: PostVisibility) => {
     switch (visibility) {
       case 'public':
         return { icon: Globe, label: 'Público', color: 'text-blue-400 bg-blue-500/10' }
@@ -290,7 +291,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       case 'subscribers':
         return { icon: Star, label: 'Solo suscriptores', color: 'text-fuchsia-400 bg-fuchsia-500/10' }
     }
-  }
+  }, [])
 
   if (loading) {
     return (
