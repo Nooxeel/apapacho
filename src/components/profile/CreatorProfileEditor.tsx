@@ -2,17 +2,47 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { Button, Input, Card } from '@/components/ui'
 import { creatorApi, uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { useFontContext } from '@/contexts/FontContext'
 import { API_URL } from '@/lib/config'
 import { LayoutDashboard, ImagePlus, Tag, Type, Menu, X } from 'lucide-react'
-import { InterestSelector } from '@/components/interests'
-import SocialLinksManager from '@/components/social/SocialLinksManager'
-import SubscriptionTiersManager from '@/components/subscriptions/SubscriptionTiersManager'
-import FontSelector from '@/components/ui/FontSelector'
 import type { Interest } from '@/types'
+
+// Lazy load de componentes pesados para mejorar TTI
+const InterestSelector = dynamic(
+  () => import('@/components/interests').then(mod => ({ default: mod.InterestSelector })),
+  { 
+    loading: () => <div className="animate-pulse bg-white/5 rounded-xl h-32" />,
+    ssr: false 
+  }
+)
+
+const SocialLinksManager = dynamic(
+  () => import('@/components/social/SocialLinksManager'),
+  { 
+    loading: () => <div className="animate-pulse bg-white/5 rounded-xl h-48" />,
+    ssr: false 
+  }
+)
+
+const SubscriptionTiersManager = dynamic(
+  () => import('@/components/subscriptions/SubscriptionTiersManager'),
+  { 
+    loading: () => <div className="animate-pulse bg-white/5 rounded-xl h-48" />,
+    ssr: false 
+  }
+)
+
+const FontSelector = dynamic(
+  () => import('@/components/ui/FontSelector'),
+  { 
+    loading: () => <div className="animate-pulse bg-white/5 rounded-lg h-10" />,
+    ssr: false 
+  }
+)
 import Image from 'next/image'
 
 // Opciones de colores de fondo predefinidos

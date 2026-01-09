@@ -44,22 +44,39 @@ export function MusicPlayer({
   const [isReady, setIsReady] = useState(false)
   const [showPlayer, setShowPlayer] = useState(true)
   const [needsInteraction, setNeedsInteraction] = useState(false)
+  const [apiLoading, setApiLoading] = useState(false)
   
   const playerRef = useRef<YT.Player | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const progressInterval = useRef<NodeJS.Timeout | null>(null)
+  const currentVideoIdRef = useRef<string | null>(null)
 
   const currentTrack = tracks[currentTrackIndex]
 
-  // Load YouTube IFrame API
+  // Cleanup on unmount
   useEffect(() => {
-    if (!tracks.length) return
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.destroy()
+        playerRef.current = null
+      }
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current)
+      }
+    }
+  }, [])
 
+  // Load YouTube IFrame API on demand (lazy loading)
+  const loadYouTubeAPI = useCallback(() => {
+    if (apiLoading) return
+    
     // Check if API is already loaded
     if (window.YT && window.YT.Player) {
       initPlayer()
       return
     }
+
+    setApiLoading(true)
 
     // Load the API
     const tag = document.createElement('script')
@@ -68,21 +85,16 @@ export function MusicPlayer({
     firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
 
     window.onYouTubeIframeAPIReady = () => {
+      setApiLoading(false)
       initPlayer()
     }
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy()
-      }
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current)
-      }
-    }
-  }, [])
+  }, [apiLoading])
 
   const initPlayer = useCallback(() => {
     if (!currentTrack || playerRef.current) return
+
+    // Guardar el ID del video actual
+    currentVideoIdRef.current = currentTrack.youtubeId
 
     playerRef.current = new window.YT.Player('youtube-player', {
       height: '1',
@@ -172,15 +184,23 @@ export function MusicPlayer({
     handleNext()
   }
 
-  // Reinitialize player when track changes
+  // Reinitialize player when track changes (only if video ID actually changed)
   useEffect(() => {
     if (isReady && playerRef.current && currentTrack) {
-      playerRef.current.loadVideoById(currentTrack.youtubeId)
-      if (isPlaying) {
-        playerRef.current.playVideo()
+      // Solo cargar si el ID del video realmente cambió
+      if (currentVideoIdRef.current !== currentTrack.youtubeId) {
+        currentVideoIdRef.current = currentTrack.youtubeId
+        playerRef.current.loadVideoById(currentTrack.youtubeId)
+        // Solo reproducir si ya estaba reproduciéndose
+        if (isPlaying) {
+          playerRef.current.playVideo()
+        } else {
+          // Asegurar que esté pausado
+          playerRef.current.pauseVideo()
+        }
       }
     }
-  }, [currentTrackIndex, currentTrack])
+  }, [currentTrackIndex, currentTrack?.youtubeId, isReady, isPlaying])
 
   // Update volume when changed
   useEffect(() => {
@@ -190,6 +210,12 @@ export function MusicPlayer({
   }, [volume, isReady])
 
   const handlePlayPause = () => {
+    // Lazy load YouTube API on first play
+    if (!playerRef.current && !apiLoading) {
+      loadYouTubeAPI()
+      return
+    }
+    
     if (!playerRef.current) return
 
     if (isPlaying) {
