@@ -458,11 +458,13 @@ export default function CreatorPublicProfile() {
               )}
             </div>
 
-            {/* Bio */}
-            {profile.bio && (
-              <p className="mt-2 text-center text-gray-300 max-w-md whitespace-pre-line">
-                {profile.bio}
-              </p>
+            {/* Extended Info - Main content */}
+            {profile.extendedInfo && (
+              <div className="mt-4 text-center text-gray-300 max-w-2xl whitespace-pre-line">
+                <p className="text-lg leading-relaxed">
+                  {profile.extendedInfo}
+                </p>
+              </div>
             )}
 
             {/* Action Buttons */}
@@ -612,16 +614,6 @@ export default function CreatorPublicProfile() {
               <p className="text-gray-300 text-sm whitespace-pre-line">
                 {profile.bio || 'Este creador aún no ha agregado una descripción.'}
               </p>
-              
-              {/* Extended Info Section */}
-              {profile.extendedInfo && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <h4 className="font-semibold text-base mb-2">{profile.extendedInfoTitle || 'Información Adicional'}</h4>
-                  <p className="text-gray-300 text-sm whitespace-pre-line">
-                    {profile.extendedInfo}
-                  </p>
-                </div>
-              )}
               
               {/* Social Links */}
               {profile.socialLinks.length > 0 && (

@@ -739,15 +739,15 @@ export function CreatorProfileEditor() {
                     placeholder="Acerca de mí"
                     value={profile.bioTitle}
                     onChange={(e) => setProfile(prev => ({ ...prev, bioTitle: e.target.value }))}
-                    helperText="Personaliza el título que aparece sobre tu biografía"
+                    helperText="Título de la tarjeta lateral (sidebar)"
                   />
 
                   <div>
                     <label className="block text-sm font-medium text-white/80 mb-1.5">
-                      Biografía
+                      Biografía (Tarjeta Lateral)
                     </label>
                     <textarea
-                      placeholder="Cuéntale al mundo sobre ti... (usa Enter para saltos de línea)"
+                      placeholder="Descripción breve que aparece en la tarjeta lateral..."
                       value={profile.bio}
                       onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
                       rows={4}
@@ -758,28 +758,28 @@ export function CreatorProfileEditor() {
                       } as any}
                     />
                     <p className="text-white/40 text-sm mt-1">
-                      {profile.bio.length}/500 caracteres
+                      {profile.bio.length}/500 caracteres • Aparece en la tarjeta lateral del perfil
                     </p>
                   </div>
 
                   <Input
-                    label="Título de Información Adicional"
+                    label="Título de Contenido Principal"
                     type="text"
                     placeholder="Información Adicional"
                     value={profile.extendedInfoTitle}
                     onChange={(e) => setProfile(prev => ({ ...prev, extendedInfoTitle: e.target.value }))}
-                    helperText="Título para la sección de información extendida (servicios, horarios, etc.)"
+                    helperText="No se muestra, solo para referencia"
                   />
 
                   <div>
                     <label className="block text-sm font-medium text-white/80 mb-1.5">
-                      Información Adicional
+                      Contenido Principal (Centro del Perfil)
                     </label>
                     <textarea
-                      placeholder="Servicios, horarios, precios, marcas, o cualquier información relevante... (usa Enter para saltos de línea)"
+                      placeholder="Información detallada que aparece grande y centrada (servicios, horarios, precios, marcas, contacto, etc.)"
                       value={profile.extendedInfo}
                       onChange={(e) => setProfile(prev => ({ ...prev, extendedInfo: e.target.value }))}
-                      rows={8}
+                      rows={12}
                       maxLength={2000}
                       className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 resize-none whitespace-pre-wrap"
                       style={{
@@ -787,7 +787,7 @@ export function CreatorProfileEditor() {
                       } as any}
                     />
                     <p className="text-white/40 text-sm mt-1">
-                      {profile.extendedInfo.length}/2000 caracteres • Visible como sección separada
+                      {profile.extendedInfo.length}/2000 caracteres • Aparece grande y centrado bajo tu foto
                     </p>
                   </div>
                 </div>
