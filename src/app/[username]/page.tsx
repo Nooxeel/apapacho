@@ -303,17 +303,35 @@ export default function CreatorPublicProfile() {
     try {
       await subscriptionsApi.unsubscribe(creator.creatorProfile.id, token)
       
-      // Actualizar estado local
-      setIsSubscriber(false)
       setShowCancelConfirm(false)
       setShowManageModal(false)
       
-      // Mostrar mensaje de éxito
-      alert('✅ Suscripción cancelada. Mantendrás acceso hasta el fin del período pagado.')
+      // Recargar perfil para obtener el estado actualizado de la suscripción
+      const updatedCreator = await creatorApi.getByUsername(username) as CreatorProfile
+      setCreator(updatedCreator)
       
-      // Recargar perfil
-      const updatedCreator = await creatorApi.getByUsername(username)
-      setCreator(updatedCreator as CreatorProfile)
+      // Verificar estado de suscripción actualizado
+      if (token && user) {
+        try {
+          const subCheck = await subscriptionsApi.checkSubscription(updatedCreator.creatorProfile.id, token)
+          setIsSubscriber(subCheck.isSubscribed)
+          setSubscriptionDetails(subCheck.subscription)
+          
+          if (subCheck.subscription?.endDate) {
+            const endDate = new Date(subCheck.subscription.endDate)
+            const formattedDate = endDate.toLocaleDateString('es-CL', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric' 
+            })
+            alert(`✅ Suscripción cancelada. Mantendrás acceso hasta el ${formattedDate}.`)
+          } else {
+            alert('✅ Suscripción cancelada.')
+          }
+        } catch (error) {
+          console.error('Error checking subscription:', error)
+        }
+      }
       
     } catch (error: any) {
       console.error('Error al cancelar suscripción:', error)
@@ -863,8 +881,18 @@ export default function CreatorPublicProfile() {
                 )}
                 <div className="flex justify-between items-start">
                   <span className="text-white/50 text-sm">Estado</span>
-                  <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
-                    {subscriptionDetails.status === 'active' ? 'Activa' : subscriptionDetails.status}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    subscriptionDetails.status === 'active' 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : subscriptionDetails.status === 'cancelled'
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : 'bg-gray-500/20 text-gray-400'
+                  }`}>
+                    {subscriptionDetails.status === 'active' 
+                      ? 'Activa' 
+                      : subscriptionDetails.status === 'cancelled'
+                      ? 'Cancelada'
+                      : subscriptionDetails.status}
                   </span>
                 </div>
                 {subscriptionDetails.autoRenew !== undefined && (
@@ -887,16 +915,34 @@ export default function CreatorPublicProfile() {
                 </div>
               )}
 
-              {/* Cancel Button */}
-              <button
-                onClick={() => {
-                  setShowManageModal(false)
-                  setShowCancelConfirm(true)
-                }}
-                className="w-full py-3 rounded-lg font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
-              >
-                Cancelar Suscripción
-              </button>
+              {/* Cancel Button - solo si está activa */}
+              {subscriptionDetails.status === 'active' && (
+                <button
+                  onClick={() => {
+                    setShowManageModal(false)
+                    setShowCancelConfirm(true)
+                  }}
+                  className="w-full py-3 rounded-lg font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
+                >
+                  Cancelar Suscripción
+                </button>
+              )}
+
+              {/* Mensaje si está cancelada */}
+              {subscriptionDetails.status === 'cancelled' && subscriptionDetails.endDate && (
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                  <p className="text-yellow-400 text-sm text-center">
+                    Tu suscripción está cancelada. Mantendrás acceso hasta el{' '}
+                    <span className="font-semibold">
+                      {new Date(subscriptionDetails.endDate).toLocaleDateString('es-CL', { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                      })}
+                    </span>
+                  </p>
+                </div>
+              )}
 
               <button
                 onClick={() => setShowManageModal(false)}
