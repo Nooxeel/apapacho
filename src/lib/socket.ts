@@ -6,19 +6,22 @@ class SocketService {
   private socket: Socket | null = null
   private listeners: Map<string, Set<Function>> = new Map()
   private connectionCount = 0 // Track number of components using the socket
+  private currentUserId: string | null = null // Track current user
 
   connect(userId: string) {
     this.connectionCount++
-    console.log(`[Socket] Connection count: ${this.connectionCount}`)
+    this.currentUserId = userId
+    console.log(`[Socket] Connection count: ${this.connectionCount}, userId: ${userId}`)
     
     if (this.socket?.connected) {
-      console.log('[Socket] Already connected')
-      // Re-join user room in case of reconnection
+      console.log('[Socket] Already connected, re-joining user room')
+      // Re-join user room in case of reconnection or multiple connects
       this.socket.emit('join:user', userId)
+      console.log('[Socket] Emitted join:user for:', userId)
       return
     }
 
-    console.log('[Socket] Connecting to:', API_URL)
+    console.log('[Socket] Creating new connection to:', API_URL)
     this.socket = io(API_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -29,7 +32,17 @@ class SocketService {
     this.socket.on('connect', () => {
       console.log('✅ WebSocket connected:', this.socket?.id)
       // Join user-specific room
-      this.socket?.emit('join:user', userId)
+      console.log('[Socket] Emitting join:user for:', this.currentUserId)
+      this.socket?.emit('join:user', this.currentUserId)
+    })
+
+    this.socket.on('reconnect', (attemptNumber) => {
+      console.log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`)
+      // Re-join user room after reconnection
+      if (this.currentUserId) {
+        console.log('[Socket] Re-joining user room after reconnect:', this.currentUserId)
+        this.socket?.emit('join:user', this.currentUserId)
+      }
     })
 
     this.socket.on('disconnect', () => {
@@ -37,19 +50,22 @@ class SocketService {
     })
 
     this.socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error)
+      console.error('❌ WebSocket connection error:', error)
     })
 
-    // Setup event listeners
+    // Setup event listeners with logging
     this.socket.on('message:new', (message) => {
+      console.log('[Socket] 📨 Received message:new event:', message)
       this.emit('message:new', message)
     })
 
     this.socket.on('unread:update', (data) => {
+      console.log('[Socket] 🔔 Received unread:update event:', data)
       this.emit('unread:update', data)
     })
 
     this.socket.on('stats:update', (data) => {
+      console.log('[Socket] 📊 Received stats:update event:', data)
       this.emit('stats:update', data)
     })
   }
@@ -65,6 +81,7 @@ class SocketService {
       this.socket = null
       this.listeners.clear()
       this.connectionCount = 0
+      this.currentUserId = null
     }
   }
 
