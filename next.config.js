@@ -57,7 +57,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://images.unsplash.com https://ui-avatars.com https://res.cloudinary.com https://*.placeholder.com http://localhost:3001",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://www.youtube.com http://localhost:3001 https://*.railway.app",
+              "connect-src 'self' https://www.youtube.com http://localhost:3001 https://*.railway.app ws://localhost:3001 wss://*.railway.app",
               "frame-src 'self' https://www.youtube.com",
               "media-src 'self' https://res.cloudinary.com http://localhost:3001 blob:",
               "object-src 'none'",
