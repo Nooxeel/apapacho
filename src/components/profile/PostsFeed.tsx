@@ -37,9 +37,10 @@ interface PostsFeedProps {
   filterType?: string
   onSubscribeClick?: () => void
   isSubscriber?: boolean
+  isOwner?: boolean
 }
 
-export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false }: PostsFeedProps) {
+export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
@@ -274,13 +275,15 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
   }, [])
 
   const canViewPost = useCallback((post: Post): boolean => {
+    // El creador siempre puede ver su propio contenido
+    if (isOwner) return true
     if (post.visibility === 'public') return true
     if (post.visibility === 'authenticated') return isAuthenticated
     if (post.visibility === 'subscribers') {
       return isSubscriber
     }
     return false
-  }, [isAuthenticated, isSubscriber])
+  }, [isOwner, isAuthenticated, isSubscriber])
 
   const getVisibilityBadge = useCallback((visibility: PostVisibility) => {
     switch (visibility) {

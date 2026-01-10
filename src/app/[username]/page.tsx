@@ -698,6 +698,7 @@ export default function CreatorPublicProfile() {
                 filterType={activeTab}
                 onSubscribeClick={() => setShowSubscribeModal(true)}
                 isSubscriber={isSubscriber}
+                isOwner={isOwner}
               />
             )}
           </div>
