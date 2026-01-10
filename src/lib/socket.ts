@@ -1,6 +1,8 @@
 import { io, Socket } from 'socket.io-client'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+// Remove /api from the URL for Socket.IO connection
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001')
+  .replace('/api', '')
 
 class SocketService {
   private socket: Socket | null = null
