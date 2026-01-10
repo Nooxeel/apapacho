@@ -150,7 +150,7 @@ export function Navbar() {
                         Dashboard
                       </Link>
                       <Link
-                        href={`/${user.username}`}
+                        href={user.isCreator ? `/${user.username}` : '/profile/edit'}
                         className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
