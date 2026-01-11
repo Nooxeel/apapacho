@@ -3,33 +3,33 @@ import { Button } from '@/components/ui'
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-[#FAF3DD]">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-[#0f0f14]">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#FFA69E]/30 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#B8F2E6]/30 rounded-full blur-3xl animate-pulse-slow delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#AED9E0]/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-slow delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-pink-500/10 rounded-full blur-3xl" />
       </div>
 
       {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSg5NCwxMDAsMTE0LDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-50" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-700/10 border border-gray-700/20 mb-8">
-          <span className="w-2 h-2 rounded-full bg-[#B8F2E6] animate-pulse" />
-          <span className="text-sm text-[#2D3748]">Plataforma en crecimiento</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+          <span className="w-2 h-2 rounded-full bg-fuchsia-400 animate-pulse" />
+          <span className="text-sm text-white/80">Plataforma en crecimiento</span>
         </div>
 
         {/* Main Title */}
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6">
-          <span className="text-[#2D3748]">Tu espacio,</span>
+          <span className="text-white">Tu espacio,</span>
           <br />
-          <span className="bg-gradient-to-r from-[#FF6B6B] via-[#4ECDC4] to-[#45B7D1] bg-clip-text text-transparent">tu estilo</span>
+          <span className="gradient-text">tu estilo</span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-xl md:text-2xl text-[#2D3748] max-w-3xl mx-auto mb-10">
+        <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-10">
           ¿Recuerdas cuando tu perfil era realmente <span className="font-semibold">tuyo</span>?
           <br />
           Música de fondo, colores personalizados, tu propio espacio.
@@ -66,20 +66,20 @@ export function HeroSection() {
 
         {/* Features Highlight */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="text-center p-6 rounded-2xl bg-white/95 border border-gray-200 backdrop-blur-sm shadow-lg">
+          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
             <div className="text-3xl mb-2">🎨</div>
-            <h3 className="text-lg font-semibold text-[#2D3748] mb-2">Diseña sin límites</h3>
-            <p className="text-[#2D3748]/80 text-sm">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Diseña sin límites</h3>
+            <p className="text-white/60 text-sm">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white/95 border border-gray-200 backdrop-blur-sm shadow-lg">
+          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
             <div className="text-3xl mb-2">🎵</div>
-            <h3 className="text-lg font-semibold text-[#2D3748] mb-2">Tu soundtrack</h3>
-            <p className="text-[#2D3748]/80 text-sm">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Tu soundtrack</h3>
+            <p className="text-white/60 text-sm">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white/95 border border-gray-200 backdrop-blur-sm shadow-lg">
+          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
             <div className="text-3xl mb-2">💰</div>
-            <h3 className="text-lg font-semibold text-[#2D3748] mb-2">Monetiza tu arte</h3>
-            <p className="text-[#2D3748]/80 text-sm">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Monetiza tu arte</h3>
+            <p className="text-white/60 text-sm">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function HeroSection() {
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <svg
-          className="w-6 h-6 text-[#5E6472]/40"
+          className="w-6 h-6 text-white/40"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
