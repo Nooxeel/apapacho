@@ -6,6 +6,7 @@ import { Button, Input, Card } from '@/components/ui'
 import { uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { useFontContext } from '@/contexts/FontContext'
+import { Navbar } from '@/components/layout'
 import { API_URL } from '@/lib/config'
 import { User as UserIcon, ImagePlus, Save, ArrowLeft, Tag, Palette, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
@@ -254,24 +255,26 @@ export default function ProfileEditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f14] text-white pb-20">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 text-white/80 hover:text-white mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Dashboard
-          </button>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <UserIcon className="w-8 h-8" />
-            Editar Mi Perfil
-          </h1>
-          <p className="text-white/70 mt-2">Personaliza tu perfil como fan de la plataforma</p>
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-[#0f0f14] text-white pb-20">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-8">
+          <div className="max-w-4xl mx-auto px-4">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="flex items-center gap-2 text-white/80 hover:text-white mb-4"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver al Dashboard
+            </button>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              <UserIcon className="w-8 h-8" />
+              Editar Mi Perfil
+            </h1>
+            <p className="text-white/70 mt-2">Personaliza tu perfil como fan de la plataforma</p>
+          </div>
         </div>
-      </div>
 
       <div className="max-w-4xl mx-auto px-4 mt-8">
         {/* Action Buttons */}
@@ -532,6 +535,7 @@ export default function ProfileEditPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
