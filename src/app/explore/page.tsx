@@ -1,83 +1,121 @@
-'use client';
+'use client'
 
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { Button } from '@/components/ui';
-import Link from 'next/link';
-import { Search, Filter, TrendingUp, Heart, Star } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
+import { CreatorsGrid } from '@/components/explore'
+import { discoverApi, interestsApi } from '@/lib/api'
+import { useAuthStore } from '@/stores/authStore'
+import type { CreatorCardData } from '@/components/explore'
 
 export default function ExplorePage() {
+  const { token, hasHydrated } = useAuthStore()
+  
+  const [creators, setCreators] = useState<CreatorCardData[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasMore, setHasMore] = useState(true)
+  const [offset, setOffset] = useState(0)
+  const [userInterests, setUserInterests] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  const LIMIT = 12
+
+  // Cargar intereses del usuario si está autenticado
+  useEffect(() => {
+    if (hasHydrated && token) {
+      interestsApi
+        .getMyInterests(token)
+        .then(interests => setUserInterests(interests.map((i: any) => i.id)))
+        .catch(err => console.error('Error loading user interests:', err))
+    }
+  }, [token, hasHydrated])
+
+  // Cargar creadores iniciales
+  useEffect(() => {
+    if (hasHydrated) {
+      loadCreators(true)
+    }
+  }, [hasHydrated])
+
+  const loadCreators = async (reset = false) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const currentOffset = reset ? 0 : offset
+      const data = await discoverApi.discoverCreators({
+        limit: LIMIT,
+        offset: currentOffset
+      })
+
+      if (reset) {
+        setCreators(data)
+        setOffset(LIMIT)
+      } else {
+        setCreators(prev => [...prev, ...data])
+        setOffset(prev => prev + LIMIT)
+      }
+
+      setHasMore(data.length === LIMIT)
+    } catch (err) {
+      console.error('Error loading creators:', err)
+      setError('Error al cargar los creadores')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleLoadMore = () => {
+    if (!isLoading && hasMore) {
+      loadCreators(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#0f0f14]">
       <Navbar />
-      
+
       <main className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Explora <span className="gradient-text">Contenido</span>
+          <div className="mb-12 text-center">
+            <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
+              Explora <span className="gradient-text">Creadores</span>
             </h1>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-lg text-white/60">
               Descubre los mejores creadores y contenido exclusivo
             </p>
           </div>
 
-          {/* Coming Soon */}
-          <div className="max-w-2xl mx-auto text-center py-20">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Próximamente
-            </h2>
-            <p className="text-white/60 mb-8">
-              Estamos trabajando en crear la mejor experiencia de exploración para ti. 
-              Mientras tanto, puedes ver todos los creadores disponibles.
-            </p>
-            <Link href="/creators">
-              <Button variant="primary" size="lg">
-                Ver Creadores
-              </Button>
-            </Link>
-          </div>
-
-          {/* Features Preview */}
-          <div className="grid md:grid-cols-3 gap-6 mt-20">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="w-12 h-12 rounded-lg bg-fuchsia-500/20 flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-fuchsia-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Tendencias</h3>
-              <p className="text-white/60 text-sm">
-                Descubre los creadores y contenido más populares del momento
+          {/* Results count */}
+          {!isLoading && creators.length > 0 && (
+            <div className="mb-6">
+              <p className="text-white/60">
+                {creators.length} {creators.length === 1 ? 'creador encontrado' : 'creadores encontrados'}
               </p>
             </div>
+          )}
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center mb-4">
-                <Heart className="w-6 h-6 text-pink-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Recomendaciones</h3>
-              <p className="text-white/60 text-sm">
-                Contenido personalizado basado en tus intereses
-              </p>
+          {/* Error message */}
+          {error && (
+            <div className="mb-6 rounded-xl border border-red-500/50 bg-red-500/20 p-4 text-red-200">
+              {error}
             </div>
+          )}
 
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4">
-                <Star className="w-6 h-6 text-purple-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Destacados</h3>
-              <p className="text-white/60 text-sm">
-                Los mejores creadores verificados de la plataforma
-              </p>
-            </div>
-          </div>
+          {/* Creators Grid */}
+          <CreatorsGrid
+            creators={creators}
+            isLoading={isLoading}
+            hasMore={hasMore}
+            onLoadMore={handleLoadMore}
+            userInterests={userInterests}
+            emptyMessage="No se encontraron creadores"
+          />
         </div>
       </main>
 
       <Footer />
     </div>
-  );
+  )
 }
