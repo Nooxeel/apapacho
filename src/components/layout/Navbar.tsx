@@ -89,8 +89,8 @@ export function Navbar() {
             <Link href="/explore" className="text-white/70 hover:text-white transition-colors">
               Explorar
             </Link>
-            <Link href="/creators" className="text-white/70 hover:text-white transition-colors">
-              Creadores
+            <Link href="/ruleta" className="text-white/70 hover:text-white transition-colors">
+              Ruleta
             </Link>
             <Link href="/pricing" className="text-white/70 hover:text-white transition-colors">
               Tarifas
@@ -254,10 +254,10 @@ export function Navbar() {
                 Explorar
               </Link>
               <Link
-                href="/creators"
+                href="/ruleta"
                 className="text-white/70 hover:text-white transition-colors px-2 py-1"
               >
-                Creadores
+                Ruleta
               </Link>
               <Link
                 href="/pricing"
