@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
-import { CreatorsGrid, ExploreFilters } from '@/components/explore'
+import { CreatorsGrid, ExploreFilters, RecommendedSection } from '@/components/explore'
 import { discoverApi, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import type { CreatorCardData, ExploreFiltersState } from '@/components/explore'
@@ -129,6 +129,14 @@ export default function ExplorePage() {
               isLoading={isLoading}
             />
           </div>
+
+          {/* Recommended Section (for authenticated users) */}
+          {token && userInterests.length > 0 && (
+            <RecommendedSection
+              token={token}
+              userInterests={userInterests}
+            />
+          )}
 
           {/* Results count */}
           {!isLoading && creators.length > 0 && (

@@ -103,3 +103,13 @@ body {
     0 0 20px rgba(244, 63, 94, 0.3),
     0 0 40px rgba(244, 63, 94, 0.1);
 }
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
