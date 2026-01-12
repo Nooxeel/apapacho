@@ -41,11 +41,15 @@ export default function RouletaPage() {
   const handleSpin = async (): Promise<number> => {
     if (!token) throw new Error('No token')
     
+    console.log('🎰 Spinning roulette, current points:', points)
+    
     try {
       const response = await api<{ prizeId: number; newPoints: number }>('/roulette/spin', {
         method: 'POST',
         token,
       })
+      
+      console.log('🎰 Spin response:', response)
       
       // Update points after spin
       setPoints(response.newPoints)

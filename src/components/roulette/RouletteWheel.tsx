@@ -48,7 +48,7 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
         // Calculate rotation to land on the prize
         const segmentAngle = 360 / prizes.length
         const targetAngle = prizeIndex * segmentAngle
-        const spins = 5 // Number of full rotations
+        const spins = 8 // Number of full rotations
         const finalRotation = spins * 360 + (360 - targetAngle) + segmentAngle / 2
 
         setRotation(finalRotation)
@@ -57,7 +57,7 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
         setTimeout(() => {
           setWinner(prizes[prizeIndex])
           setIsSpinning(false)
-        }, 5000)
+        }, 6000)
       }
     } catch (error) {
       console.error('Error spinning:', error)
@@ -97,7 +97,7 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
             className="absolute inset-0 rounded-full overflow-hidden shadow-2xl border-8 border-white/10"
             style={{
               transform: `rotate(${rotation}deg)`,
-              transition: isSpinning ? 'transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
+              transition: isSpinning ? 'transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
             }}
           >
             {prizes.map((prize, index) => {
