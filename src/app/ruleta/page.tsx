@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 import { RouletteWheel } from '@/components/roulette'
 import { useAuthStore } from '@/stores'
 import api from '@/lib/api'
@@ -63,14 +65,19 @@ export default function RouletaPage() {
 
   if (!hasHydrated || loading) {
     return (
-      <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-fuchsia-500 border-t-transparent" />
-      </div>
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-fuchsia-500 border-t-transparent" />
+        </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f14] py-20">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-[#0f0f14] py-20">
       {/* Header */}
       <div className="container mx-auto px-4 mb-12">
         <div className="text-center max-w-3xl mx-auto">
@@ -177,5 +184,7 @@ export default function RouletaPage() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   )
 }
