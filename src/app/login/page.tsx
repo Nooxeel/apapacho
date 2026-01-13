@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   
   const [formData, setFormData] = useState({
     email: '',
@@ -27,6 +28,7 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
+    setFieldErrors({})
 
     // Validar términos en registro
     if (!isLogin && !formData.acceptTerms) {
@@ -71,7 +73,23 @@ export default function LoginPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Error en la autenticación')
+      // Manejar errores de validación con detalles
+      if (err.message === 'Validation failed' && err.details) {
+        const errors: Record<string, string> = {}
+        err.details.forEach((detail: any) => {
+          const field = detail.path?.[0] || 'general'
+          errors[field] = detail.message
+        })
+        setFieldErrors(errors)
+        
+        // Mostrar el primer error como mensaje general también
+        const firstError = Object.values(errors)[0]
+        if (firstError) {
+          setError(firstError)
+        }
+      } else {
+        setError(err.message || 'Error en la autenticación')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -111,6 +129,7 @@ export default function LoginPage() {
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               required
+              error={fieldErrors.email}
             />
 
             {!isLogin && (
@@ -123,6 +142,7 @@ export default function LoginPage() {
                   required
                   leftIcon={<span className="text-white/50">@</span>}
                   helperText="Solo letras minúsculas, números y guiones bajos"
+                  error={fieldErrors.username}
                 />
                 <Input
                   label="Nombre para mostrar"
@@ -130,6 +150,7 @@ export default function LoginPage() {
                   value={formData.displayName}
                   onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
                   required
+                  error={fieldErrors.displayName}
                 />
               </>
             )}
@@ -142,6 +163,7 @@ export default function LoginPage() {
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               required
               helperText={!isLogin ? "Mínimo 8 caracteres" : undefined}
+              error={fieldErrors.password}
             />
 
             {!isLogin && (
@@ -196,6 +218,7 @@ export default function LoginPage() {
               onClick={() => {
                 setIsLogin(!isLogin)
                 setError(null)
+                setFieldErrors({})
               }}
               className="text-fuchsia-400 hover:text-fuchsia-300 text-sm"
             >

@@ -12,7 +12,8 @@ export class ApiError extends Error {
     message: string,
     public statusCode?: number,
     public endpoint?: string,
-    public method?: string
+    public method?: string,
+    public details?: any
   ) {
     super(message)
     this.name = 'ApiError'
@@ -40,12 +41,14 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
 
     if (!response.ok) {
       let errorMessage = 'API request failed'
+      let errorDetails = undefined
 
       try {
         const contentType = response.headers.get('content-type')
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.message || errorMessage
+          errorDetails = errorData.details
         } else {
           errorMessage = await response.text() || errorMessage
         }
@@ -53,7 +56,7 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
         // If parsing error response fails, use generic message
       }
 
-      throw new ApiError(errorMessage, response.status, endpoint, method)
+      throw new ApiError(errorMessage, response.status, endpoint, method, errorDetails)
     }
 
     return response.json()
