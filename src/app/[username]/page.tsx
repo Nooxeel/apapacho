@@ -436,12 +436,15 @@ export default function CreatorPublicProfile() {
         }}
       >
         {/* Cover Image */}
-        <div className="relative h-[300px] md:h-[400px] w-full">
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ 
-              backgroundImage: `url(${coverImageUrl})`,
-            }}
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image
+            src={coverImageUrl}
+            alt={`${creator.displayName} cover`}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+            quality={90}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
         </div>
