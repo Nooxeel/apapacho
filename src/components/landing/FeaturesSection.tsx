@@ -9,7 +9,7 @@ const features = [
     ),
     title: 'Tu Identidad, Tu Canvas',
     description: 'Escoge colores, fondos, fuentes. Como MySpace pero mejor. Tu perfil refleja quien eres realmente.',
-    gradient: 'from-primary-500 to-pink-500',
+    gradient: 'from-purple-500 to-violet-600',
   },
   {
     icon: (
@@ -19,7 +19,7 @@ const features = [
     ),
     title: 'Tu Música, Tu Vibe',
     description: 'Reproduce tu playlist favorita automáticamente cuando alguien visite tu perfil. La magia de MySpace está de vuelta.',
-    gradient: 'from-accent-500 to-orange-500',
+    gradient: 'from-violet-500 to-indigo-600',
   },
   {
     icon: (
@@ -29,7 +29,7 @@ const features = [
     ),
     title: 'Expresa tu Estilo',
     description: 'Desde layouts clásicos hasta diseños modernos. La creatividad no tiene límites en tu espacio.',
-    gradient: 'from-purple-500 to-violet-500',
+    gradient: 'from-indigo-500 to-blue-600',
   },
   {
     icon: (
@@ -39,7 +39,7 @@ const features = [
     ),
     title: 'Gana con tu Arte',
     description: 'Suscripciones, contenido premium y donaciones. Tu talento merece ser recompensado.',
-    gradient: 'from-green-500 to-emerald-500',
+    gradient: 'from-blue-500 to-cyan-600',
   },
   {
     icon: (
@@ -49,7 +49,7 @@ const features = [
     ),
     title: 'Construye tu Tribu',
     description: 'Libro de visitas, comentarios, mensajes. Conexiones reales como en los viejos tiempos.',
-    gradient: 'from-blue-500 to-cyan-500',
+    gradient: 'from-cyan-500 to-teal-600',
   },
   {
     icon: (
@@ -59,20 +59,20 @@ const features = [
     ),
     title: 'Tu Contenido, Tus Reglas',
     description: 'Decide quién ve qué. Control total sobre tu contenido y tu privacidad.',
-    gradient: 'from-yellow-500 to-orange-500',
+    gradient: 'from-teal-500 to-emerald-600',
   },
 ]
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 relative bg-[#0f0f14]">
+    <section className="py-24 relative bg-gradient-to-b from-[#1a1528] to-[#0d0d1a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-cinzel text-3xl md:text-5xl font-semibold text-white/95 mb-4 tracking-wide">
             La plataforma que <span className="gradient-text">extrañabas</span>
           </h2>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+          <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
             Donde tu creatividad no tiene límites y tu perfil es tan único como tú.
             <br />
             Bienvenido de vuelta a la era dorada de la personalización.
@@ -86,7 +86,7 @@ export function FeaturesSection() {
               key={index}
               variant="solid"
               hover
-              className="group border-white/10"
+              className="group border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04] hover:border-purple-500/20"
             >
               <CardContent>
                 <div
@@ -96,10 +96,10 @@ export function FeaturesSection() {
                     {feature.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-fuchsia-400 transition-all">
+                <h3 className="text-xl font-semibold text-white/90 mb-2 group-hover:text-purple-300 transition-all">
                   {feature.title}
                 </h3>
-                <p className="text-white/60">
+                <p className="text-white/50">
                   {feature.description}
                 </p>
               </CardContent>

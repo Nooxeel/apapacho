@@ -21,7 +21,7 @@ const mockCreators = [
     name: 'Gatita Veve',
     username: 'gatitaveve',
     avatar: '',
-    coverGradient: 'from-purple-600 via-pink-500 to-red-500',
+    coverGradient: 'from-purple-600 via-violet-500 to-indigo-500',
     category: 'Contenido',
     subscribers: 0,
     isOnline: true,
@@ -31,7 +31,7 @@ const mockCreators = [
     name: 'Imperfecto',
     username: 'imperfecto',
     avatar: '',
-    coverGradient: 'from-blue-600 via-cyan-500 to-teal-500',
+    coverGradient: 'from-indigo-600 via-blue-500 to-cyan-500',
     category: 'Tech',
     subscribers: 0,
     isOnline: false,
@@ -61,7 +61,7 @@ export function CreatorsShowcase() {
             name: c.user?.displayName || c.displayName || 'Usuario',
             username: c.user?.username || c.username || 'usuario',
             avatar: c.user?.avatar || c.profileImage || '',
-            coverGradient: 'from-purple-600 via-pink-500 to-red-500',
+            coverGradient: 'from-purple-600 via-violet-500 to-indigo-500',
             category: 'Contenido',
             subscribers: 0,
             isOnline: Math.random() > 0.5,
@@ -78,17 +78,17 @@ export function CreatorsShowcase() {
   }, [])
 
   return (
-    <section className="py-24 relative overflow-hidden bg-[#0f0f14]">
+    <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#0d0d1a] to-[#12101f]">
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-fuchsia-500/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-cinzel text-3xl md:text-5xl font-semibold text-white/95 mb-4 tracking-wide">
             Creadores <span className="gradient-text">destacados</span>
           </h2>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+          <p className="text-lg text-white/50 max-w-2xl mx-auto">
             Descubre creadores únicos con perfiles personalizables
           </p>
         </div>
@@ -100,7 +100,7 @@ export function CreatorsShowcase() {
               <Card
                 variant="solid"
                 hover
-                className="overflow-hidden cursor-pointer group border-white/10"
+                className="overflow-hidden cursor-pointer group border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04] hover:border-purple-500/20"
               >
               {/* Cover Gradient */}
               <div
@@ -109,7 +109,7 @@ export function CreatorsShowcase() {
 
               {/* Avatar */}
               <div className="relative -mt-10 mb-4 flex justify-center">
-                <div className="ring-4 ring-[#0f0f14] rounded-full">
+                <div className="ring-4 ring-[#12101f] rounded-full">
                   <Avatar
                     src={creator.avatar}
                     fallback={creator.name}
@@ -121,23 +121,23 @@ export function CreatorsShowcase() {
 
               {/* Info */}
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-white group-hover:text-fuchsia-400 transition-all">
+                <h3 className="text-lg font-semibold text-white/90 group-hover:text-purple-300 transition-all">
                   {creator.name}
                 </h3>
-                <p className="text-white/60 text-sm mb-3">@{creator.username}</p>
+                <p className="text-white/50 text-sm mb-3">@{creator.username}</p>
 
                 <div className="flex items-center justify-center gap-3">
                   <Badge variant="primary" size="sm">
                     {creator.category}
                   </Badge>
-                  <span className="text-white/60 text-sm">
+                  <span className="text-white/50 text-sm">
                     {formatSubscribers(creator.subscribers)} subs
                   </span>
                 </div>
               </div>
 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-fuchsia-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </Card>
             </Link>
           ))}
@@ -145,8 +145,8 @@ export function CreatorsShowcase() {
 
         {/* View All Button */}
         <div className="text-center mt-12">
-          <Link href="/creators">
-            <button className="text-fuchsia-400 hover:text-fuchsia-300 font-medium transition-colors inline-flex items-center gap-2">
+          <Link href="/explore">
+            <button className="text-purple-400 hover:text-purple-300 font-medium transition-colors inline-flex items-center gap-2">
               Ver todos los creadores
               <svg
                 className="w-4 h-4"

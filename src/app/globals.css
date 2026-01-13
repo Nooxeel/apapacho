@@ -23,6 +23,10 @@
   font-family: var(--font-montserrat), system-ui, sans-serif;
 }
 
+@utility font-cinzel {
+  font-family: var(--font-cinzel), Georgia, 'Times New Roman', serif;
+}
+
 /* Default font for the entire app */
 body {
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -30,8 +34,8 @@ body {
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 15, 15, 20;
-  --background-end-rgb: 30, 20, 40;
+  --background-start-rgb: 13, 13, 26;
+  --background-end-rgb: 20, 15, 35;
 }
 
 body {
@@ -81,27 +85,35 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Gradient text */
+/* Gradient text - Blizzard style purple/blue */
 .gradient-text {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient text warm - for accents */
+.gradient-text-warm {
   background: linear-gradient(135deg, #d946ef 0%, #f43f5e 50%, #fb923c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Neon glow effects */
+/* Neon glow effects - purple/blue style */
 .neon-glow {
   box-shadow: 
-    0 0 5px rgba(217, 70, 239, 0.5),
-    0 0 20px rgba(217, 70, 239, 0.3),
-    0 0 40px rgba(217, 70, 239, 0.1);
+    0 0 5px rgba(139, 92, 246, 0.5),
+    0 0 20px rgba(139, 92, 246, 0.3),
+    0 0 40px rgba(139, 92, 246, 0.1);
 }
 
 .neon-glow-accent {
   box-shadow: 
-    0 0 5px rgba(244, 63, 94, 0.5),
-    0 0 20px rgba(244, 63, 94, 0.3),
-    0 0 40px rgba(244, 63, 94, 0.1);
+    0 0 5px rgba(124, 58, 237, 0.5),
+    0 0 20px rgba(124, 58, 237, 0.3),
+    0 0 40px rgba(124, 58, 237, 0.1);
 }
 
 /* Hide scrollbar utility */

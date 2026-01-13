@@ -3,44 +3,48 @@ import { Button } from '@/components/ui'
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-[#0f0f14]">
-      {/* Background Effects */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-gradient-to-b from-[#0d0d1a] via-[#12101f] to-[#1a1528]">
+      {/* Background Effects - Blizzard style purple/blue glows */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-fuchsia-500/20 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-slow delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-pink-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[120px] animate-pulse-slow" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600/15 rounded-full blur-[100px] animate-pulse-slow delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-indigo-600/10 rounded-full blur-[150px]" />
       </div>
 
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+      {/* Subtle vignette effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
-          <span className="w-2 h-2 rounded-full bg-fuchsia-400 animate-pulse" />
-          <span className="text-sm text-white/80">Plataforma en crecimiento</span>
+        <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-500/10 border border-purple-500/20 mb-10">
+          <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+          <span className="text-sm text-purple-200/90 tracking-wide">Plataforma en crecimiento</span>
         </div>
 
-        {/* Main Title */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6">
-          <span className="text-white">Tu espacio,</span>
+        {/* Main Title - Elegant serif font */}
+        <h1 className="font-cinzel text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-8 tracking-wide">
+          <span className="text-white/95">Tu espacio,</span>
           <br />
           <span className="gradient-text">tu estilo</span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-10">
-          ¿Recuerdas cuando tu perfil era realmente <span className="font-semibold">tuyo</span>?
-          <br />
+        <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto mb-12 leading-relaxed">
+          ¿Recuerdas cuando tu perfil era realmente <span className="text-purple-300 font-medium">tuyo</span>?
+          <br className="hidden md:block" />
           Música de fondo, colores personalizados, tu propio espacio.
-          <br />
+          <br className="hidden md:block" />
           La nostalgia de MySpace con las herramientas de hoy.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
           <Link href="/login">
-            <Button variant="primary" size="lg">
+            <Button 
+              variant="primary" 
+              size="lg"
+              className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 border-0 px-8 py-4 text-base font-medium tracking-wide shadow-lg shadow-purple-500/25"
+            >
               Crea tu Espacio
               <svg
                 className="w-5 h-5 ml-2"
@@ -58,7 +62,11 @@ export function HeroSection() {
             </Button>
           </Link>
           <Link href="/explore">
-            <Button variant="ghost" size="lg">
+            <Button 
+              variant="ghost" 
+              size="lg"
+              className="text-purple-200/80 hover:text-white hover:bg-purple-500/10 border border-purple-500/20 px-8 py-4"
+            >
               Ver Ejemplos
             </Button>
           </Link>
@@ -66,20 +74,20 @@ export function HeroSection() {
 
         {/* Features Highlight */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-            <div className="text-3xl mb-2">🎨</div>
-            <h3 className="text-lg font-semibold text-white mb-2">Diseña sin límites</h3>
-            <p className="text-white/60 text-sm">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
+          <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
+            <div className="text-4xl mb-4">🎨</div>
+            <h3 className="text-lg font-semibold text-white/90 mb-3">Diseña sin límites</h3>
+            <p className="text-white/50 text-sm leading-relaxed">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-            <div className="text-3xl mb-2">🎵</div>
-            <h3 className="text-lg font-semibold text-white mb-2">Tu soundtrack</h3>
-            <p className="text-white/60 text-sm">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
+          <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
+            <div className="text-4xl mb-4">🎵</div>
+            <h3 className="text-lg font-semibold text-white/90 mb-3">Tu soundtrack</h3>
+            <p className="text-white/50 text-sm leading-relaxed">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-            <div className="text-3xl mb-2">💰</div>
-            <h3 className="text-lg font-semibold text-white mb-2">Monetiza tu arte</h3>
-            <p className="text-white/60 text-sm">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
+          <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
+            <div className="text-4xl mb-4">💰</div>
+            <h3 className="text-lg font-semibold text-white/90 mb-3">Monetiza tu arte</h3>
+            <p className="text-white/50 text-sm leading-relaxed">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
           </div>
         </div>
       </div>
@@ -87,7 +95,7 @@ export function HeroSection() {
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <svg
-          className="w-6 h-6 text-white/40"
+          className="w-6 h-6 text-purple-400/40"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

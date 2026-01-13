@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins, Roboto, Open_Sans, Montserrat } from 'next/font/google'
+import { Inter, Poppins, Roboto, Open_Sans, Montserrat, Cinzel } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 
@@ -39,6 +39,14 @@ const montserrat = Montserrat({
   weight: ['300', '400', '500', '600', '700'],
 })
 
+// Elegant serif font for headers (similar to Blizzard style)
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  variable: '--font-cinzel',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+})
+
 export const metadata: Metadata = {
   title: 'Apapacho - Tu Plataforma de Contenido',
   description: 'Plataforma para creadores de contenido con personalización total estilo MySpace',
@@ -52,7 +60,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} ${openSans.variable} ${montserrat.variable}`}>
+      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} ${openSans.variable} ${montserrat.variable} ${cinzel.variable}`}>
         <FontProvider>
           {children}
         </FontProvider>
