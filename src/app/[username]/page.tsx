@@ -52,6 +52,7 @@ interface CreatorProfile {
         audio: boolean
         guestbook: boolean
         tipping: boolean
+        postTipping: boolean
       }
       messaging?: 'all' | 'logged_in' | 'subscribers_only'
     }
@@ -702,6 +703,7 @@ export default function CreatorPublicProfile() {
                 onSubscribeClick={() => setShowSubscribeModal(true)}
                 isSubscriber={isSubscriber}
                 isOwner={isOwner}
+                showPostTipping={profile.visibilitySettings?.tabs?.postTipping !== false}
               />
             )}
           </div>

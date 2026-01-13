@@ -38,9 +38,10 @@ interface PostsFeedProps {
   onSubscribeClick?: () => void
   isSubscriber?: boolean
   isOwner?: boolean
+  showPostTipping?: boolean
 }
 
-export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false }: PostsFeedProps) {
+export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false, showPostTipping = true }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
@@ -476,10 +477,12 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                     <MessageCircle className="w-5 h-5" />
                     <span className="text-sm font-medium">{post.comments.toLocaleString()}</span>
                   </button>
-                  <button className="flex items-center gap-2 text-white/60 hover:text-green-400 transition-colors">
-                    <DollarSign className="w-5 h-5" />
-                    <span className="text-sm font-medium">Propina</span>
-                  </button>
+                  {showPostTipping && (
+                    <button className="flex items-center gap-2 text-white/60 hover:text-green-400 transition-colors">
+                      <DollarSign className="w-5 h-5" />
+                      <span className="text-sm font-medium">Propina</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Comments Section */}

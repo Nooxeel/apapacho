@@ -74,6 +74,7 @@ interface VisibilitySettings {
     audio: boolean
     guestbook: boolean
     tipping: boolean
+    postTipping: boolean
   }
   messaging: 'all' | 'logged_in' | 'subscribers_only'
 }
@@ -87,6 +88,7 @@ const defaultVisibility: VisibilitySettings = {
     audio: true,
     guestbook: true,
     tipping: true,
+    postTipping: true,
   },
   messaging: 'logged_in'
 }
@@ -846,7 +848,8 @@ export function CreatorProfileEditor() {
                     { key: 'videos', label: 'Videos', icon: '🎬' },
                     { key: 'audio', label: 'Audio', icon: '🎵' },
                     { key: 'guestbook', label: 'Libro de visitas', icon: '📖' },
-                    { key: 'tipping', label: 'Botón de Propina', icon: '💰' },
+                    { key: 'tipping', label: 'Botón de Propina (perfil)', icon: '💰' },
+                    { key: 'postTipping', label: 'Botón de Propina (posts)', icon: '💸' },
                   ].map((item) => (
                     <label
                       key={item.key}
