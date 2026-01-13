@@ -125,16 +125,16 @@ export function CreatorsShowcase() {
 
               {/* Info */}
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-white/90 group-hover:text-purple-300 transition-all">
+                <h3 className="text-xl font-semibold text-white/90 group-hover:text-purple-300 transition-all">
                   {creator.name}
                 </h3>
-                <p className="text-white/50 text-sm mb-3">@{creator.username}</p>
+                <p className="text-white/50 text-base mb-3">@{creator.username}</p>
 
                 <div className="flex items-center justify-center gap-3">
                   <Badge variant="primary" size="sm">
                     {creator.category}
                   </Badge>
-                  <span className="text-white/50 text-sm">
+                  <span className="text-white/50 text-base">
                     {formatSubscribers(creator.subscribers)} subs
                   </span>
                 </div>

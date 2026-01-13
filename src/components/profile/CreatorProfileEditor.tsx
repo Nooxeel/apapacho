@@ -135,7 +135,7 @@ export function CreatorProfileEditor() {
     backgroundColor: backgroundColors[0].color,
     backgroundGradient: backgroundColors[0].gradient,
     accentColor: accentColors[0].color,
-    fontFamily: 'Inter',
+    fontFamily: 'Tiller',
     visibilitySettings: defaultVisibility,
   })
   
@@ -192,7 +192,7 @@ export function CreatorProfileEditor() {
         backgroundColor: userData.creatorProfile.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.creatorProfile.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.creatorProfile.accentColor || accentColors[0].color,
-        fontFamily: userData.fontFamily || 'Inter',
+        fontFamily: userData.fontFamily || 'Tiller',
         visibilitySettings: userData.creatorProfile.visibilitySettings || defaultVisibility,
       })
 
