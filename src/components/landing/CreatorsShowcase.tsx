@@ -21,6 +21,7 @@ const mockCreators = [
     name: 'Gatita Veve',
     username: 'gatitaveve',
     avatar: '',
+    backgroundColor: '#7c3aed',
     coverGradient: 'from-purple-600 via-violet-500 to-indigo-500',
     category: 'Contenido',
     subscribers: 0,
@@ -31,6 +32,7 @@ const mockCreators = [
     name: 'Imperfecto',
     username: 'imperfecto',
     avatar: '',
+    backgroundColor: '#6366f1',
     coverGradient: 'from-indigo-600 via-blue-500 to-cyan-500',
     category: 'Tech',
     subscribers: 0,
@@ -61,6 +63,7 @@ export function CreatorsShowcase() {
             name: c.user?.displayName || c.displayName || 'Usuario',
             username: c.user?.username || c.username || 'usuario',
             avatar: c.user?.avatar || c.profileImage || '',
+            backgroundColor: c.backgroundColor || '#7c3aed', // Color del perfil del creador
             coverGradient: 'from-purple-600 via-violet-500 to-indigo-500',
             category: 'Contenido',
             subscribers: 0,
@@ -102,9 +105,10 @@ export function CreatorsShowcase() {
                 hover
                 className="overflow-hidden cursor-pointer group border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04] hover:border-purple-500/20"
               >
-              {/* Cover Gradient */}
+              {/* Cover with Creator's Background Color */}
               <div
-                className={`h-24 bg-gradient-to-r ${creator.coverGradient} -m-6 mb-0`}
+                className="h-24 -m-6 mb-0"
+                style={{ backgroundColor: creator.backgroundColor || '#7c3aed' }}
               />
 
               {/* Avatar */}
