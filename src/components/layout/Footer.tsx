@@ -101,9 +101,14 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/40 text-sm">
-            © 2025 Apapacho. Todos los derechos reservados.
-          </p>
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+            <p className="text-white/40 text-sm">
+              © 2025 Apapacho. Todos los derechos reservados.
+            </p>
+            <span className="text-white/30 text-xs font-mono">
+              v1.0.0
+            </span>
+          </div>
           <div className="flex items-center gap-4">
             <a
               href="https://twitter.com"
