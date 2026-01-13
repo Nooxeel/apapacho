@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins, Roboto, Open_Sans, Montserrat, Cinzel } from 'next/font/google'
+import { Inter, Poppins, Roboto, Open_Sans, Montserrat, Cinzel, Crimson_Text } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 
@@ -47,6 +47,14 @@ const cinzel = Cinzel({
   weight: ['400', '500', '600', '700'],
 })
 
+// Tiller-style elegant serif font (default for site)
+const tiller = Crimson_Text({
+  subsets: ['latin'],
+  variable: '--font-tiller',
+  display: 'swap',
+  weight: ['400', '600', '700'],
+})
+
 export const metadata: Metadata = {
   title: 'Apapacho - Tu Plataforma de Contenido',
   description: 'Plataforma para creadores de contenido con personalización total estilo MySpace',
@@ -60,7 +68,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} ${openSans.variable} ${montserrat.variable} ${cinzel.variable}`}>
+      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} ${openSans.variable} ${montserrat.variable} ${cinzel.variable} ${tiller.variable}`}>
         <FontProvider>
           {children}
         </FontProvider>

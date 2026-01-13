@@ -10,6 +10,7 @@ interface FontOption {
 }
 
 const FONT_OPTIONS: FontOption[] = [
+  { value: 'Tiller', label: 'Tiller', description: 'Elegante y clásica (por defecto)', fontFamily: 'var(--font-tiller), Georgia, serif' },
   { value: 'Inter', label: 'Inter', description: 'Moderna y limpia', fontFamily: 'Inter, system-ui, sans-serif' },
   { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna', fontFamily: 'Poppins, system-ui, sans-serif' },
   { value: 'Roboto', label: 'Roboto', description: 'Profesional y versátil', fontFamily: 'Roboto, system-ui, sans-serif' },

@@ -10,6 +10,7 @@ const FONT_CLASS_MAP: Record<string, string> = {
   'Roboto': 'font-roboto',
   'Open Sans': 'font-open-sans',
   'Montserrat': 'font-montserrat',
+  'Tiller': 'font-tiller',
 }
 
 interface FontContextType {
@@ -25,14 +26,14 @@ export function FontProvider({ children }: { children: ReactNode }) {
   const [previewFont, setPreviewFont] = useState<string | null>(null)
 
   // Get the saved font from user or use preview font
-  const savedFont = (user as any)?.fontFamily || 'Inter'
+  const savedFont = (user as any)?.fontFamily || 'Tiller'
   const currentFont = previewFont || savedFont
 
   // Apply font to body whenever it changes
   useEffect(() => {
     if (!hasHydrated) return
 
-    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-inter'
+    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-tiller'
 
     // Remove all font classes from body
     Object.values(FONT_CLASS_MAP).forEach(className => {

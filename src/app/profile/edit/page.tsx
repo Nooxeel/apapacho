@@ -57,7 +57,7 @@ export default function ProfileEditPage() {
     backgroundColor: backgroundColors[0].color,
     backgroundGradient: backgroundColors[0].gradient,
     accentColor: accentColors[0].color,
-    fontFamily: 'Inter',
+    fontFamily: 'Tiller',
   })
 
   const [isLoading, setIsLoading] = useState(true)
@@ -97,7 +97,7 @@ export default function ProfileEditPage() {
         backgroundColor: userData.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.accentColor || accentColors[0].color,
-        fontFamily: userData.fontFamily || 'Inter',
+        fontFamily: userData.fontFamily || 'Tiller',
       })
 
       // Set avatar preview
