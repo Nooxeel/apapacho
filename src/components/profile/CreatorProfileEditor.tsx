@@ -53,6 +53,8 @@ const backgroundColors = [
   { id: 'pink', name: 'Rosa', color: '#3d1a35', gradient: 'from-[#3d1a35] to-[#1f0d1a]' },
   { id: 'green', name: 'Verde', color: '#1a3d2e', gradient: 'from-[#1a3d2e] to-[#0d1f17]' },
   { id: 'orange', name: 'Naranja', color: '#3d2a1a', gradient: 'from-[#3d2a1a] to-[#1f150d]' },
+  { id: 'cyan', name: 'Cyan', color: '#1a3d3d', gradient: 'from-[#1a3d3d] to-[#0d1f1f]' },
+  { id: 'gray', name: 'Gris', color: '#2a2a2e', gradient: 'from-[#2a2a2e] to-[#15151a]' },
 ]
 
 // Colores de acento predefinidos
@@ -63,6 +65,8 @@ const accentColors = [
   { id: 'orange', name: 'Naranja', color: '#f97316' },
   { id: 'blue', name: 'Azul', color: '#3b82f6' },
   { id: 'red', name: 'Rojo', color: '#ef4444' },
+  { id: 'yellow', name: 'Amarillo', color: '#eab308' },
+  { id: 'purple', name: 'Púrpura', color: '#a855f7' },
 ]
 
 interface VisibilitySettings {
@@ -1060,9 +1064,26 @@ export function CreatorProfileEditor() {
                       }))}
                       className="w-10 h-10 rounded-lg cursor-pointer border-0"
                     />
-                    <span className="text-sm text-white/50 font-mono">
-                      {profile.backgroundColor}
-                    </span>
+                    <input
+                      type="text"
+                      value={profile.backgroundColor}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        // Validar formato hexadecimal (#RRGGBB o #RGB)
+                        if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value) || value === '#' || value === '') {
+                          setProfile(prev => ({ 
+                            ...prev, 
+                            backgroundColor: value,
+                            backgroundGradient: /^#([0-9A-Fa-f]{3}){1,2}$/.test(value) 
+                              ? `from-[${value}] to-[${value}dd]` 
+                              : prev.backgroundGradient
+                          }))
+                        }
+                      }}
+                      placeholder="#1a3d2e"
+                      maxLength={7}
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/80 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
+                    />
                   </div>
                 </div>
               </div>
@@ -1114,9 +1135,23 @@ export function CreatorProfileEditor() {
                       }))}
                       className="w-10 h-10 rounded-lg cursor-pointer border-0"
                     />
-                    <span className="text-sm text-white/50 font-mono">
-                      {profile.accentColor}
-                    </span>
+                    <input
+                      type="text"
+                      value={profile.accentColor}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        // Validar formato hexadecimal (#RRGGBB o #RGB)
+                        if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(value) || value === '#' || value === '') {
+                          setProfile(prev => ({ 
+                            ...prev, 
+                            accentColor: value
+                          }))
+                        }
+                      }}
+                      placeholder="#3b82f6"
+                      maxLength={7}
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/80 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
+                    />
                   </div>
                 </div>
               </div>
