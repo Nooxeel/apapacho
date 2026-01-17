@@ -48,6 +48,13 @@ const MessageCircleIcon = ({ className = "w-6 h-6" }: { className?: string }) =>
   </svg>
 )
 
+const DollarSignIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <line x1="12" y1="1" x2="12" y2="23" />
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+  </svg>
+)
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -208,6 +215,14 @@ export function Navbar() {
                       </Link>
                       {user.isCreator && (
                         <>
+                          <Link
+                            href="/creator/earnings"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <DollarSignIcon />
+                            Mis Ganancias
+                          </Link>
                           <Link
                             href="/creator/posts"
                             className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
