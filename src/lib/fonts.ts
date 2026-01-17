@@ -1,40 +1,42 @@
 /**
  * Font utilities for mapping font names to CSS variables and classes
- * OPTIMIZED: Only 2 fonts loaded for performance (Inter + Poppins)
  */
 
-// Map font names to Tailwind v4 utility classes
+// Map font names to Tailwind v4 utility classes (optimized to 3 fonts)
 export const FONT_CLASS_MAP: Record<string, string> = {
   'Inter': 'font-inter',
   'Poppins': 'font-poppins',
+  'Cinzel': 'font-cinzel',
 }
 
 // Map font names to CSS variable values for inline styles
 export const FONT_CSS_VAR_MAP: Record<string, string> = {
   'Inter': 'var(--font-inter), system-ui, sans-serif',
   'Poppins': 'var(--font-poppins), system-ui, sans-serif',
+  'Cinzel': 'var(--font-cinzel), Georgia, serif',
 }
-
-/** Default font (preloaded for best LCP) */
-export const DEFAULT_FONT = 'Inter'
 
 /**
  * Get Tailwind font class from font name
  */
 export function getFontClass(fontName: string): string {
-  return FONT_CLASS_MAP[fontName] || FONT_CLASS_MAP[DEFAULT_FONT]
+  return FONT_CLASS_MAP[fontName] || 'font-inter'
 }
 
 /**
- * Get CSS font-family value for inline styles
+ * Get CSS font-family value for inline styles (higher specificity)
  */
 export function getFontStyle(fontName: string): string {
-  return FONT_CSS_VAR_MAP[fontName] || FONT_CSS_VAR_MAP[DEFAULT_FONT]
+  return FONT_CSS_VAR_MAP[fontName] || 'var(--font-inter), system-ui, sans-serif'
 }
 
 /**
- * Available font options (must match fonts loaded in layout.tsx)
+ * Get all available font options (optimized to 3 for performance)
  */
-export const AVAILABLE_FONTS = ['Inter', 'Poppins'] as const
+export const AVAILABLE_FONTS = [
+  'Inter',
+  'Poppins',
+  'Cinzel',
+] as const
 
 export type FontName = typeof AVAILABLE_FONTS[number]

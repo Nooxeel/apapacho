@@ -3,24 +3,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 
-/**
- * Map font names to Tailwind utility classes
- * MUST match fonts loaded in layout.tsx (Inter, Poppins only)
- */
+// Map font names to Tailwind v4 utility classes defined in globals.css (optimized to 3 fonts)
 const FONT_CLASS_MAP: Record<string, string> = {
   'Inter': 'font-inter',
   'Poppins': 'font-poppins',
+  'Cinzel': 'font-cinzel',
 }
 
-/** Default font for best performance (preloaded) */
-const DEFAULT_FONT = 'Inter'
-
 interface FontContextType {
-  /** Currently active font name */
   currentFont: string
-  /** Set a preview font (temporary, not persisted) */
   setPreviewFont: (font: string) => void
-  /** Clear preview and revert to saved font */
   clearPreviewFont: () => void
 }
 
@@ -30,32 +22,24 @@ export function FontProvider({ children }: { children: ReactNode }) {
   const { user, hasHydrated } = useAuthStore()
   const [previewFont, setPreviewFont] = useState<string | null>(null)
 
-  // Get the saved font from user profile, fallback to default
-  const savedFont = (user as any)?.fontFamily || DEFAULT_FONT
-  
-  // Validate saved font is actually available
-  const validatedSavedFont = FONT_CLASS_MAP[savedFont] ? savedFont : DEFAULT_FONT
-  
-  // Preview takes priority over saved font
-  const currentFont = previewFont || validatedSavedFont
+  // Get the saved font from user or use preview font (default to Inter for performance)
+  const savedFont = (user as any)?.fontFamily || 'Inter'
+  const currentFont = previewFont || savedFont
 
-  // Apply font class to body element for global effect
+  // Apply font to body whenever it changes
   useEffect(() => {
     if (!hasHydrated) return
 
-    const fontClass = FONT_CLASS_MAP[currentFont] || FONT_CLASS_MAP[DEFAULT_FONT]
+    const fontClass = FONT_CLASS_MAP[currentFont] || 'font-inter'
 
-    // Remove all font classes first
+    // Remove all font classes from body
     Object.values(FONT_CLASS_MAP).forEach(className => {
       document.body.classList.remove(className)
     })
 
-    // Apply the selected font class
+    // Add the selected font class
     document.body.classList.add(fontClass)
-    
-    // Also set CSS variable for components using inline styles
-    document.documentElement.style.setProperty('--active-font', currentFont)
-  }, [currentFont, hasHydrated])
+  }, [currentFont, hasHydrated, savedFont])
 
   const clearPreviewFont = () => {
     setPreviewFont(null)
