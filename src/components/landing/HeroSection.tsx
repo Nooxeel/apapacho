@@ -74,18 +74,20 @@ export function HeroSection() {
 
         {/* Features Highlight */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {/* Visually hidden h2 for accessibility - maintains heading hierarchy */}
+          <h2 className="sr-only">Características principales</h2>
           <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
-            <div className="text-4xl mb-4">🎨</div>
+            <div className="text-4xl mb-4" aria-hidden="true">🎨</div>
             <h3 className="text-lg font-semibold text-white/90 mb-3">Diseña sin límites</h3>
             <p className="text-white/50 text-sm leading-relaxed">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
           </div>
           <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
-            <div className="text-4xl mb-4">🎵</div>
+            <div className="text-4xl mb-4" aria-hidden="true">🎵</div>
             <h3 className="text-lg font-semibold text-white/90 mb-3">Tu soundtrack</h3>
             <p className="text-white/50 text-sm leading-relaxed">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
           </div>
           <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
-            <div className="text-4xl mb-4">💰</div>
+            <div className="text-4xl mb-4" aria-hidden="true">💰</div>
             <h3 className="text-lg font-semibold text-white/90 mb-3">Monetiza tu arte</h3>
             <p className="text-white/50 text-sm leading-relaxed">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
           </div>
