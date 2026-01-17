@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { creatorApi, subscriptionsApi } from '@/lib/api'
+import { creatorApi, subscriptionsApi, promocodesApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { Navbar } from '@/components/layout'
@@ -21,7 +21,10 @@ import {
   MessageCircle,
   Share2,
   BadgeCheck,
-  Lock
+  Lock,
+  Ticket,
+  Check,
+  X
 } from 'lucide-react'
 
 interface CreatorProfile {
@@ -130,6 +133,22 @@ export default function CreatorPublicProfile() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [subscriptionDetails, setSubscriptionDetails] = useState<any>(null)
+
+  // Promocode state
+  const [promoCode, setPromoCode] = useState('')
+  const [promoLoading, setPromoLoading] = useState(false)
+  const [promoError, setPromoError] = useState('')
+  const [promoDiscount, setPromoDiscount] = useState<{
+    promocodeId: string
+    code: string
+    type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_TRIAL'
+    value: number
+    description: string
+    originalAmount: number
+    discountAmount: number
+    finalAmount: number
+  } | null>(null)
+  const [selectedTierId, setSelectedTierId] = useState<string | null>(null)
 
   // Real-time stats (sincronizado con polling de mensajes)
   const [totalLikes, setTotalLikes] = useState(0)
@@ -252,6 +271,55 @@ export default function CreatorPublicProfile() {
     }).format(price)
   }
 
+  // Validar código promocional
+  const handleValidatePromocode = async () => {
+    if (!promoCode.trim() || !creator || !selectedTierId) return
+
+    const tier = profile.subscriptionTiers.find(t => t.id === selectedTierId)
+    if (!tier) return
+
+    setPromoLoading(true)
+    setPromoError('')
+
+    try {
+      const result = await promocodesApi.validate(
+        promoCode.trim(),
+        creator.creatorProfile.id,
+        selectedTierId,
+        tier.price,
+        token || undefined
+      )
+
+      if (result.valid && result.promocode && result.discount) {
+        setPromoDiscount({
+          promocodeId: result.promocode.id,
+          code: result.promocode.code,
+          type: result.promocode.type,
+          value: result.promocode.value,
+          description: result.promocode.description,
+          originalAmount: result.discount.originalAmount,
+          discountAmount: result.discount.discountAmount,
+          finalAmount: result.discount.finalAmount
+        })
+      } else {
+        setPromoError(result.error || 'Código inválido')
+        setPromoDiscount(null)
+      }
+    } catch (error: any) {
+      setPromoError(error.message || 'Error al validar código')
+      setPromoDiscount(null)
+    } finally {
+      setPromoLoading(false)
+    }
+  }
+
+  // Limpiar promocode
+  const clearPromocode = () => {
+    setPromoCode('')
+    setPromoDiscount(null)
+    setPromoError('')
+  }
+
   // Handler para suscribirse
   const handleSubscribe = async (tierId: string) => {
     if (!token || !creator) {
@@ -270,9 +338,28 @@ export default function CreatorPublicProfile() {
       // Por ahora: Aprobación automática para desarrollo
       const response = await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
       
+      // Si hay promocode aplicado, registrar la redención
+      if (promoDiscount) {
+        try {
+          await promocodesApi.redeem({
+            promocodeId: promoDiscount.promocodeId,
+            subscriptionId: response.subscription?.id,
+            originalAmount: promoDiscount.originalAmount,
+            discountAmount: promoDiscount.discountAmount,
+            finalAmount: promoDiscount.finalAmount
+          }, token)
+        } catch (redeemError) {
+          console.error('Error redeeming promocode:', redeemError)
+        }
+      }
+      
       // Actualizar estado local inmediatamente
       setIsSubscriber(true)
       setShowSubscribeModal(false)
+      
+      // Limpiar promocode state
+      clearPromocode()
+      setSelectedTierId(null)
       
       // Mostrar mensaje de éxito con modal personalizado
       const tier = profile.subscriptionTiers.find(t => t.id === tierId)
@@ -732,7 +819,11 @@ export default function CreatorPublicProfile() {
       {showSubscribeModal && creator && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-          onClick={() => setShowSubscribeModal(false)}
+          onClick={() => {
+            setShowSubscribeModal(false)
+            clearPromocode()
+            setSelectedTierId(null)
+          }}
         >
           <div 
             className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full max-h-[90vh] overflow-auto"
@@ -743,52 +834,156 @@ export default function CreatorPublicProfile() {
               <p className="text-white/60 text-sm mb-6">Elige un plan para acceder a contenido exclusivo</p>
               
               <div className="space-y-4">
-                {profile.subscriptionTiers.filter(t => t.isActive).map((tier) => (
-                  <div
-                    key={tier.id}
-                    className="p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-white">{tier.name}</h3>
-                      <span className="text-xl font-bold" style={{ color: profile.accentColor }}>
-                        {formatPriceCLP(tier.price)}
-                        <span className="text-sm font-normal text-white/50">/mes</span>
-                      </span>
-                    </div>
-                    
-                    {tier.description && (
-                      <p className="text-sm text-white/60 mb-3">{tier.description}</p>
-                    )}
-                    
-                    {tier.benefits && (
-                      <div className="text-sm text-white/50 mb-4 space-y-1">
-                        {tier.benefits.split('\n').filter(b => b.trim()).map((benefit, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span className="text-green-400 text-xs">✓</span>
-                            <span>{benefit}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleSubscribe(tier.id)
+                {profile.subscriptionTiers.filter(t => t.isActive).map((tier) => {
+                  const isSelected = selectedTierId === tier.id
+                  const showDiscount = isSelected && promoDiscount
+                  const finalPrice = showDiscount ? promoDiscount.finalAmount : tier.price
+                  
+                  return (
+                    <div
+                      key={tier.id}
+                      onClick={() => {
+                        setSelectedTierId(tier.id)
+                        // Revalidar promocode si hay uno ingresado
+                        if (promoCode.trim() && promoDiscount) {
+                          setPromoDiscount(null)
+                          // La validación se hará al hacer click en aplicar
+                        }
                       }}
-                      disabled={subscribing}
-                      className="w-full py-2.5 rounded-lg font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
-                      style={{ backgroundColor: profile.accentColor }}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                        isSelected 
+                          ? 'border-pink-500 bg-pink-500/10' 
+                          : 'border-white/10 bg-white/5 hover:bg-white/10'
+                      }`}
                     >
-                      {subscribing ? 'Procesando...' : 'Suscribirse'}
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold text-white">{tier.name}</h3>
+                        <div className="text-right">
+                          {showDiscount && (
+                            <span className="text-sm text-white/40 line-through mr-2">
+                              {formatPriceCLP(tier.price)}
+                            </span>
+                          )}
+                          <span className="text-xl font-bold" style={{ color: profile.accentColor }}>
+                            {formatPriceCLP(finalPrice)}
+                            <span className="text-sm font-normal text-white/50">/mes</span>
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {tier.description && (
+                        <p className="text-sm text-white/60 mb-3">{tier.description}</p>
+                      )}
+                      
+                      {tier.benefits && (
+                        <div className="text-sm text-white/50 mb-4 space-y-1">
+                          {tier.benefits.split('\n').filter(b => b.trim()).map((benefit, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                              <span className="text-green-400 text-xs">✓</span>
+                              <span>{benefit}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Promocode section - solo visible cuando está seleccionado */}
+                      {isSelected && (
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                          <div className="flex items-center gap-2 text-sm text-white/60 mb-2">
+                            <Ticket className="w-4 h-4" />
+                            <span>¿Tienes un código promocional?</span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <div className="relative flex-1">
+                              <input
+                                type="text"
+                                value={promoCode}
+                                onChange={(e) => {
+                                  setPromoCode(e.target.value.toUpperCase())
+                                  setPromoError('')
+                                }}
+                                placeholder="CODIGO2024"
+                                disabled={!!promoDiscount}
+                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm disabled:opacity-50"
+                              />
+                              {promoDiscount && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    clearPromocode()
+                                  }}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-700 rounded transition"
+                                >
+                                  <X className="w-4 h-4 text-gray-400" />
+                                </button>
+                              )}
+                            </div>
+                            {!promoDiscount ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleValidatePromocode()
+                                }}
+                                disabled={promoLoading || !promoCode.trim()}
+                                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {promoLoading ? '...' : 'Aplicar'}
+                              </button>
+                            ) : (
+                              <div className="flex items-center gap-1 px-3 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm">
+                                <Check className="w-4 h-4" />
+                                <span>Aplicado</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Error de promocode */}
+                          {promoError && (
+                            <p className="text-red-400 text-xs mt-2">{promoError}</p>
+                          )}
+
+                          {/* Descuento aplicado */}
+                          {promoDiscount && (
+                            <div className="mt-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                              <p className="text-green-400 text-sm font-medium">
+                                {promoDiscount.description}
+                              </p>
+                              <p className="text-green-300/80 text-xs mt-1">
+                                Ahorras {formatPriceCLP(promoDiscount.discountAmount)}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleSubscribe(tier.id)
+                        }}
+                        disabled={subscribing}
+                        className="w-full py-2.5 rounded-lg font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 mt-3"
+                        style={{ backgroundColor: profile.accentColor }}
+                      >
+                        {subscribing ? 'Procesando...' : (
+                          showDiscount && promoDiscount.finalAmount === 0 
+                            ? '¡Suscribirse Gratis!' 
+                            : `Suscribirse ${showDiscount ? `por ${formatPriceCLP(finalPrice)}` : ''}`
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
               </div>
               
               <button
-                onClick={() => setShowSubscribeModal(false)}
+                onClick={() => {
+                  setShowSubscribeModal(false)
+                  clearPromocode()
+                  setSelectedTierId(null)
+                }}
                 className="w-full mt-4 py-2 text-white/50 hover:text-white transition-colors text-sm"
               >
                 Cancelar

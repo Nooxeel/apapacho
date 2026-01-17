@@ -7,8 +7,9 @@ import { API_URL } from '@/lib/config'
 import { Navbar } from '@/components/layout'
 import { format, isToday, isYesterday } from 'date-fns'
 import { es } from 'date-fns/locale/es'
-import { ArrowLeft, Send, MoreVertical, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { ArrowLeft, Send, MoreVertical, Image as ImageIcon, Trash2, Ban, UserCheck } from 'lucide-react'
 import { socketService } from '@/lib/socket'
+import { blockApi } from '@/lib/api'
 
 interface Message {
   id: string
@@ -46,12 +47,58 @@ export default function ChatPage() {
   const [hasMore, setHasMore] = useState(false)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showMenu, setShowMenu] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [blockLoading, setBlockLoading] = useState(false)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Check if user is blocked
+  const checkBlockStatus = useCallback(async (userId: string) => {
+    if (!token) return
+    try {
+      const result = await blockApi.checkBlocked(userId, token)
+      setIsBlocked(result.isBlocked)
+    } catch (error) {
+      console.error('Error checking block status:', error)
+    }
+  }, [token])
+
+  const handleBlockToggle = async () => {
+    if (!otherUser || !token || blockLoading) return
+    
+    setBlockLoading(true)
+    try {
+      if (isBlocked) {
+        await blockApi.unblockUser(otherUser.id, token)
+        setIsBlocked(false)
+      } else {
+        await blockApi.blockUser(otherUser.id, undefined, token)
+        setIsBlocked(true)
+      }
+      setShowMenu(false)
+    } catch (error) {
+      console.error('Error toggling block:', error)
+    } finally {
+      setBlockLoading(false)
+    }
   }
 
   const loadConversationInfo = useCallback(async () => {
@@ -64,12 +111,14 @@ export default function ChatPage() {
         const conv = conversations.find((c: { id: string; otherUser: OtherUser }) => c.id === conversationId)
         if (conv) {
           setOtherUser(conv.otherUser)
+          // Check if user is blocked
+          checkBlockStatus(conv.otherUser.id)
         }
       }
     } catch (error) {
       console.error('Error loading conversation info:', error)
     }
-  }, [conversationId, token])
+  }, [conversationId, token, checkBlockStatus])
 
   const loadMessages = useCallback(async (cursor?: string, silent = false) => {
     try {
@@ -263,9 +312,37 @@ export default function ChatPage() {
             </button>
           )}
 
-          <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-            <MoreVertical className="w-5 h-5 text-white/60" />
-          </button>
+          {/* Menu dropdown */}
+          <div className="relative" ref={menuRef}>
+            <button 
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <MoreVertical className="w-5 h-5 text-white/60" />
+            </button>
+            
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a24] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50">
+                <button
+                  onClick={handleBlockToggle}
+                  disabled={blockLoading}
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-colors text-left disabled:opacity-50"
+                >
+                  {isBlocked ? (
+                    <>
+                      <UserCheck className="w-5 h-5 text-green-400" />
+                      <span className="text-green-400">Desbloquear</span>
+                    </>
+                  ) : (
+                    <>
+                      <Ban className="w-5 h-5 text-red-400" />
+                      <span className="text-red-400">Bloquear</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

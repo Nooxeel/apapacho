@@ -567,4 +567,410 @@ export const blockApi = {
     api<{ isBlocked: boolean }>(`/block/am-i-blocked/${creatorUsername}`, { token }),
 }
 
+// Promocodes API
+export const promocodesApi = {
+  // Create a new promocode (creator)
+  create: (data: {
+    code?: string;
+    type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_TRIAL';
+    value: number;
+    currency?: string;
+    maxUses?: number;
+    maxUsesPerUser?: number;
+    minPurchase?: number;
+    applicableTiers?: string[];
+    startsAt?: string;
+    expiresAt?: string;
+  }, token: string) =>
+    api<{ success: boolean; promocode: any }>('/promocodes', {
+      method: 'POST',
+      body: data,
+      token
+    }),
+
+  // Get creator's promocodes
+  list: (token: string, page = 1, limit = 20, status?: 'active' | 'expired' | 'all') => {
+    const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() })
+    if (status) params.set('status', status)
+    return api<{
+      promocodes: Array<{
+        id: string;
+        code: string;
+        type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_TRIAL';
+        value: number;
+        currency: string;
+        maxUses: number | null;
+        currentUses: number;
+        maxUsesPerUser: number;
+        minPurchase: number | null;
+        applicableTiers: string[];
+        startsAt: string;
+        expiresAt: string | null;
+        isActive: boolean;
+        createdAt: string;
+        totalRedemptions: number;
+        isExpired: boolean;
+        isMaxedOut: boolean;
+      }>;
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>(`/promocodes?${params}`, { token })
+  },
+
+  // Get promocode detail with stats
+  getDetail: (id: string, token: string) =>
+    api<any>(`/promocodes/${id}`, { token }),
+
+  // Update promocode
+  update: (id: string, data: {
+    maxUses?: number | null;
+    expiresAt?: string | null;
+    isActive?: boolean;
+    applicableTiers?: string[];
+  }, token: string) =>
+    api<{ success: boolean; promocode: any }>(`/promocodes/${id}`, {
+      method: 'PUT',
+      body: data,
+      token
+    }),
+
+  // Delete/deactivate promocode
+  delete: (id: string, token: string) =>
+    api<{ success: boolean; message: string }>(`/promocodes/${id}`, {
+      method: 'DELETE',
+      token
+    }),
+
+  // Validate a code (for fans during checkout)
+  validate: (code: string, creatorId: string, tierId?: string, amount?: number, token?: string) =>
+    api<{
+      valid: boolean;
+      error?: string;
+      promocode?: {
+        id: string;
+        code: string;
+        type: 'PERCENTAGE' | 'FIXED_AMOUNT' | 'FREE_TRIAL';
+        value: number;
+        description: string;
+      };
+      discount?: {
+        originalAmount: number;
+        discountAmount: number;
+        finalAmount: number;
+      };
+    }>('/promocodes/validate', {
+      method: 'POST',
+      body: { code, creatorId, tierId, amount },
+      token
+    }),
+
+  // Redeem promocode (internal, called during subscription)
+  redeem: (data: {
+    promocodeId: string;
+    subscriptionId?: string;
+    originalAmount: number;
+    discountAmount: number;
+    finalAmount: number;
+  }, token: string) =>
+    api<{ success: boolean; redemption: any }>('/promocodes/redeem', {
+      method: 'POST',
+      body: data,
+      token
+    }),
+}
+
+// Broadcasts / Mass DM API
+export type BroadcastTarget = 'ALL_SUBSCRIBERS' | 'SPECIFIC_TIERS' | 'NEW_SUBSCRIBERS' | 'EXPIRING_SOON'
+export type BroadcastStatus = 'PENDING' | 'SCHEDULED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+
+export interface Broadcast {
+  id: string
+  creatorId: string
+  content: string
+  mediaUrl?: string
+  mediaType?: string
+  targetType: BroadcastTarget
+  targetTierIds: string[]
+  status: BroadcastStatus
+  totalRecipients: number
+  sentCount: number
+  failedCount: number
+  scheduledFor?: string
+  sentAt?: string
+  completedAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const broadcastsApi = {
+  // Create and send a broadcast
+  create: (data: {
+    content: string;
+    mediaUrl?: string;
+    mediaType?: string;
+    targetType?: BroadcastTarget;
+    targetTierIds?: string[];
+    scheduledFor?: string;
+  }, token: string) =>
+    api<{ success: boolean; broadcast: Broadcast }>('/broadcasts', {
+      method: 'POST',
+      body: data,
+      token
+    }),
+
+  // List broadcasts
+  list: (token: string, page = 1, limit = 20) =>
+    api<{
+      broadcasts: Broadcast[];
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>(`/broadcasts?page=${page}&limit=${limit}`, { token }),
+
+  // Get broadcast detail
+  getDetail: (id: string, token: string) =>
+    api<Broadcast & { recipients: any[]; _count: { recipients: number } }>(`/broadcasts/${id}`, { token }),
+
+  // Cancel scheduled broadcast
+  cancel: (id: string, token: string) =>
+    api<{ success: boolean; message: string }>(`/broadcasts/${id}`, {
+      method: 'DELETE',
+      token
+    }),
+
+  // Get stats
+  getStats: (token: string) =>
+    api<{
+      totalBroadcasts: number;
+      totalMessagesSent: number;
+      scheduledBroadcasts: number;
+      recentBroadcasts: Array<{
+        id: string;
+        content: string;
+        status: BroadcastStatus;
+        sentCount: number;
+        totalRecipients: number;
+        createdAt: string;
+      }>;
+    }>('/broadcasts/stats/summary', { token }),
+
+  // Get subscriber count for targeting
+  getSubscriberCount: (targetType: BroadcastTarget, tierIds: string[] | undefined, token: string) => {
+    const params = new URLSearchParams({ targetType })
+    if (tierIds?.length) params.set('tierIds', tierIds.join(','))
+    return api<{ count: number }>(`/broadcasts/subscribers/count?${params}`, { token })
+  },
+}
+
+// Watermark API
+export interface WatermarkSettings {
+  enabled: boolean
+  text: string
+  position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
+  opacity: number
+  size: 'small' | 'medium' | 'large'
+}
+
+export const watermarkApi = {
+  // Get watermark settings
+  getSettings: (token: string) =>
+    api<{ settings: WatermarkSettings }>('/watermark/settings', { token }),
+
+  // Update watermark settings
+  updateSettings: (settings: Partial<WatermarkSettings>, token: string) =>
+    api<{ success: boolean; settings: WatermarkSettings }>('/watermark/settings', {
+      method: 'PUT',
+      body: settings,
+      token
+    }),
+
+  // Apply watermark to URL
+  applyWatermark: (url: string, creatorId: string, contentType?: 'image' | 'video') =>
+    api<{ url: string; hasWatermark: boolean }>('/watermark/apply', {
+      method: 'POST',
+      body: { url, creatorId, contentType }
+    }),
+
+  // Preview watermark
+  preview: (settings: Partial<WatermarkSettings>, sampleUrl: string | undefined, token: string) =>
+    api<{ originalUrl: string; watermarkedUrl: string; settings: WatermarkSettings }>('/watermark/preview', {
+      method: 'POST',
+      body: { settings, sampleUrl },
+      token
+    }),
+}
+
+// ====================
+// AGE VERIFICATION API
+// ====================
+
+export interface AgeVerificationStatus {
+  verified: boolean
+  verifiedAt: string | null
+  hasBirthdate: boolean
+}
+
+export interface AgeVerificationResult {
+  success: boolean
+  verified: boolean
+  verifiedAt: string
+  message: string
+}
+
+export const ageVerificationApi = {
+  // Get verification status
+  getStatus: (token: string) =>
+    api<AgeVerificationStatus>('/age-verification/status', { token }),
+
+  // Verify age with birthdate
+  verify: (birthdate: string, token: string) =>
+    api<AgeVerificationResult>('/age-verification/verify', {
+      method: 'POST',
+      body: { birthdate },
+      token
+    }),
+
+  // Confirm age (for already verified users)
+  confirm: (token: string) =>
+    api<{ verified: boolean; message: string }>('/age-verification/confirm', {
+      method: 'POST',
+      token
+    }),
+}
+
+// ====================
+// REFERRALS API
+// ====================
+
+export interface ReferralStats {
+  totalReferrals: number
+  activeReferrals: number
+  pendingReferrals: number
+  totalEarned: number
+  thisMonthEarned: number
+}
+
+export interface ReferralInfo {
+  id: string
+  referredUser: {
+    username: string
+    displayName: string
+    avatar: string | null
+    createdAt: string
+  }
+  status: 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'CANCELLED'
+  commissionRate: number
+  commissionEndDate: string
+  totalEarned: number
+  convertedAt: string | null
+  createdAt: string
+}
+
+export interface ReferralData {
+  referralCode: string
+  referralLink: string
+  stats: ReferralStats
+  referrals: ReferralInfo[]
+}
+
+export interface ReferralCommission {
+  id: string
+  amount: number
+  sourceType: string
+  referredUser: {
+    username: string
+    displayName: string
+  }
+  createdAt: string
+}
+
+export const referralsApi = {
+  // Get user's referral info and stats
+  getReferrals: (token: string) =>
+    api<ReferralData>('/referrals', { token }),
+
+  // Apply a referral code
+  applyCode: (code: string, token: string) =>
+    api<{ success: boolean; message: string; referral: { id: string; referrerUsername: string; commissionEndDate: string } }>('/referrals/apply', {
+      method: 'POST',
+      body: { code },
+      token
+    }),
+
+  // Regenerate referral code
+  regenerateCode: (token: string) =>
+    api<{ success: boolean; referralCode: string; referralLink: string }>('/referrals/regenerate', {
+      method: 'POST',
+      token
+    }),
+
+  // Get commission history
+  getCommissions: (page: number, limit: number, token: string) =>
+    api<{ commissions: ReferralCommission[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>(`/referrals/commissions?page=${page}&limit=${limit}`, { token }),
+
+  // Validate referral code (public)
+  validateCode: (code: string) =>
+    api<{ valid: boolean; referrer?: { username: string; displayName: string; avatar: string | null } }>(`/referrals/validate/${code}`),
+}
+
+// ====================
+// PLATFORM IMPORT API
+// ====================
+
+export interface ImportPlatformInfo {
+  id: string
+  name: string
+  icon: string
+  description: string
+  supported: string[]
+}
+
+export interface PlatformImport {
+  id: string
+  platform: 'ONLYFANS' | 'ARSMATE' | 'FANSLY' | 'OTHER'
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'PARTIAL' | 'FAILED' | 'CANCELLED'
+  profileImported: boolean
+  postsImported: number
+  mediaImported: number
+  errorsCount: number
+  errorLog: string | null
+  startedAt: string | null
+  completedAt: string | null
+  createdAt: string
+}
+
+export const importApi = {
+  // Get supported platforms
+  getPlatforms: () =>
+    api<{ platforms: ImportPlatformInfo[] }>('/import/platforms'),
+
+  // Get import history
+  getImports: (token: string) =>
+    api<{ imports: PlatformImport[] }>('/import', { token }),
+
+  // Start a new import
+  startImport: (platform: string, data: Record<string, unknown>, token: string) =>
+    api<{ success: boolean; importId: string; message: string }>('/import/start', {
+      method: 'POST',
+      body: { platform, data },
+      token
+    }),
+
+  // Import profile data directly
+  importProfile: (platform: string, profileData: Record<string, unknown>, token: string) =>
+    api<{ success: boolean; message: string; imported: Record<string, unknown> }>('/import/profile', {
+      method: 'POST',
+      body: { platform, profileData },
+      token
+    }),
+
+  // Get import status
+  getImportStatus: (importId: string, token: string) =>
+    api<{ import: PlatformImport }>(`/import/${importId}`, { token }),
+
+  // Cancel import
+  cancelImport: (importId: string, token: string) =>
+    api<{ success: boolean; message: string }>(`/import/${importId}`, {
+      method: 'DELETE',
+      token
+    }),
+}
+
 export default api

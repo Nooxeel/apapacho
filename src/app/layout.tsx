@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
+import { AgeVerificationProvider } from '@/components/providers/AgeVerificationProvider'
 
 // Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font (body text, buttons) - CRITICAL for LCP
@@ -66,7 +67,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${poppins.variable}`}>
         <FontProvider>
-          {children}
+          <AgeVerificationProvider>
+            {children}
+          </AgeVerificationProvider>
         </FontProvider>
       </body>
     </html>

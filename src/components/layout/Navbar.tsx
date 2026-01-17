@@ -61,6 +61,38 @@ const ShieldIcon = () => (
   </svg>
 )
 
+const TicketIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13 5v2m0 12v2m0-7v2" />
+  </svg>
+)
+
+const SendIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M22 2L11 13" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M22 2L15 22l-4-9-9-4 20-7z" />
+  </svg>
+)
+
+const DropletIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+  </svg>
+)
+
+const UsersIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+  </svg>
+)
+
+const ImportIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+  </svg>
+)
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -252,6 +284,46 @@ export function Navbar() {
                           >
                             <ShieldIcon />
                             Bloqueados
+                          </Link>
+                          <Link
+                            href="/creator/promocodes"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <TicketIcon />
+                            Promocodes
+                          </Link>
+                          <Link
+                            href="/creator/broadcasts"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <SendIcon />
+                            Mass DM
+                          </Link>
+                          <Link
+                            href="/creator/watermark"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <DropletIcon />
+                            Watermark
+                          </Link>
+                          <Link
+                            href="/creator/referrals"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <UsersIcon />
+                            Referidos
+                          </Link>
+                          <Link
+                            href="/creator/import"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <ImportIcon />
+                            Importar
                           </Link>
                         </>
                       )}
