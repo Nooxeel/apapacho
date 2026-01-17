@@ -4,31 +4,31 @@ import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 
 // Optimized: Only 3 essential fonts for performance
-// Inter: Primary UI font (body text, buttons)
+// Inter: Primary UI font (body text, buttons) - CRITICAL for LCP
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
-  weight: ['400', '600', '700'], // Reduced from 5 to 3 weights
-  preload: true, // Preload critical font
+  weight: ['400', '600', '700'],
+  preload: true, // Only preload the critical font
 })
 
-// Poppins: Secondary font (headings, emphasis)
+// Poppins: Secondary font (headings) - NOT critical, load async
 const poppins = Poppins({
-  weight: ['400', '600', '700'], // Reduced from 5 to 3 weights
+  weight: ['400', '600', '700'],
   subsets: ['latin'],
   variable: '--font-poppins',
-  display: 'swap',
-  preload: true,
+  display: 'optional', // Don't block rendering - use fallback if not loaded
+  preload: false, // Load on-demand to reduce render-blocking
 })
 
-// Cinzel: Elegant serif for special headings
+// Cinzel: Elegant serif for special headings - decorative only
 const cinzel = Cinzel({
   subsets: ['latin'],
   variable: '--font-cinzel',
-  display: 'swap',
-  weight: ['600', '700'], // Reduced from 4 to 2 weights
-  preload: false, // Load on-demand
+  display: 'optional', // Don't block rendering
+  weight: ['600', '700'],
+  preload: false,
 })
 
 export const metadata: Metadata = {
