@@ -89,22 +89,59 @@ export function useWebpay() {
       });
 
       if (response.success && response.url && response.token) {
-        // Create form manually and submit to Webpay
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = response.url;
-        form.style.display = 'none';
+        console.log('[Webpay] Redirecting to:', response.url);
+        console.log('[Webpay] Token:', response.token.substring(0, 30) + '...');
         
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = 'token_ws';
-        tokenInput.value = response.token;
-        form.appendChild(tokenInput);
+        // Create a temporary page that auto-submits the form
+        // This avoids any React/Next.js navigation blocking
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Redirigiendo a Webpay...</title>
+            <style>
+              body { 
+                font-family: system-ui; 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                min-height: 100vh; 
+                margin: 0;
+                background: #1a1a2e;
+                color: white;
+              }
+              .loading { text-align: center; }
+              .spinner {
+                border: 4px solid #333;
+                border-top: 4px solid #8b5cf6;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 20px;
+              }
+              @keyframes spin { 100% { transform: rotate(360deg); } }
+            </style>
+          </head>
+          <body>
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Redirigiendo a Webpay...</p>
+            </div>
+            <form id="webpayForm" method="POST" action="${response.url}">
+              <input type="hidden" name="token_ws" value="${response.token}">
+            </form>
+            <script>
+              document.getElementById('webpayForm').submit();
+            </script>
+          </body>
+          </html>
+        `;
         
-        document.body.appendChild(form);
-        
-        // Submit the form - this will redirect to Webpay
-        form.submit();
+        // Replace current page with the auto-submit form
+        document.open();
+        document.write(htmlContent);
+        document.close();
 
         return {
           success: true,
