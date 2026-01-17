@@ -46,9 +46,12 @@
   },
   "browserslist": {
     "production": [
-      ">0.5%",
-      "not dead",
-      "not op_mini all"
+      "chrome >= 92",
+      "firefox >= 90", 
+      "safari >= 15",
+      "edge >= 92",
+      "ios >= 15",
+      "not dead"
     ],
     "development": [
       "last 1 chrome version",
