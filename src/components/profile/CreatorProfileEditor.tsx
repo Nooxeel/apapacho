@@ -1082,7 +1082,7 @@ export function CreatorProfileEditor() {
                       }}
                       placeholder="#1a3d2e"
                       maxLength={7}
-                      className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/80 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
+                      className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/80 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
                     />
                   </div>
                 </div>
@@ -1150,7 +1150,7 @@ export function CreatorProfileEditor() {
                       }}
                       placeholder="#3b82f6"
                       maxLength={7}
-                      className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/80 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
+                      className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white/80 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
                     />
                   </div>
                 </div>
