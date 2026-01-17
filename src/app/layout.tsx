@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins, Cinzel } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 
-// Optimized: Only 3 essential fonts for performance
+// Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font (body text, buttons) - CRITICAL for LCP
 const inter = Inter({
   subsets: ['latin'],
@@ -13,22 +13,13 @@ const inter = Inter({
   preload: true, // Only preload the critical font
 })
 
-// Poppins: Secondary font (headings) - NOT critical, load async
+// Poppins: Secondary font (headings) - also used for decorative headings
 const poppins = Poppins({
   weight: ['400', '600', '700'],
   subsets: ['latin'],
   variable: '--font-poppins',
   display: 'optional', // Don't block rendering - use fallback if not loaded
   preload: false, // Load on-demand to reduce render-blocking
-})
-
-// Cinzel: Elegant serif for special headings - decorative only
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  variable: '--font-cinzel',
-  display: 'optional', // Don't block rendering
-  weight: ['600', '700'],
-  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -67,7 +58,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#0d0d1a" />
       </head>
-      <body className={`${inter.variable} ${poppins.variable} ${cinzel.variable}`}>
+      <body className={`${inter.variable} ${poppins.variable}`}>
         <FontProvider>
           {children}
         </FontProvider>

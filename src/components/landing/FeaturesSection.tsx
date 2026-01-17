@@ -69,7 +69,7 @@ export function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="font-cinzel text-3xl md:text-5xl font-semibold text-white/95 mb-4 tracking-wide">
+          <h2 className="font-poppins text-3xl md:text-5xl font-semibold text-white/95 mb-4 tracking-wide">
             La plataforma que <span className="gradient-text">extrañabas</span>
           </h2>
           <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">

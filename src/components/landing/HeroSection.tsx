@@ -22,7 +22,7 @@ export function HeroSection() {
         </div>
 
         {/* Main Title - Elegant serif font */}
-        <h1 className="font-cinzel text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-8 tracking-wide">
+        <h1 className="font-poppins text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-8 tracking-wide">
           <span className="text-white/95">Tu espacio,</span>
           <br />
           <span className="gradient-text">tu estilo</span>
