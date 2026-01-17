@@ -89,59 +89,53 @@ export function useWebpay() {
       });
 
       if (response.success && response.url && response.token) {
-        console.log('[Webpay] Redirecting to:', response.url);
-        console.log('[Webpay] Token:', response.token.substring(0, 30) + '...');
+        console.log('[Webpay] ✅ API Response received');
+        console.log('[Webpay] URL:', response.url);
+        console.log('[Webpay] Token length:', response.token.length);
+        console.log('[Webpay] BuyOrder:', response.buyOrder);
         
-        // Create a temporary page that auto-submits the form
-        // This avoids any React/Next.js navigation blocking
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>Redirigiendo a Webpay...</title>
-            <style>
-              body { 
-                font-family: system-ui; 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                min-height: 100vh; 
-                margin: 0;
-                background: #1a1a2e;
-                color: white;
-              }
-              .loading { text-align: center; }
-              .spinner {
-                border: 4px solid #333;
-                border-top: 4px solid #8b5cf6;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 20px;
-              }
-              @keyframes spin { 100% { transform: rotate(360deg); } }
-            </style>
-          </head>
-          <body>
-            <div class="loading">
-              <div class="spinner"></div>
-              <p>Redirigiendo a Webpay...</p>
-            </div>
-            <form id="webpayForm" method="POST" action="${response.url}">
-              <input type="hidden" name="token_ws" value="${response.token}">
-            </form>
-            <script>
-              document.getElementById('webpayForm').submit();
-            </script>
-          </body>
-          </html>
-        `;
-        
-        // Replace current page with the auto-submit form
-        document.open();
-        document.write(htmlContent);
-        document.close();
+        // Method 1: Direct form submission (most reliable)
+        try {
+          console.log('[Webpay] 🔄 Creating form element...');
+          
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = response.url;
+          form.style.display = 'none';
+          
+          const tokenInput = document.createElement('input');
+          tokenInput.type = 'hidden';
+          tokenInput.name = 'token_ws';
+          tokenInput.value = response.token;
+          form.appendChild(tokenInput);
+          
+          document.body.appendChild(form);
+          console.log('[Webpay] 📝 Form appended to body');
+          console.log('[Webpay] 📝 Form action:', form.action);
+          console.log('[Webpay] 📝 Form method:', form.method);
+          console.log('[Webpay] 📝 Token input value length:', tokenInput.value.length);
+          
+          // Submit after a micro-delay
+          console.log('[Webpay] 🚀 Submitting form in 50ms...');
+          
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
+          console.log('[Webpay] 🚀 Calling form.submit() NOW');
+          form.submit();
+          console.log('[Webpay] ✅ form.submit() called successfully');
+          
+          // If we reach here after 2 seconds, something went wrong
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          console.log('[Webpay] ⚠️ Still on page after 2s - redirect may have failed');
+          
+        } catch (formError) {
+          console.error('[Webpay] ❌ Form creation/submit error:', formError);
+          
+          // Fallback: Open URL in new window with POST data
+          console.log('[Webpay] 🔄 Trying fallback: window.location...');
+          const fallbackUrl = `${response.url}?token_ws=${encodeURIComponent(response.token)}`;
+          window.location.href = fallbackUrl;
+        }
 
         return {
           success: true,
