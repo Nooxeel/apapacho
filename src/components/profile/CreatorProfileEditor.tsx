@@ -198,7 +198,7 @@ export function CreatorProfileEditor() {
         backgroundColor: userData.creatorProfile.backgroundColor || backgroundColors[0].color,
         backgroundGradient: userData.creatorProfile.backgroundGradient || backgroundColors[0].gradient,
         accentColor: userData.creatorProfile.accentColor || accentColors[0].color,
-        fontFamily: userData.fontFamily || 'Playfair Display',
+        fontFamily: userData.creatorProfile.fontFamily || 'Playfair Display',
         visibilitySettings: userData.creatorProfile.visibilitySettings || defaultVisibility,
       })
 
