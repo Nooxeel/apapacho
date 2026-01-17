@@ -98,7 +98,28 @@ export function CreatorsShowcase() {
 
         {/* Creators Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {creators.slice(0, 4).map((creator) => (
+          {loading ? (
+            // Skeleton loaders to prevent CLS
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <Card
+                  variant="solid"
+                  className="overflow-hidden border-white/[0.05] bg-white/[0.02]"
+                >
+                  <div className="h-24 -m-6 mb-0 bg-white/5" />
+                  <div className="relative -mt-10 mb-4 flex justify-center">
+                    <div className="w-20 h-20 rounded-full bg-white/10 ring-4 ring-[#12101f]" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <div className="h-6 w-24 mx-auto bg-white/10 rounded" />
+                    <div className="h-4 w-16 mx-auto bg-white/5 rounded" />
+                    <div className="h-6 w-20 mx-auto bg-white/10 rounded-full" />
+                  </div>
+                </Card>
+              </div>
+            ))
+          ) : (
+          creators.slice(0, 4).map((creator) => (
             <Link key={creator.id} href={`/${creator.username}`}>
               <Card
                 variant="solid"
@@ -144,7 +165,8 @@ export function CreatorsShowcase() {
                 <div className="absolute inset-0 bg-gradient-to-t from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </Card>
             </Link>
-          ))}
+          ))
+          )}
         </div>
 
         {/* View All Button */}
