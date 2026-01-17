@@ -12,6 +12,7 @@ import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
 import { useAuthStore } from '@/stores/authStore'
 import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
+import { useWebpay } from '@/hooks/useWebpay'
 import {
   Heart,
   FileText,
@@ -152,6 +153,9 @@ export default function CreatorPublicProfile() {
 
   // Real-time stats (sincronizado con polling de mensajes)
   const [totalLikes, setTotalLikes] = useState(0)
+
+  // Webpay hook
+  const { payForSubscription, loading: webpayLoading, error: webpayError } = useWebpay()
   const [totalPostComments, setTotalPostComments] = useState(0)
 
   // Set initial active tab based on visibility settings
@@ -327,57 +331,68 @@ export default function CreatorPublicProfile() {
       return
     }
 
+    const tier = profile.subscriptionTiers.find(t => t.id === tierId)
+    if (!tier) {
+      alert('Plan no encontrado')
+      return
+    }
+
+    // Calcular precio final (con promocode si aplica)
+    const finalPrice = promoDiscount && selectedTierId === tierId 
+      ? promoDiscount.finalAmount 
+      : tier.price
+
     setSubscribing(true)
     try {
-      // TODO: Integrar con pasarela de pago (Flow, Transbank, etc.)
-      // 1. Crear orden de pago con monto y detalles del tier
-      // 2. Redirigir a pasarela o mostrar formulario de pago
-      // 3. Webhook de confirmación de pago
-      // 4. Crear suscripción en base de datos
-      
-      // Por ahora: Aprobación automática para desarrollo
-      const response = await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
-      
-      // Si hay promocode aplicado, registrar la redención
-      if (promoDiscount) {
-        try {
-          await promocodesApi.redeem({
-            promocodeId: promoDiscount.promocodeId,
-            subscriptionId: response.subscription?.id,
-            originalAmount: promoDiscount.originalAmount,
-            discountAmount: promoDiscount.discountAmount,
-            finalAmount: promoDiscount.finalAmount
-          }, token)
-        } catch (redeemError) {
-          console.error('Error redeeming promocode:', redeemError)
+      // Si el precio es 0 (promocode free trial), suscribir directamente
+      if (finalPrice === 0) {
+        const response = await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
+        
+        // Registrar redención del promocode
+        if (promoDiscount) {
+          try {
+            await promocodesApi.redeem({
+              promocodeId: promoDiscount.promocodeId,
+              subscriptionId: response.subscription?.id,
+              originalAmount: promoDiscount.originalAmount,
+              discountAmount: promoDiscount.discountAmount,
+              finalAmount: promoDiscount.finalAmount
+            }, token)
+          } catch (redeemError) {
+            console.error('Error redeeming promocode:', redeemError)
+          }
         }
-      }
-      
-      // Actualizar estado local inmediatamente
-      setIsSubscriber(true)
-      setShowSubscribeModal(false)
-      
-      // Limpiar promocode state
-      clearPromocode()
-      setSelectedTierId(null)
-      
-      // Mostrar mensaje de éxito con modal personalizado
-      const tier = profile.subscriptionTiers.find(t => t.id === tierId)
-      if (tier) {
+        
+        setIsSubscriber(true)
+        setShowSubscribeModal(false)
+        clearPromocode()
+        setSelectedTierId(null)
+        
         setSuccessMessage({
           tierName: tier.name,
           endDate: new Date(response.subscription.endDate).toLocaleDateString('es-CL')
         })
         setShowSuccessModal(true)
+        
+        const updatedCreator = await creatorApi.getByUsername(username)
+        setCreator(updatedCreator as CreatorProfile)
+        return
+      }
+
+      // Usar Webpay para pagos con monto > 0
+      // El usuario será redirigido a la página de Transbank
+      const result = await payForSubscription(tierId, creator.creatorProfile.id, finalPrice)
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Error al iniciar pago')
       }
       
-      // Recargar perfil para actualizar contadores
-      const updatedCreator = await creatorApi.getByUsername(username)
-      setCreator(updatedCreator as CreatorProfile)
+      // Si llegamos aquí, el usuario fue redirigido a Webpay
+      // La página /payments/result manejará el resultado
       
     } catch (error: any) {
       console.error('Error al suscribirse:', error)
-      alert(error.message || 'Error al procesar la suscripción. Intenta de nuevo.')
+      alert(error.message || 'Error al procesar el pago. Intenta de nuevo.')
     } finally {
       setSubscribing(false)
     }
