@@ -9,6 +9,7 @@ interface AvatarProps {
   fallback?: string
   isOnline?: boolean
   hasStory?: boolean
+  priority?: boolean // Para avatares above-the-fold (ej: navbar, header)
 }
 
 const sizeClasses = {
@@ -28,6 +29,7 @@ export function Avatar({
   fallback,
   isOnline,
   hasStory,
+  priority = false,
 }: AvatarProps) {
   const initials = fallback
     ?.split(' ')
@@ -58,7 +60,10 @@ export function Avatar({
             src={src}
             alt={alt}
             fill
+            sizes={size === 'xs' ? '24px' : size === 'sm' ? '32px' : size === 'md' ? '40px' : size === 'lg' ? '56px' : size === 'xl' ? '80px' : '128px'}
             className="object-cover rounded-full"
+            loading={priority ? 'eager' : 'lazy'}
+            priority={priority}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-600 to-accent-600 text-white font-semibold">

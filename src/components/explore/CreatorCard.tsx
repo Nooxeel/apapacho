@@ -54,6 +54,8 @@ export function CreatorCard({ creator, userInterests = [] }: CreatorCardProps) {
               alt=""
               fill
               className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
             />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-fuchsia-600/30 via-purple-600/30 to-pink-600/30" />
@@ -69,6 +71,8 @@ export function CreatorCard({ creator, userInterests = [] }: CreatorCardProps) {
                 alt={creator.user.displayName}
                 fill
                 className="object-cover"
+                sizes="80px"
+                loading="lazy"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-fuchsia-500 to-purple-500">

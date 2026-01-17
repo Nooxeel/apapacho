@@ -379,7 +379,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                             fill
                             className="object-contain"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
-                            priority={false}
+                            loading="lazy"
                           />
                         </div>
                       ) : (
@@ -404,7 +404,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                             fill
                             className="object-contain blur-2xl"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
-                            priority={false}
+                            loading="lazy"
                           />
                         </div>
                       ) : (
