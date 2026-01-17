@@ -44,15 +44,20 @@ export default function BlockedUsersPage() {
 
   useEffect(() => {
     if (!hasHydrated) return
-    if (!token || !user?.isCreator) {
+    if (!token) {
       router.push('/login')
       return
     }
+    if (!user?.isCreator) {
+      // Redirect non-creators to their profile or home
+      router.push('/profile')
+      return
+    }
     loadBlockedUsers()
-  }, [hasHydrated, token, user, page])
+  }, [hasHydrated, token, user, page, router])
 
   const loadBlockedUsers = async () => {
-    if (!token) return
+    if (!token || !user?.isCreator) return
     
     setIsLoading(true)
     setError(null)
@@ -63,7 +68,12 @@ export default function BlockedUsersPage() {
       setTotalPages(response.pagination.totalPages)
       setTotal(response.pagination.total)
     } catch (err: any) {
-      setError(err.message || 'Error al cargar usuarios bloqueados')
+      // Handle specific error for non-creators
+      if (err.message?.includes('Solo los creadores') || err.status === 403) {
+        setError('Esta función solo está disponible para creadores')
+      } else {
+        setError(err.message || 'Error al cargar usuarios bloqueados')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -107,6 +117,25 @@ export default function BlockedUsersPage() {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-fuchsia-500" />
+      </div>
+    )
+  }
+
+  // Show loading while checking creator status
+  if (!user?.isCreator) {
+    return (
+      <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="w-16 h-16 mx-auto text-white/20 mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">Acceso restringido</h2>
+          <p className="text-white/60 mb-4">Esta función solo está disponible para creadores</p>
+          <button
+            onClick={() => router.push('/')}
+            className="px-6 py-2 bg-fuchsia-500 hover:bg-fuchsia-600 rounded-lg text-white font-medium transition-colors"
+          >
+            Ir al inicio
+          </button>
+        </div>
       </div>
     )
   }
