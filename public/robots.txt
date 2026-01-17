@@ -9,4 +9,4 @@ Disallow: /creator/
 Disallow: /settings/
 
 # Sitemap location
-Sitemap: https://appapacho.vercel.app/sitemap.xml
+Sitemap: https://apapacho.vercel.app/sitemap.xml
