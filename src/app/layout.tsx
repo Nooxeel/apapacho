@@ -1,58 +1,34 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins, Roboto, Open_Sans, Montserrat, Cinzel, Crimson_Text } from 'next/font/google'
+import { Inter, Poppins, Cinzel } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 
-// Top 5 web fonts optimized for performance
+// Optimized: Only 3 essential fonts for performance
+// Inter: Primary UI font (body text, buttons)
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '600', '700'], // Reduced from 5 to 3 weights
+  preload: true, // Preload critical font
 })
 
+// Poppins: Secondary font (headings, emphasis)
 const poppins = Poppins({
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '600', '700'], // Reduced from 5 to 3 weights
   subsets: ['latin'],
   variable: '--font-poppins',
-  display: 'swap'
-})
-
-const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  display: 'swap'
-})
-
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  variable: '--font-open-sans',
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
+  preload: true,
 })
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-  display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
-})
-
-// Elegant serif font for headers (similar to Blizzard style)
+// Cinzel: Elegant serif for special headings
 const cinzel = Cinzel({
   subsets: ['latin'],
   variable: '--font-cinzel',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
-})
-
-// Tiller-style elegant serif font (default for site)
-const tiller = Crimson_Text({
-  subsets: ['latin'],
-  variable: '--font-tiller',
-  display: 'swap',
-  weight: ['400', '600', '700'],
+  weight: ['600', '700'], // Reduced from 4 to 2 weights
+  preload: false, // Load on-demand
 })
 
 export const metadata: Metadata = {
@@ -68,7 +44,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} ${openSans.variable} ${montserrat.variable} ${cinzel.variable} ${tiller.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className={`${inter.variable} ${poppins.variable} ${cinzel.variable}`}>
         <FontProvider>
           {children}
         </FontProvider>

@@ -77,7 +77,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2" aria-label="Ir a página de inicio">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <span className="text-white font-bold text-xl">A</span>
             </div>
@@ -106,6 +106,7 @@ export function Navbar() {
                   <Link
                     href="/messages"
                     className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
+                    aria-label={unreadCount > 0 ? `Mensajes (${unreadCount} sin leer)` : 'Mensajes'}
                   >
                     <MessageCircle className="w-6 h-6 text-white/70 hover:text-white transition-colors" />
                     {unreadCount > 0 && (

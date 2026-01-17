@@ -1,0 +1,12 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /creator/
+Disallow: /settings/
+
+# Sitemap location
+Sitemap: https://appapacho.vercel.app/sitemap.xml
