@@ -2,13 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useAuthStore } from '@/stores/authStore'
-
-// Map font names to Tailwind v4 utility classes defined in globals.css (optimized to 3 fonts)
-const FONT_CLASS_MAP: Record<string, string> = {
-  'Inter': 'font-inter',
-  'Poppins': 'font-poppins',
-  'Cinzel': 'font-cinzel',
-}
+import { FONT_CLASS_MAP } from '@/lib/fonts'
 
 interface FontContextType {
   currentFont: string
@@ -22,11 +16,11 @@ export function FontProvider({ children }: { children: ReactNode }) {
   const { user, hasHydrated } = useAuthStore()
   const [previewFont, setPreviewFont] = useState<string | null>(null)
 
-  // Get the saved font from user or use preview font (default to Inter for performance)
-  const savedFont = (user as any)?.fontFamily || 'Inter'
+  // Get the saved font from user or use preview font (default to Playfair Display)
+  const savedFont = (user as any)?.fontFamily || 'Playfair Display'
   const currentFont = previewFont || savedFont
 
-  // Apply font to body whenever it changes
+  // Apply font to body whenever it changes (for preview in editor only)
   useEffect(() => {
     if (!hasHydrated) return
 

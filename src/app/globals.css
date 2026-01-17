@@ -1,18 +1,31 @@
 @import "tailwindcss";
 
-/* ===== Tailwind v4 Custom Font Utilities (Optimized to 3 fonts) ===== */
-/* Next.js Google Fonts define CSS variables that we use here */
+/* ===== Tailwind v4 Custom Font Utilities ===== */
+/* Core fonts: Inter & Poppins loaded via next/font (CSS variables) */
+/* Profile fonts: Roboto, Open Sans, Montserrat, Playfair Display loaded via Google Fonts link */
 
 @utility font-inter {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: Inter, var(--font-inter), system-ui, sans-serif;
 }
 
 @utility font-poppins {
-  font-family: var(--font-poppins), system-ui, sans-serif;
+  font-family: Poppins, var(--font-poppins), system-ui, sans-serif;
 }
 
-@utility font-cinzel {
-  font-family: var(--font-cinzel), Georgia, 'Times New Roman', serif;
+@utility font-playfair {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+}
+
+@utility font-roboto {
+  font-family: Roboto, system-ui, sans-serif;
+}
+
+@utility font-open-sans {
+  font-family: 'Open Sans', system-ui, sans-serif;
+}
+
+@utility font-montserrat {
+  font-family: Montserrat, system-ui, sans-serif;
 }
 
 /* Default font for the entire app - Inter for performance */

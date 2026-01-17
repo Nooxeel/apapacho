@@ -1,21 +1,21 @@
 'use client'
 
 import { useFontContext } from '@/contexts/FontContext'
+import { FONT_CSS_VAR_MAP } from '@/lib/fonts'
 
 interface FontOption {
   value: string
   label: string
   description: string
-  fontFamily: string  // Actual font-family value for inline styles
 }
 
 const FONT_OPTIONS: FontOption[] = [
-  { value: 'Tiller', label: 'Tiller', description: 'Elegante y clásica (por defecto)', fontFamily: 'var(--font-tiller), Georgia, serif' },
-  { value: 'Inter', label: 'Inter', description: 'Moderna y limpia', fontFamily: 'Inter, system-ui, sans-serif' },
-  { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna', fontFamily: 'Poppins, system-ui, sans-serif' },
-  { value: 'Roboto', label: 'Roboto', description: 'Profesional y versátil', fontFamily: 'Roboto, system-ui, sans-serif' },
-  { value: 'Open Sans', label: 'Open Sans', description: 'Amigable y legible', fontFamily: 'Open Sans, system-ui, sans-serif' },
-  { value: 'Montserrat', label: 'Montserrat', description: 'Elegante y urbana', fontFamily: 'Montserrat, system-ui, sans-serif' },
+  { value: 'Playfair Display', label: 'Playfair Display', description: 'Elegante y clásica (por defecto)' },
+  { value: 'Inter', label: 'Inter', description: 'Moderna y limpia' },
+  { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna' },
+  { value: 'Roboto', label: 'Roboto', description: 'Profesional y versátil' },
+  { value: 'Open Sans', label: 'Open Sans', description: 'Amigable y legible' },
+  { value: 'Montserrat', label: 'Montserrat', description: 'Elegante y urbana' },
 ]
 
 interface FontSelectorProps {
@@ -30,6 +30,11 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
   const handleSelect = (fontValue: string) => {
     setPreviewFont(fontValue)
     onChange(fontValue)
+  }
+
+  // Get font-family from centralized mapping
+  const getFontFamily = (fontValue: string): string => {
+    return FONT_CSS_VAR_MAP[fontValue] || 'system-ui, sans-serif'
   }
 
   return (
@@ -65,13 +70,13 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                 {/* Font preview */}
                 <p
                   className="text-xl text-white/90 leading-tight mb-1"
-                  style={{ fontFamily: font.fontFamily }}
+                  style={{ fontFamily: getFontFamily(font.value) }}
                 >
                   Apapacho
                 </p>
                 <p
                   className="text-sm text-white/60"
-                  style={{ fontFamily: font.fontFamily }}
+                  style={{ fontFamily: getFontFamily(font.value) }}
                 >
                   AaBbCc 123
                 </p>

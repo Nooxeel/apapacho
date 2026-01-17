@@ -6,18 +6,25 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
-    // Only 3 optimized fonts
+    // Core fonts + profile customization fonts
     'font-inter',
     'font-poppins',
-    'font-cinzel',
+    'font-playfair',
+    'font-roboto',
+    'font-open-sans',
+    'font-montserrat',
   ],
   theme: {
     extend: {
       fontFamily: {
-        // Only 3 fonts for better performance
-        inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
-        cinzel: ['var(--font-cinzel)', 'Georgia', 'serif'],
+        // Core fonts (loaded via next/font)
+        inter: ['Inter', 'var(--font-inter)', 'system-ui', 'sans-serif'],
+        poppins: ['Poppins', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+        // Profile customization fonts (loaded via Google Fonts link)
+        playfair: ['"Playfair Display"', 'Georgia', 'serif'],
+        roboto: ['Roboto', 'system-ui', 'sans-serif'],
+        'open-sans': ['"Open Sans"', 'system-ui', 'sans-serif'],
+        montserrat: ['Montserrat', 'system-ui', 'sans-serif'],
       },
       colors: {
         primary: {
