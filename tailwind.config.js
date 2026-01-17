@@ -6,20 +6,18 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
+    // Only 3 optimized fonts
     'font-inter',
-    'font-roboto',
-    'font-open-sans',
-    'font-lato',
     'font-poppins',
+    'font-cinzel',
   ],
   theme: {
     extend: {
       fontFamily: {
-        inter: ['var(--font-inter)'],
-        roboto: ['var(--font-roboto)'],
-        'open-sans': ['var(--font-open-sans)'],
-        lato: ['var(--font-lato)'],
-        poppins: ['var(--font-poppins)'],
+        // Only 3 fonts for better performance
+        inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        cinzel: ['var(--font-cinzel)', 'Georgia', 'serif'],
       },
       colors: {
         primary: {

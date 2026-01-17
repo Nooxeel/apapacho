@@ -35,6 +35,15 @@ export const metadata: Metadata = {
   title: 'Apapacho - Tu Plataforma de Contenido',
   description: 'Plataforma para creadores de contenido con personalización total estilo MySpace',
   keywords: ['creadores', 'contenido', 'suscripciones', 'personalización'],
+  metadataBase: new URL('https://apapacho.vercel.app'),
+  openGraph: {
+    title: 'Apapacho - Tu Plataforma de Contenido',
+    description: 'Plataforma para creadores de contenido con personalización total estilo MySpace',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({
@@ -45,8 +54,18 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        {/* DNS Prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        
+        {/* Preconnect for critical resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Viewport optimization */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#0d0d1a" />
       </head>
       <body className={`${inter.variable} ${poppins.variable} ${cinzel.variable}`}>
         <FontProvider>

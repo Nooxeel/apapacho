@@ -4,7 +4,18 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  swcMinify: true,
+  
+  // Experimental optimizations for better performance
+  experimental: {
+    optimizeCss: true, // Optimize CSS for faster loads
+  },
+  
+  // Reduce bundle size by excluding unused modules
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
+    },
+  },
   
   images: {
     remotePatterns: [
@@ -74,6 +85,36 @@ const nextConfig = {
               "form-action 'self'",
               "frame-ancestors 'none'",
             ].join('; '),
+          },
+        ],
+      },
+      // Cache static assets aggressively
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Cache fonts
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Cache images
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=31536000',
           },
         ],
       },

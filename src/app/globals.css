@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ===== Tailwind v4 Custom Font Utilities ===== */
+/* ===== Tailwind v4 Custom Font Utilities (Optimized to 3 fonts) ===== */
 /* Next.js Google Fonts define CSS variables that we use here */
 
 @utility font-inter {
@@ -11,29 +11,13 @@
   font-family: var(--font-poppins), system-ui, sans-serif;
 }
 
-@utility font-roboto {
-  font-family: var(--font-roboto), system-ui, sans-serif;
-}
-
-@utility font-open-sans {
-  font-family: var(--font-open-sans), system-ui, sans-serif;
-}
-
-@utility font-montserrat {
-  font-family: var(--font-montserrat), system-ui, sans-serif;
-}
-
 @utility font-cinzel {
   font-family: var(--font-cinzel), Georgia, 'Times New Roman', serif;
 }
 
-@utility font-tiller {
-  font-family: var(--font-tiller), Georgia, 'Times New Roman', serif;
-}
-
-/* Default font for the entire app - Tiller serif */
+/* Default font for the entire app - Inter for performance */
 body {
-  font-family: var(--font-tiller), Georgia, serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 :root {
@@ -150,4 +134,47 @@ body {
 
 .animate-bounce-in {
   animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* GPU-accelerated animations for better performance */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-in,
+  .animate-pulse-slow,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Prevent layout shifts */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Critical above-the-fold content prioritization */
+.glass-dark {
+  contain: layout style;
 }
