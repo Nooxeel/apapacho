@@ -529,4 +529,42 @@ export const creatorEarningsApi = {
   },
 }
 
+// Block Lists API
+export const blockApi = {
+  // Block a user
+  blockUser: (userId: string, reason: string | undefined, token: string) =>
+    api<{ success: boolean; message: string; blocked: any }>(`/creator/block/${userId}`, {
+      method: 'POST',
+      body: { reason },
+      token
+    }),
+
+  // Unblock a user
+  unblockUser: (userId: string, token: string) =>
+    api<{ success: boolean; message: string }>(`/creator/block/${userId}`, {
+      method: 'DELETE',
+      token
+    }),
+
+  // Get blocked users list
+  getBlockedUsers: (token: string, page = 1, limit = 20) =>
+    api<{
+      blockedUsers: Array<{
+        id: string;
+        user: { id: string; username: string; displayName: string; avatar?: string };
+        reason?: string;
+        createdAt: string;
+      }>;
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>(`/creator/block?page=${page}&limit=${limit}`, { token }),
+
+  // Check if a specific user is blocked
+  checkBlocked: (userId: string, token: string) =>
+    api<{ isBlocked: boolean; blockedAt?: string; reason?: string }>(`/creator/block/check/${userId}`, { token }),
+
+  // Check if current user is blocked by a creator (for fans)
+  amIBlocked: (creatorUsername: string, token: string) =>
+    api<{ isBlocked: boolean }>(`/block/am-i-blocked/${creatorUsername}`, { token }),
+}
+
 export default api

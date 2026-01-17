@@ -55,6 +55,12 @@ const DollarSignIcon = () => (
   </svg>
 )
 
+const ShieldIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+)
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -238,6 +244,14 @@ export function Navbar() {
                           >
                             <SettingsIcon />
                             Editar Perfil
+                          </Link>
+                          <Link
+                            href="/creator/blocked"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <ShieldIcon />
+                            Bloqueados
                           </Link>
                         </>
                       )}
