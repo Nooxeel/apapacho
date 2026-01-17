@@ -70,7 +70,11 @@ function PaymentResultContent() {
       if (token_ws) {
         console.log('[PaymentResult] Confirming payment with backend...');
         try {
-          const response = await fetch(`${API_URL}/payments/webpay/return?token_ws=${token_ws}`);
+          const response = await fetch(`${API_URL}/payments/webpay/return?token_ws=${token_ws}`, {
+            headers: {
+              'Accept': 'application/json',
+            },
+          });
           const data = await response.json();
           
           console.log('[PaymentResult] Backend response:', data);
