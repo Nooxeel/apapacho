@@ -29,7 +29,7 @@ export function HeroSection() {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg md:text-xl text-white/60 max-w-3xl mx-auto mb-12 leading-relaxed">
+        <p className="text-lg md:text-xl text-white/75 max-w-3xl mx-auto mb-12 leading-relaxed">
           ¿Recuerdas cuando tu perfil era realmente <span className="text-purple-300 font-medium">tuyo</span>?
           <br className="hidden md:block" />
           Música de fondo, colores personalizados, tu propio espacio.
@@ -79,17 +79,17 @@ export function HeroSection() {
           <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
             <div className="text-4xl mb-4" aria-hidden="true">🎨</div>
             <h3 className="text-lg font-semibold text-white/90 mb-3">Diseña sin límites</h3>
-            <p className="text-white/50 text-sm leading-relaxed">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
+            <p className="text-white/70 text-sm leading-relaxed">Colores, fondos, layouts. Todo personalizable como en los 2000s</p>
           </div>
           <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
             <div className="text-4xl mb-4" aria-hidden="true">🎵</div>
             <h3 className="text-lg font-semibold text-white/90 mb-3">Tu soundtrack</h3>
-            <p className="text-white/50 text-sm leading-relaxed">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
+            <p className="text-white/70 text-sm leading-relaxed">Agrega música a tu perfil. Hazlo tuyo con tu banda sonora favorita</p>
           </div>
           <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-300">
             <div className="text-4xl mb-4" aria-hidden="true">💰</div>
             <h3 className="text-lg font-semibold text-white/90 mb-3">Monetiza tu arte</h3>
-            <p className="text-white/50 text-sm leading-relaxed">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
+            <p className="text-white/70 text-sm leading-relaxed">Tu audiencia, tus reglas. Gana directamente de tus fans</p>
           </div>
         </div>
       </div>

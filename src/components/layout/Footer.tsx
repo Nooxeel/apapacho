@@ -13,7 +13,7 @@ export function Footer() {
               </div>
               <span className="text-xl font-bold gradient-text">Apapacho</span>
             </Link>
-            <p className="text-white/50 text-sm">
+            <p className="text-white/70 text-sm">
               La plataforma más personalizable para creadores de contenido.
             </p>
           </div>
@@ -23,22 +23,22 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Plataforma</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/explore" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/explore" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Explorar
                 </Link>
               </li>
               <li>
-                <Link href="/creators" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/creators" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Creadores
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/pricing" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Precios
                 </Link>
               </li>
               <li>
-                <Link href="/features" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/features" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Características
                 </Link>
               </li>
@@ -50,22 +50,22 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Soporte</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/help" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/help" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Centro de Ayuda
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/contact" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Contacto
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/faq" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/guidelines" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/guidelines" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Guías de Comunidad
                 </Link>
               </li>
@@ -77,22 +77,22 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/terms" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/terms" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Términos de Servicio
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/privacy" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Política de Privacidad
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/cookies" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Cookies
                 </Link>
               </li>
               <li>
-                <Link href="/dmca" className="text-white/50 hover:text-white text-sm transition-colors">
+                <Link href="/dmca" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   DMCA
                 </Link>
               </li>
@@ -102,10 +102,10 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
-            <p className="text-white/40 text-sm">
+            <p className="text-white/60 text-sm">
               © 2025 Apapacho. Todos los derechos reservados.
             </p>
-            <span className="text-white/30 text-xs font-mono">
+            <span className="text-white/50 text-xs font-mono">
               v1.0.0
             </span>
           </div>
@@ -114,7 +114,7 @@ export function Footer() {
               href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/40 hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
               aria-label="Síguenos en Twitter"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -125,7 +125,7 @@ export function Footer() {
               href="https://instagram.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/40 hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
               aria-label="Síguenos en Instagram"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -136,7 +136,7 @@ export function Footer() {
               href="https://discord.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/40 hover:text-white transition-colors"
+              className="text-white/60 hover:text-white transition-colors"
               aria-label="Únete a nuestro Discord"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
