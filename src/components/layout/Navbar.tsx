@@ -121,6 +121,8 @@ export function Navbar() {
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
                       className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                      aria-label="Menú de usuario"
+                      aria-expanded={showUserMenu}
                     >
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
                         {user.avatar ? (
@@ -218,6 +220,8 @@ export function Navbar() {
           <button
             className="md:hidden p-2 text-white/70 hover:text-white"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={isMenuOpen}
           >
             <svg
               className="w-6 h-6"
