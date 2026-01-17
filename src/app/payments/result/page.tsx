@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle, XCircle, Clock, AlertCircle, ArrowLeft, Home, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
 type PaymentStatus = 'AUTHORIZED' | 'FAILED' | 'CANCELLED' | 'TIMEOUT' | 'PENDING' | 'REVERSED' | 'REFUNDED';
 
 interface PaymentDetails {
@@ -22,30 +24,92 @@ function PaymentResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [details, setDetails] = useState<PaymentDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Parse URL parameters
-    const status = searchParams.get('status') as PaymentStatus;
-    const success = searchParams.get('success') === 'true';
-    const buyOrder = searchParams.get('buyOrder') || '';
-    const amount = parseInt(searchParams.get('amount') || '0');
-    const transactionId = searchParams.get('transactionId') || '';
-    const authorizationCode = searchParams.get('authorizationCode') || undefined;
-    const cardNumber = searchParams.get('cardNumber') || undefined;
-    const error = searchParams.get('error') || undefined;
+    const confirmPayment = async () => {
+      // Get token from Webpay redirect
+      const token_ws = searchParams.get('token_ws');
+      const TBK_TOKEN = searchParams.get('TBK_TOKEN');
+      const TBK_ORDEN_COMPRA = searchParams.get('TBK_ORDEN_COMPRA');
+      
+      console.log('[PaymentResult] Params:', { token_ws, TBK_TOKEN, TBK_ORDEN_COMPRA });
+      
+      // Case 1: User cancelled (has TBK_TOKEN)
+      if (TBK_TOKEN && TBK_ORDEN_COMPRA) {
+        console.log('[PaymentResult] User cancelled payment');
+        setDetails({
+          status: 'CANCELLED',
+          success: false,
+          buyOrder: TBK_ORDEN_COMPRA,
+          amount: 0,
+          transactionId: '',
+          error: 'Pago cancelado por el usuario',
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Case 2: Timeout (has TBK_ORDEN_COMPRA but no tokens)
+      if (TBK_ORDEN_COMPRA && !token_ws && !TBK_TOKEN) {
+        console.log('[PaymentResult] Payment timeout');
+        setDetails({
+          status: 'TIMEOUT',
+          success: false,
+          buyOrder: TBK_ORDEN_COMPRA,
+          amount: 0,
+          transactionId: '',
+          error: 'El tiempo para completar el pago expiró',
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Case 3: Normal flow - confirm with backend
+      if (token_ws) {
+        console.log('[PaymentResult] Confirming payment with backend...');
+        try {
+          const response = await fetch(`${API_URL}/payments/webpay/return?token_ws=${token_ws}`);
+          const data = await response.json();
+          
+          console.log('[PaymentResult] Backend response:', data);
+          
+          if (data.success) {
+            setDetails({
+              status: 'AUTHORIZED',
+              success: true,
+              buyOrder: data.buyOrder || '',
+              amount: data.amount || 0,
+              transactionId: data.transactionId || '',
+              authorizationCode: data.authorizationCode,
+              cardNumber: data.cardNumber,
+            });
+          } else {
+            setDetails({
+              status: data.status || 'FAILED',
+              success: false,
+              buyOrder: data.buyOrder || '',
+              amount: data.amount || 0,
+              transactionId: data.transactionId || '',
+              error: data.error || 'El pago no pudo ser procesado',
+            });
+          }
+        } catch (err) {
+          console.error('[PaymentResult] Error confirming payment:', err);
+          setError('Error al confirmar el pago. Por favor contacta a soporte.');
+        }
+        setLoading(false);
+        return;
+      }
+      
+      // No valid parameters
+      console.log('[PaymentResult] No valid payment parameters');
+      setError('No se encontraron datos de pago válidos.');
+      setLoading(false);
+    };
 
-    if (status) {
-      setDetails({
-        status,
-        success,
-        buyOrder,
-        amount,
-        transactionId,
-        authorizationCode,
-        cardNumber,
-        error,
-      });
-    }
+    confirmPayment();
   }, [searchParams]);
 
   const formatAmount = (amount: number) => {
@@ -104,6 +168,38 @@ function PaymentResultContent() {
         };
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f0f14] flex flex-col items-center justify-center gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>
+        <p className="text-white/70">Confirmando tu pago...</p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-red-500/20 border border-red-500/30 rounded-2xl p-8 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-500/20 mb-6">
+            <XCircle className="w-10 h-10 text-red-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-red-400 mb-2">Error</h1>
+          <p className="text-white/70 mb-6">{error}</p>
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
+          >
+            <Home className="w-5 h-5" />
+            Volver al inicio
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!details) {
     return (
