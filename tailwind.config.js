@@ -6,18 +6,16 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
-    // Only 3 optimized fonts
+    // Only 2 optimized fonts
     'font-inter',
     'font-poppins',
-    'font-cinzel',
   ],
   theme: {
     extend: {
       fontFamily: {
-        // Only 3 fonts for better performance
+        // Only 2 fonts for optimal performance
         inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
-        cinzel: ['var(--font-cinzel)', 'Georgia', 'serif'],
       },
       colors: {
         primary: {

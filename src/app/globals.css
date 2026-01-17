@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ===== Tailwind v4 Custom Font Utilities (Optimized to 3 fonts) ===== */
+/* ===== Tailwind v4 Custom Font Utilities (Optimized to 2 fonts) ===== */
 /* Next.js Google Fonts define CSS variables that we use here */
 
 @utility font-inter {
@@ -9,10 +9,6 @@
 
 @utility font-poppins {
   font-family: var(--font-poppins), system-ui, sans-serif;
-}
-
-@utility font-cinzel {
-  font-family: var(--font-cinzel), Georgia, 'Times New Roman', serif;
 }
 
 /* Default font for the entire app - Inter for performance */

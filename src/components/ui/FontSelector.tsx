@@ -2,20 +2,31 @@
 
 import { useFontContext } from '@/contexts/FontContext'
 
+/**
+ * Font options - MUST match fonts loaded in layout.tsx
+ * Only Inter and Poppins are loaded for performance
+ */
 interface FontOption {
   value: string
   label: string
   description: string
-  fontFamily: string  // Actual font-family value for inline styles
+  /** CSS font-family for inline preview (uses CSS variable) */
+  fontFamily: string
 }
 
 const FONT_OPTIONS: FontOption[] = [
-  { value: 'Tiller', label: 'Tiller', description: 'Elegante y clásica (por defecto)', fontFamily: 'var(--font-tiller), Georgia, serif' },
-  { value: 'Inter', label: 'Inter', description: 'Moderna y limpia', fontFamily: 'Inter, system-ui, sans-serif' },
-  { value: 'Poppins', label: 'Poppins', description: 'Geométrica y moderna', fontFamily: 'Poppins, system-ui, sans-serif' },
-  { value: 'Roboto', label: 'Roboto', description: 'Profesional y versátil', fontFamily: 'Roboto, system-ui, sans-serif' },
-  { value: 'Open Sans', label: 'Open Sans', description: 'Amigable y legible', fontFamily: 'Open Sans, system-ui, sans-serif' },
-  { value: 'Montserrat', label: 'Montserrat', description: 'Elegante y urbana', fontFamily: 'Montserrat, system-ui, sans-serif' },
+  { 
+    value: 'Inter', 
+    label: 'Inter', 
+    description: 'Moderna y limpia (por defecto)', 
+    fontFamily: 'var(--font-inter), system-ui, sans-serif' 
+  },
+  { 
+    value: 'Poppins', 
+    label: 'Poppins', 
+    description: 'Geométrica y elegante', 
+    fontFamily: 'var(--font-poppins), system-ui, sans-serif' 
+  },
 ]
 
 interface FontSelectorProps {
@@ -28,7 +39,9 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
   const { currentFont, setPreviewFont } = useFontContext()
 
   const handleSelect = (fontValue: string) => {
+    // Apply preview immediately (changes body class via FontContext)
     setPreviewFont(fontValue)
+    // Notify parent to update profile state
     onChange(fontValue)
   }
 
@@ -52,6 +65,8 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                 }
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
+              aria-pressed={isSelected}
+              aria-label={`Seleccionar fuente ${font.label}`}
             >
               {/* Left side: Font info and description */}
               <div className="flex-1 min-w-0">
@@ -62,7 +77,7 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                   {font.description}
                 </p>
 
-                {/* Font preview */}
+                {/* Font preview with actual font */}
                 <p
                   className="text-xl text-white/90 leading-tight mb-1"
                   style={{ fontFamily: font.fontFamily }}
@@ -87,7 +102,7 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                   }
                 `}>
                   {isSelected && (
-                    <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                    <div className="w-2.5 h-2.5 bg-white rounded-full" />
                   )}
                 </div>
               </div>
@@ -97,7 +112,7 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
       </div>
 
       <p className="text-xs text-white/40">
-        💡 Los cambios se aplican instantáneamente. Guarda para mantener tu selección.
+        ✨ El cambio se aplica instantáneamente a todo el sitio
       </p>
     </div>
   )
