@@ -88,17 +88,23 @@ export function useWebpay() {
         token,
       });
 
-      if (response.success) {
-        // Redirect to Webpay using form submission
-        // Create a temporary form and submit it
-        const formContainer = document.createElement('div');
-        formContainer.innerHTML = response.formHtml;
-        document.body.appendChild(formContainer);
+      if (response.success && response.url && response.token) {
+        // Create form manually and submit to Webpay
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = response.url;
+        form.style.display = 'none';
         
-        const form = formContainer.querySelector('form');
-        if (form) {
-          form.submit();
-        }
+        const tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = 'token_ws';
+        tokenInput.value = response.token;
+        form.appendChild(tokenInput);
+        
+        document.body.appendChild(form);
+        
+        // Submit the form - this will redirect to Webpay
+        form.submit();
 
         return {
           success: true,
