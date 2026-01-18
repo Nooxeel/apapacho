@@ -25,7 +25,7 @@ interface FontSelectorProps {
 }
 
 export default function FontSelector({ value, onChange, disabled }: FontSelectorProps) {
-  const { currentFont, setPreviewFont } = useFontContext()
+  const { setPreviewFont } = useFontContext()
 
   const handleSelect = (fontValue: string) => {
     setPreviewFont(fontValue)
@@ -41,7 +41,8 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
     <div className="space-y-3">
       <div className="flex flex-col gap-3">
         {FONT_OPTIONS.map((font) => {
-          const isSelected = currentFont === font.value
+          // Use the value prop to determine selection, not context
+          const isSelected = value === font.value
 
           return (
             <button

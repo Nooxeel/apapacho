@@ -180,6 +180,7 @@ export function CreatorProfileEditor() {
     setIsLoading(true)
     try {
       const userData = await authApi.getMe(authToken) as any
+      console.log('[LOAD PROFILE] userData.creatorProfile.fontFamily:', userData.creatorProfile?.fontFamily)
       if (!userData.creatorProfile) {
         setError('No eres un creador')
         return
