@@ -148,6 +148,7 @@ export const authApi = {
     password: string
     displayName: string
     isCreator?: boolean
+    referralCode?: string
   }) => api('/auth/register', { method: 'POST', body: data }),
 
   login: (data: { email: string; password: string }) =>

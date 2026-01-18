@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { authApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
@@ -9,11 +9,13 @@ import { useAuthStore } from '@/stores/authStore'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login } = useAuthStore()
   const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [referralCode, setReferralCode] = useState<string | null>(null)
   
   const [formData, setFormData] = useState({
     email: '',
@@ -23,6 +25,15 @@ export default function LoginPage() {
     isCreator: true,
     acceptTerms: false
   })
+
+  // Capture referral code from URL (?ref=XXXXX)
+  useEffect(() => {
+    const ref = searchParams.get('ref')
+    if (ref) {
+      setReferralCode(ref.toUpperCase())
+      setIsLogin(false) // Switch to register mode if referral code present
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,7 +70,8 @@ export default function LoginPage() {
           password: formData.password,
           username: formData.username,
           displayName: formData.displayName,
-          isCreator: formData.isCreator
+          isCreator: formData.isCreator,
+          ...(referralCode ? { referralCode } : {})
         }) as any
         
         localStorage.setItem('apapacho-token', result.token)
@@ -114,6 +126,13 @@ export default function LoginPage() {
               ? 'Ingresa a tu cuenta de Apapacho' 
               : 'Únete a la comunidad de creadores'}
           </p>
+
+          {/* Referral code indicator */}
+          {referralCode && !isLogin && (
+            <div className="bg-fuchsia-500/20 border border-fuchsia-500/50 rounded-lg p-3 text-fuchsia-300 text-sm mb-4 text-center">
+              🎁 Código de referido aplicado: <strong>{referralCode}</strong>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm mb-4">
