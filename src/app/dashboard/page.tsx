@@ -359,22 +359,23 @@ export default function DashboardPage() {
               <p className="text-white/50 text-sm mt-1">{user.email}</p>
 
               <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                {user.isCreator && (
+                {user.isCreator ? (
                   <Link
                     href="/creator/edit"
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm hover:bg-white/30 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-fuchsia-600/80 rounded-full text-sm hover:bg-fuchsia-600 transition-colors"
                   >
                     <Settings className="w-4 h-4" />
-                    Editar perfil de creador
+                    Editar perfil
+                  </Link>
+                ) : (
+                  <Link
+                    href="/profile/edit"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-fuchsia-600/80 rounded-full text-sm hover:bg-fuchsia-600 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    Editar mi perfil
                   </Link>
                 )}
-                <Link
-                  href="/profile/edit"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-fuchsia-600/80 rounded-full text-sm hover:bg-fuchsia-600 transition-colors"
-                >
-                  <User className="w-4 h-4" />
-                  Editar mi perfil
-                </Link>
               </div>
             </div>
 
