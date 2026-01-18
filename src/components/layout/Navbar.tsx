@@ -262,6 +262,14 @@ export function Navbar() {
                             Mis Ganancias
                           </Link>
                           <Link
+                            href="/creator/subscriptions"
+                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <UsersIcon />
+                            Suscripciones
+                          </Link>
+                          <Link
                             href="/creator/posts"
                             className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
                             onClick={() => setShowUserMenu(false)}
