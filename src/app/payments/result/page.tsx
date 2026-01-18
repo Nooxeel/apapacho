@@ -4,6 +4,9 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle, XCircle, Clock, AlertCircle, ArrowLeft, Home, CreditCard } from 'lucide-react';
 import Link from 'next/link';
+import { SaveCardPrompt } from '@/components/cards';
+import api from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -20,12 +23,20 @@ interface PaymentDetails {
   error?: string;
 }
 
+interface CardsCheckResponse { 
+  success: boolean; 
+  cards?: { id: string }[] 
+}
+
 function PaymentResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { token, hasHydrated } = useAuthStore();
   const [details, setDetails] = useState<PaymentDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSaveCardPrompt, setShowSaveCardPrompt] = useState(false);
+  const [hasSavedCards, setHasSavedCards] = useState(false);
 
   useEffect(() => {
     const confirmPayment = async () => {
@@ -89,6 +100,22 @@ function PaymentResultContent() {
               authorizationCode: data.authorizationCode,
               cardNumber: data.cardNumber,
             });
+            
+            // Check if user has saved cards (to prompt for saving)
+            if (hasHydrated && token) {
+              try {
+                const cardsResponse = await api<CardsCheckResponse>('/cards', { token });
+                const cards = cardsResponse.cards || [];
+                setHasSavedCards(cards.length > 0);
+                
+                // Show save card prompt only if no cards saved yet
+                if (cards.length === 0) {
+                  setShowSaveCardPrompt(true);
+                }
+              } catch (e) {
+                console.log('[PaymentResult] Could not check saved cards');
+              }
+            }
           } else {
             setDetails({
               status: data.status || 'FAILED',
@@ -328,6 +355,14 @@ function PaymentResultContent() {
           </p>
         </div>
       </div>
+      
+      {/* Save Card Prompt Modal */}
+      {showSaveCardPrompt && (
+        <SaveCardPrompt
+          isOpen={showSaveCardPrompt}
+          onClose={() => setShowSaveCardPrompt(false)}
+        />
+      )}
     </div>
   );
 }
