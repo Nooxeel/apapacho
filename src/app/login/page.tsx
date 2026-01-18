@@ -185,6 +185,17 @@ function LoginContent() {
               error={fieldErrors.password}
             />
 
+            {isLogin && (
+              <div className="text-right -mt-2">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-pink-400 hover:text-pink-300 transition-colors"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+            )}
+
             {!isLogin && (
               <>
                 <label className="flex items-center gap-2 cursor-pointer">
