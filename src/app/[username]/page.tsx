@@ -177,6 +177,7 @@ export default function CreatorPublicProfile() {
       try {
         setLoading(true)
         const data = await creatorApi.getByUsername(username) as CreatorProfile
+        console.log('[PROFILE] Loaded creator data, fontFamily:', data.creatorProfile?.fontFamily)
         setCreator(data)
 
         // Cargar conteo de comentarios

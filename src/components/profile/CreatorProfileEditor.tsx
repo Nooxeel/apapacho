@@ -307,22 +307,27 @@ export function CreatorProfileEditor() {
       }
 
       // 2. Update profile data (without files)
+      const profileData = {
+        bio: profile.bio,
+        bioTitle: profile.bioTitle,
+        extendedInfo: profile.extendedInfo,
+        extendedInfoTitle: profile.extendedInfoTitle,
+        backgroundColor: profile.backgroundColor,
+        backgroundGradient: profile.backgroundGradient,
+        accentColor: profile.accentColor,
+        fontFamily: profile.fontFamily,
+        visibilitySettings: profile.visibilitySettings,
+      }
+      console.log('[SAVE] Sending fontFamily to backend:', profile.fontFamily)
+      console.log('[SAVE] Full profile data:', profileData)
+      
       const response = await fetch(`${API_URL}/creators/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          bio: profile.bio,
-          bioTitle: profile.bioTitle,
-          extendedInfo: profile.extendedInfo,
-          extendedInfoTitle: profile.extendedInfoTitle,
-          backgroundColor: profile.backgroundColor,
-          backgroundGradient: profile.backgroundGradient,
-          accentColor: profile.accentColor,
-          visibilitySettings: profile.visibilitySettings,
-        }),
+        body: JSON.stringify(profileData),
       })
 
       if (!response.ok) {
@@ -1167,7 +1172,10 @@ export function CreatorProfileEditor() {
 
                 <FontSelector
                   value={profile.fontFamily}
-                  onChange={(font) => setProfile({ ...profile, fontFamily: font })}
+                  onChange={(font) => {
+                    console.log('[FONT] Changing fontFamily from', profile.fontFamily, 'to', font)
+                    setProfile({ ...profile, fontFamily: font })
+                  }}
                   disabled={isSaving}
                 />
               </div>
