@@ -325,14 +325,6 @@ export function Navbar() {
                             <UsersIcon />
                             Referidos
                           </Link>
-                          <Link
-                            href="/creator/import"
-                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                            onClick={() => setShowUserMenu(false)}
-                          >
-                            <ImportIcon />
-                            Importar
-                          </Link>
                         </>
                       )}
                       <button
