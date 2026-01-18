@@ -104,7 +104,7 @@ export default function CreatorSubscriptionsPage() {
               }`}
             >
               <CreditCard className="w-4 h-4 inline mr-2" />
-              Planes ({user.creatorProfile?.subscriptionTiers?.length || 0})
+              Planes ({(user as any).subscriptionTiers?.length || 0})
             </button>
             <button
               onClick={() => setActiveTab('subscribers')}
@@ -121,7 +121,7 @@ export default function CreatorSubscriptionsPage() {
 
           {/* Content */}
           {activeTab === 'tiers' ? (
-            <SubscriptionTiersManager />
+            <SubscriptionTiersManager token={token || ''} />
           ) : (
             <div className="bg-white/5 rounded-2xl border border-white/10 p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Tus Suscriptores Activos</h2>

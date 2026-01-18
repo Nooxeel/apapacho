@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { authApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { login } = useAuthStore()
@@ -249,5 +249,27 @@ export default function LoginPage() {
         </div>
       </Card>
     </div>
+  )
+}
+
+// Loading fallback for Suspense
+function LoginFallback() {
+  return (
+    <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center px-4 py-8">
+      <Card variant="glass" className="w-full max-w-md">
+        <div className="p-8 text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-fuchsia-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-white/60">Cargando...</p>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginContent />
+    </Suspense>
   )
 }

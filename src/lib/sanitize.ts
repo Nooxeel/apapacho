@@ -3,13 +3,38 @@
  * Solo se ejecuta en el cliente para evitar problemas con SSR
  */
 
-// Lazy load DOMPurify solo en el cliente
+// Lazy load DOMPurify solo en el cliente con promesa para tracking
 let DOMPurify: any = null
+let domPurifyReady: Promise<void> | null = null
 
+// Inicializar inmediatamente en el cliente
 if (typeof window !== 'undefined') {
-  import('dompurify').then((module) => {
+  domPurifyReady = import('dompurify').then((module) => {
     DOMPurify = module.default
+  }).catch((err) => {
+    console.error('Failed to load DOMPurify:', err)
   })
+}
+
+/**
+ * Espera a que DOMPurify esté listo (útil para componentes críticos)
+ * Uso: await ensureSanitizerReady() antes de operaciones sensibles
+ */
+export async function ensureSanitizerReady(): Promise<boolean> {
+  if (typeof window === 'undefined') return false
+  if (DOMPurify) return true
+  if (domPurifyReady) {
+    await domPurifyReady
+    return !!DOMPurify
+  }
+  return false
+}
+
+/**
+ * Verifica si DOMPurify está disponible (sync check)
+ */
+export function isSanitizerReady(): boolean {
+  return !!DOMPurify
 }
 
 /**
