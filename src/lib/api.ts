@@ -531,6 +531,21 @@ export const creatorEarningsApi = {
   },
 }
 
+// Users API
+export const usersApi = {
+  // Search users by username or displayName
+  search: (query: string, token: string, limit = 10) =>
+    api<{
+      users: Array<{
+        id: string;
+        username: string;
+        displayName: string;
+        avatar?: string;
+        isCreator: boolean;
+      }>;
+    }>(`/users/search?q=${encodeURIComponent(query)}&limit=${limit}`, { token }),
+}
+
 // Block Lists API
 export const blockApi = {
   // Block a user

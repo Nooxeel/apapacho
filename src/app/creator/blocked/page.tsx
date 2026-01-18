@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Navbar } from '@/components/layout'
 import { useAuthStore } from '@/stores/authStore'
-import { blockApi } from '@/lib/api'
+import { blockApi, usersApi } from '@/lib/api'
 import { 
   Shield, 
   ShieldOff, 
@@ -14,8 +14,18 @@ import {
   UserX,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
+  Plus,
+  X
 } from 'lucide-react'
+
+interface SearchUser {
+  id: string
+  username: string
+  displayName: string
+  avatar?: string
+  isCreator: boolean
+}
 
 interface BlockedUser {
   id: string
@@ -41,6 +51,14 @@ export default function BlockedUsersPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
   const [unblockingId, setUnblockingId] = useState<string | null>(null)
+  
+  // Search for new users to block
+  const [showSearchModal, setShowSearchModal] = useState(false)
+  const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchUser[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [blockingId, setBlockingId] = useState<string | null>(null)
+  const [blockReason, setBlockReason] = useState('')
 
   useEffect(() => {
     if (!hasHydrated) return
@@ -96,6 +114,73 @@ export default function BlockedUsersPage() {
       alert(err.message || 'Error al desbloquear usuario')
     } finally {
       setUnblockingId(null)
+    }
+  }
+
+  // Search for users to block
+  const handleSearchUsers = useCallback(async (query: string) => {
+    if (!token || query.trim().length < 2) {
+      setSearchResults([])
+      return
+    }
+    
+    setIsSearching(true)
+    try {
+      const response = await usersApi.search(query, token, 10)
+      // Filter out already blocked users
+      const blockedIds = blockedUsers.map(b => b.user.id)
+      const filteredResults = response.users.filter(u => !blockedIds.includes(u.id))
+      setSearchResults(filteredResults)
+    } catch (err) {
+      console.error('Error searching users:', err)
+    } finally {
+      setIsSearching(false)
+    }
+  }, [token, blockedUsers])
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (userSearchQuery.trim().length >= 2) {
+        handleSearchUsers(userSearchQuery)
+      } else {
+        setSearchResults([])
+      }
+    }, 300)
+    
+    return () => clearTimeout(timer)
+  }, [userSearchQuery, handleSearchUsers])
+
+  const handleBlockUser = async (userId: string, username: string) => {
+    if (!token) return
+    
+    setBlockingId(userId)
+    
+    try {
+      await blockApi.blockUser(userId, blockReason || undefined, token)
+      // Add to blocked list
+      const blockedUser = searchResults.find(u => u.id === userId)
+      if (blockedUser) {
+        setBlockedUsers(prev => [{
+          id: Date.now().toString(), // Temporary ID
+          user: {
+            id: blockedUser.id,
+            username: blockedUser.username,
+            displayName: blockedUser.displayName,
+            avatar: blockedUser.avatar
+          },
+          reason: blockReason || undefined,
+          createdAt: new Date().toISOString()
+        }, ...prev])
+        setTotal(prev => prev + 1)
+      }
+      // Remove from search results
+      setSearchResults(prev => prev.filter(u => u.id !== userId))
+      setBlockReason('')
+    } catch (err: any) {
+      alert(err.message || 'Error al bloquear usuario')
+    } finally {
+      setBlockingId(null)
     }
   }
 
@@ -170,15 +255,105 @@ export default function BlockedUsersPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
               <input
                 type="text"
-                placeholder="Buscar por nombre o username..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar usuario para bloquear..."
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+                onFocus={() => setShowSearchModal(true)}
                 className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 
                          focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500
                          placeholder:text-white/40"
               />
+              
+              {/* Search Results Dropdown */}
+              {showSearchModal && userSearchQuery.length >= 2 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a24] border border-white/10 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto">
+                  {isSearching ? (
+                    <div className="flex items-center justify-center py-6">
+                      <Loader2 className="w-5 h-5 animate-spin text-fuchsia-500" />
+                    </div>
+                  ) : searchResults.length === 0 ? (
+                    <div className="p-4 text-center text-white/60">
+                      <UserX className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No se encontraron usuarios</p>
+                    </div>
+                  ) : (
+                    <div className="p-2">
+                      {searchResults.map(result => (
+                        <div
+                          key={result.id}
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors"
+                        >
+                          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-br from-fuchsia-500 to-pink-500">
+                            {result.avatar ? (
+                              <Image
+                                src={result.avatar}
+                                alt={result.displayName}
+                                width={40}
+                                height={40}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="w-full h-full flex items-center justify-center text-white font-semibold">
+                                {result.displayName.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-white truncate">{result.displayName}</p>
+                            <p className="text-sm text-white/60">@{result.username}</p>
+                          </div>
+                          <button
+                            onClick={() => handleBlockUser(result.id, result.username)}
+                            disabled={blockingId === result.id}
+                            className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors disabled:opacity-50 flex items-center gap-1"
+                          >
+                            {blockingId === result.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Shield className="w-4 h-4" />
+                                Bloquear
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+            
+            {/* Close dropdown when clicking outside */}
+            {showSearchModal && (
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => {
+                  setShowSearchModal(false)
+                  setUserSearchQuery('')
+                  setSearchResults([])
+                }}
+              />
+            )}
           </div>
+          
+          {/* Filter blocked list */}
+          {blockedUsers.length > 0 && (
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <input
+                  type="text"
+                  placeholder="Filtrar lista de bloqueados..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm
+                           focus:outline-none focus:ring-1 focus:ring-white/20
+                           placeholder:text-white/40"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Error State */}
           {error && (
