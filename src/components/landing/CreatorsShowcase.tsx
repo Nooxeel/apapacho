@@ -23,7 +23,7 @@ const mockCreators = [
     avatar: '',
     backgroundColor: '#7c3aed',
     coverGradient: 'from-purple-600 via-violet-500 to-indigo-500',
-    category: 'Contenido',
+    postsCount: 0,
     subscribers: 0,
     isOnline: true,
   },
@@ -34,7 +34,7 @@ const mockCreators = [
     avatar: '',
     backgroundColor: '#6366f1',
     coverGradient: 'from-indigo-600 via-blue-500 to-cyan-500',
-    category: 'Tech',
+    postsCount: 0,
     subscribers: 0,
     isOnline: false,
   },
@@ -63,10 +63,10 @@ export function CreatorsShowcase() {
             name: c.user?.displayName || c.displayName || 'Usuario',
             username: c.user?.username || c.username || 'usuario',
             avatar: c.user?.avatar || c.profileImage || '',
-            backgroundColor: c.backgroundColor || '#7c3aed', // Color del perfil del creador
+            backgroundColor: c.backgroundColor || '#7c3aed',
             coverGradient: 'from-purple-600 via-violet-500 to-indigo-500',
-            category: 'Contenido',
-            subscribers: 0,
+            postsCount: c.stats?.postsCount || c._count?.posts || 0,
+            subscribers: c.stats?.subscribersCount || c._count?.subscribers || 0,
             isOnline: Math.random() > 0.5,
           }))
           setCreators(formatted.length > 0 ? formatted : mockCreators)
@@ -152,9 +152,10 @@ export function CreatorsShowcase() {
                 <p className="text-white/50 text-base mb-3">@{creator.username}</p>
 
                 <div className="flex items-center justify-center gap-3">
-                  <Badge variant="primary" size="sm">
-                    {creator.category}
-                  </Badge>
+                  <span className="text-white/50 text-base">
+                    {creator.postsCount || 0} posts
+                  </span>
+                  <span className="text-white/30">•</span>
                   <span className="text-white/50 text-base">
                     {formatSubscribers(creator.subscribers)} subs
                   </span>
