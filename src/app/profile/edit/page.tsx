@@ -47,7 +47,7 @@ interface ProfileData {
 
 export default function ProfileEditPage() {
   const router = useRouter()
-  const { token, logout, hasHydrated, updateUser } = useAuthStore()
+  const { token, logout, hasHydrated, updateUser, user } = useAuthStore()
   const { clearPreviewFont } = useFontContext()
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
@@ -81,8 +81,14 @@ export default function ProfileEditPage() {
       return
     }
 
+    // Si es creador, redirigir a /creator/edit
+    if (user?.isCreator) {
+      router.replace('/creator/edit')
+      return
+    }
+
     loadProfile(token)
-  }, [token, hasHydrated, router])
+  }, [token, hasHydrated, router, user])
 
   const loadProfile = async (authToken: string) => {
     setIsLoading(true)
