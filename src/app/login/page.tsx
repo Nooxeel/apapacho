@@ -225,7 +225,15 @@ function LoginContent() {
                     >
                       Términos y Condiciones
                     </Link>
-                    {' '}y confirmo que soy mayor de 18 años
+                    {' '}y la{' '}
+                    <Link 
+                      href="/privacidad" 
+                      target="_blank"
+                      className="text-fuchsia-400 hover:text-fuchsia-300 underline"
+                    >
+                      Política de Privacidad
+                    </Link>
+                    , y confirmo que soy mayor de 18 años
                   </span>
                 </label>
               </>

@@ -4,6 +4,7 @@ import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 import { AgeVerificationProvider } from '@/components/providers/AgeVerificationProvider'
 import { ContentProtection } from '@/components/ui/ContentProtection'
+import CookieConsent from '@/components/ui/CookieConsent'
 
 // Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font (body text, buttons) - CRITICAL for LCP
@@ -73,6 +74,7 @@ export default function RootLayout({
             {children}
           </AgeVerificationProvider>
         </FontProvider>
+        <CookieConsent />
       </body>
     </html>
   )
