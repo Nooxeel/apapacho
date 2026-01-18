@@ -105,13 +105,15 @@ export default function ChatModal({ conversationId, otherUser, onClose }: ChatMo
         <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setIsMinimized(false)}>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Image
-                src={otherUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.displayName)}&background=a21caf&color=fff`}
-                alt={otherUser.displayName}
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full object-cover"
-              />
+              <div className="w-10 h-10 rounded-full overflow-hidden">
+                <Image
+                  src={otherUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.displayName)}&background=a21caf&color=fff`}
+                  alt={otherUser.displayName}
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-800 rounded-full" />
             </div>
             <div>
@@ -131,13 +133,15 @@ export default function ChatModal({ conversationId, otherUser, onClose }: ChatMo
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Image
-              src={otherUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.displayName)}&background=a21caf&color=fff`}
-              alt={otherUser.displayName}
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full object-cover"
-            />
+            <div className="w-10 h-10 rounded-full overflow-hidden">
+              <Image
+                src={otherUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.displayName)}&background=a21caf&color=fff`}
+                alt={otherUser.displayName}
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface-800 rounded-full" />
           </div>
           <div>

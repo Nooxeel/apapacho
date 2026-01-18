@@ -253,13 +253,15 @@ export default function DiscoverPage() {
                 >
                   {/* Avatar & Name */}
                   <div className="flex items-start gap-4 mb-4">
-                    <Image
-                      src={creator.profileImage || creator.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.displayName)}&background=a21caf&color=fff`}
-                      alt={creator.displayName}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
+                    <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                      <Image
+                        src={creator.profileImage || creator.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.displayName)}&background=a21caf&color=fff`}
+                        alt={creator.displayName}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">

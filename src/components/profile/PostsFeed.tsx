@@ -523,13 +523,15 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
                           return (
                             <div key={comment.id} className="flex gap-3">
-                              <Image
-                                src={comment.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.displayName)}&background=a21caf&color=fff`}
-                                alt={comment.user.displayName}
-                                width={32}
-                                height={32}
-                                className="w-8 h-8 rounded-full object-cover"
-                              />
+                              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={comment.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.displayName)}&background=a21caf&color=fff`}
+                                  alt={comment.user.displayName}
+                                  width={32}
+                                  height={32}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
                               <div className="flex-1">
                                 <div className="bg-white/10 rounded-2xl px-4 py-2">
                                   <div className="flex items-center gap-2 mb-1">
