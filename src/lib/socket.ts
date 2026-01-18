@@ -13,11 +13,18 @@ class SocketService {
   private listeners: Map<string, Set<Function>> = new Map()
   private connectionCount = 0 // Track number of components using the socket
   private currentUserId: string | null = null // Track current user
+  private authToken: string | null = null // Auth token for WebSocket
 
-  connect(userId: string) {
+  connect(userId: string, token?: string) {
     this.connectionCount++
     this.currentUserId = userId
+    this.authToken = token || localStorage.getItem('apapacho-token')
     log(`[Socket] Connection count: ${this.connectionCount}, userId: ${userId}`)
+    
+    if (!this.authToken) {
+      log('[Socket] No auth token available, skipping connection')
+      return
+    }
     
     if (this.socket?.connected) {
       log('[Socket] Already connected, re-joining user room')
@@ -32,7 +39,10 @@ class SocketService {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5
+      reconnectionAttempts: 5,
+      auth: {
+        token: this.authToken
+      }
     })
 
     this.socket.on('connect', () => {
@@ -57,7 +67,19 @@ class SocketService {
 
     this.socket.on('connect_error', (error) => {
       // Solo loggear error en desarrollo, en producción puede ser normal
-      if (isDev) console.error('❌ WebSocket connection error:', error)
+      if (isDev) console.error('❌ WebSocket connection error:', error.message)
+      
+      // If authentication error, clear token and disconnect
+      if (error.message === 'Authentication required' || error.message === 'Invalid or expired token') {
+        log('[Socket] Authentication failed, disconnecting')
+        this.authToken = null
+        this.disconnect()
+      }
+    })
+
+    // Handle server-side errors
+    this.socket.on('error', (error: { message: string }) => {
+      log('[Socket] Server error:', error.message)
     })
 
     // Setup event listeners with logging
