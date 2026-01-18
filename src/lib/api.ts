@@ -37,6 +37,7 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
       headers,
       body: body ? JSON.stringify(body) : undefined,
       signal,
+      credentials: 'include', // Send httpOnly cookies for authentication
     })
 
     if (!response.ok) {

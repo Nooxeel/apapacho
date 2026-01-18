@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User, Creator } from '@/types'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+
 interface AuthState {
   user: User | Creator | null
   token: string | null
@@ -10,7 +12,7 @@ interface AuthState {
   isLoading: boolean
   hasHydrated: boolean
   login: (user: User | Creator, token: string) => void
-  logout: () => void
+  logout: () => Promise<void>
   updateUser: (updates: Partial<User | Creator>) => void
   setHasHydrated: (state: boolean) => void
   isTokenValid: () => boolean
@@ -39,12 +41,24 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => set({
-        user: null,
-        token: null,
-        tokenExpiry: null,
-        isAuthenticated: false
-      }),
+      logout: async () => {
+        // Clear httpOnly cookie on backend
+        try {
+          await fetch(`${API_URL}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include',
+          })
+        } catch {
+          // Ignore errors - still clear local state
+        }
+        
+        set({
+          user: null,
+          token: null,
+          tokenExpiry: null,
+          isAuthenticated: false
+        })
+      },
 
       updateUser: (updates) =>
         set((state) => ({
