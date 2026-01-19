@@ -7,7 +7,7 @@ import { Button } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
 import { messageApi } from '@/lib/api'
 import { socketService } from '@/lib/socket'
-import { LevelBadge } from '@/components/gamification'
+import { AvatarWithProgressCompact } from '@/components/gamification'
 import Image from 'next/image'
 
 // Inline icons to avoid loading full lucide-react bundle
@@ -208,27 +208,23 @@ export function Navbar() {
                       aria-label="Menú de usuario"
                       aria-expanded={showUserMenu}
                     >
-                      <div className="relative">
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
-                          {user.avatar ? (
-                            <Image
-                              src={user.avatar}
-                              alt={user.displayName}
-                              width={32}
-                              height={32}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
+                      <AvatarWithProgressCompact size={36} strokeWidth={3}>
+                        {user.avatar ? (
+                          <Image
+                            src={user.avatar}
+                            alt={user.displayName}
+                            width={30}
+                            height={30}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-fuchsia-500 to-pink-500 flex items-center justify-center">
                             <span className="text-white font-semibold text-sm">
                               {user.displayName.charAt(0).toUpperCase()}
                             </span>
-                          )}
-                        </div>
-                        {/* Level Badge */}
-                        <div className="absolute -bottom-1 -right-1">
-                          <LevelBadge className="!px-1 !py-0.5 !text-[10px] scale-90" />
-                        </div>
-                      </div>
+                          </div>
+                        )}
+                      </AvatarWithProgressCompact>
                       <span className="text-white font-medium">{user.displayName}</span>
                     </button>
                   

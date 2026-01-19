@@ -1169,6 +1169,11 @@ export interface PublicUserBadges {
     icon: string
     color: string
   } | null
+  progress: {
+    current: number
+    needed: number
+    percentage: number
+  } | null
   totalBadges: number
 }
 

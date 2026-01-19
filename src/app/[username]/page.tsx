@@ -28,7 +28,7 @@ import {
   Check,
   X
 } from 'lucide-react'
-import { LevelBadge } from '@/components/gamification'
+import { AvatarWithProgress } from '@/components/gamification'
 
 interface CreatorProfile {
   id: string
@@ -566,24 +566,21 @@ export default function CreatorPublicProfile() {
         <div className="max-w-4xl mx-auto px-4">
           {/* Profile Image */}
           <div className="flex flex-col items-center">
-            <div className="relative">
-              <div 
-                className="relative w-36 h-36 rounded-full overflow-hidden border-4 shadow-lg"
-                style={{ borderColor: profile.accentColor }}
-              >
-                <Image
-                  src={profileImageUrl}
-                  alt={creator.displayName}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 150px, 200px"
-                />
-              </div>
-              {/* Level Badge */}
-              <div className="absolute -bottom-1 right-2">
-                <LevelBadge userId={creator.id} className="!text-sm" />
-              </div>
-            </div>
+            <AvatarWithProgress
+              userId={creator.id}
+              size={152}
+              strokeWidth={5}
+              accentColor={profile.accentColor}
+              showLevelBadge={true}
+            >
+              <Image
+                src={profileImageUrl}
+                alt={creator.displayName}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 150px, 200px"
+              />
+            </AvatarWithProgress>
 
             {/* Title with verification */}
             <div className="mt-4 flex items-center gap-2">
