@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { uploadApi, ApiError, subscriptionsApi } from '@/lib/api';
 import { API_URL } from '@/lib/config';
+import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay } from '@/components/gamification';
 import {
   User,
   Heart,
@@ -22,7 +23,8 @@ import {
   Video,
   Image as ImageIcon,
   ArrowRight,
-  Users
+  Users,
+  Trophy
 } from 'lucide-react';
 
 interface Subscription {
@@ -109,7 +111,7 @@ export default function DashboardPage() {
   const { user, token, logout, updateUser, hasHydrated } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [activeTab, setActiveTab] = useState<'subscriptions' | 'favorites' | 'payments' | 'comments'>('favorites');
+  const [activeTab, setActiveTab] = useState<'subscriptions' | 'favorites' | 'payments' | 'comments' | 'rankings'>('favorites');
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -603,6 +605,17 @@ export default function DashboardPage() {
             <MessageCircle className="w-4 h-4 inline mr-2" />
             Comentarios ({comments.length})
           </button>
+          <button
+            onClick={() => setActiveTab('rankings')}
+            className={`pb-3 px-2 font-medium transition-colors ${
+              activeTab === 'rankings'
+                ? 'text-fuchsia-400 border-b-2 border-fuchsia-400'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            <Trophy className="w-4 h-4 inline mr-2" />
+            🔥 Rankings
+          </button>
         </div>
 
         {/* Content */}
@@ -872,6 +885,20 @@ export default function DashboardPage() {
               <p className="text-sm mt-2">Tus comentarios en perfiles de creadores aparecerán aquí</p>
             </div>
           )
+        ) : activeTab === 'rankings' ? (
+          <div className="space-y-6">
+            {/* Level & Streak row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <LevelDisplay variant="full" />
+              <StreakDisplay variant="full" />
+            </div>
+            
+            {/* Badges */}
+            <BadgesDisplay variant="full" />
+            
+            {/* Leaderboard */}
+            <Leaderboard showMyRank={true} />
+          </div>
         ) : null}
       </div>
 

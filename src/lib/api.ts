@@ -1019,4 +1019,202 @@ export const importApi = {
     }),
 }
 
+// ==================== GAMIFICATION API ====================
+
+export interface StreakInfo {
+  currentStreak: number
+  lastLoginDate: string
+  milestones: {
+    days: number
+    bonus: number
+    badge?: string
+    achieved: boolean
+    isCurrent: boolean
+  }[]
+  nextMilestone: {
+    days: number
+    bonus: number
+    daysRemaining: number
+    progress: number
+  } | null
+  achievedCount: number
+  totalBonusEarned: number
+}
+
+export interface UserPointsInfo {
+  points: number
+  totalEarned: number
+  totalSpent: number
+  loginStreak: number
+  lastLoginDate: string
+  streak: {
+    current: number
+    nextMilestone: {
+      days: number
+      bonus: number
+      daysRemaining: number
+    } | null
+  }
+}
+
+export interface LeaderboardEntry {
+  rank: number
+  userId: string
+  username: string
+  displayName: string
+  avatar: string | null
+  totalAmount?: number
+  donationCount?: number
+  totalEarned?: number
+  currentPoints?: number
+  loginStreak?: number
+}
+
+export interface LeaderboardResponse {
+  leaderboard: LeaderboardEntry[]
+  updatedAt: string
+  period?: string
+  creator?: {
+    id: string
+    username: string
+    displayName: string
+  }
+}
+
+export interface MyRankResponse {
+  tipping: {
+    rank: number
+    totalAmount: number
+    donationCount: number
+  }
+  points: {
+    rank: number
+    totalEarned: number
+    currentPoints: number
+  } | null
+  streak: {
+    rank: number
+    currentStreak: number
+  } | null
+}
+
+// ==================== BADGES & LEVELS TYPES ====================
+
+export type BadgeCategory = 'TIPPING' | 'STREAK' | 'SOCIAL' | 'LOYALTY' | 'MILESTONE' | 'SPECIAL';
+export type BadgeRarity = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
+
+export interface Badge {
+  id: string
+  code: string
+  name: string
+  description: string
+  icon: string
+  category: BadgeCategory
+  rarity: BadgeRarity
+  pointsReward: number
+  earned?: boolean
+  earnedAt?: string | null
+}
+
+export interface UserBadgesResponse {
+  badges: Badge[]
+  byCategory: Record<BadgeCategory, Badge[]>
+  stats: {
+    total: number
+    earned: number
+    percentage: number
+  }
+  newBadges: string[]
+}
+
+export interface FanLevel {
+  level: number
+  name: string
+  minXp: number
+  icon: string
+  color: string
+  perks: string[]
+}
+
+export interface UserLevelResponse {
+  currentXp: number
+  level: number
+  levelName: string
+  levelIcon: string
+  levelColor: string
+  perks: string[]
+  nextLevel: {
+    level: number
+    name: string
+    xpNeeded: number
+  } | null
+  progress: {
+    current: number
+    needed: number
+    percentage: number
+  } | null
+}
+
+export interface PublicUserBadges {
+  badges: {
+    code: string
+    name: string
+    icon: string
+    rarity: BadgeRarity
+    earnedAt: string
+  }[]
+  level: {
+    level: number
+    name: string
+    icon: string
+    color: string
+  } | null
+  totalBadges: number
+}
+
+export const gamificationApi = {
+  // Points & Streak
+  getPoints: (token: string) =>
+    api<UserPointsInfo>('/roulette/points', { token }),
+
+  getStreakInfo: (token: string) =>
+    api<StreakInfo>('/roulette/streak', { token }),
+
+  // Leaderboards
+  getTopTippers: (params?: { limit?: number; days?: number }) =>
+    api<LeaderboardResponse>(`/leaderboard/tippers${params ? `?limit=${params.limit || 10}&days=${params.days || 30}` : ''}`),
+
+  getCreatorTopTippers: (creatorId: string, params?: { limit?: number; days?: number }) =>
+    api<LeaderboardResponse>(`/leaderboard/tippers/${creatorId}${params ? `?limit=${params.limit || 10}&days=${params.days || 30}` : ''}`),
+
+  getTopPoints: (limit?: number) =>
+    api<LeaderboardResponse>(`/leaderboard/points${limit ? `?limit=${limit}` : ''}`),
+
+  getTopStreaks: (limit?: number) =>
+    api<LeaderboardResponse>(`/leaderboard/streaks${limit ? `?limit=${limit}` : ''}`),
+
+  getMyRank: (token: string, days?: number) =>
+    api<MyRankResponse>(`/leaderboard/my-rank${days ? `?days=${days}` : ''}`, { token }),
+
+  // Badges
+  getAllBadges: () =>
+    api<{ badges: Badge[] }>('/gamification/badges'),
+
+  getMyBadges: (token: string) =>
+    api<UserBadgesResponse>('/gamification/my-badges', { token }),
+
+  checkBadges: (token: string) =>
+    api<{ newBadges: Badge[] }>('/gamification/check-badges', { token, method: 'POST' }),
+
+  getUserBadges: (userId: string) =>
+    api<PublicUserBadges>(`/gamification/user/${userId}/badges`),
+
+  // Levels
+  getAllLevels: () =>
+    api<{ levels: FanLevel[] }>('/gamification/levels'),
+
+  getMyLevel: (token: string) =>
+    api<UserLevelResponse>('/gamification/my-level', { token }),
+}
+
 export default api
