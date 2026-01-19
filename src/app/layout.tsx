@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   keywords: ['creadores', 'contenido', 'suscripciones', 'personalización'],
   metadataBase: new URL('https://apapacho.vercel.app'),
   openGraph: {
-    title: 'Apapacho - Tu Plataforma de Contenido',
+    title: 'Appapacho - Tu Plataforma de Contenido',
     description: 'Plataforma para creadores de contenido con personalización total estilo MySpace',
     type: 'website',
   },

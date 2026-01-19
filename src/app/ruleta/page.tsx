@@ -123,7 +123,7 @@ export default function RouletaPage() {
               </div>
               <h3 className="text-xl font-bold text-white mb-2">1. Gana Puntos</h3>
               <p className="text-white/60">
-                Recibe 1 punto cada día que inicies sesión en Apapacho
+                Recibe 1 punto cada día que inicies sesión en Appapacho
               </p>
             </div>
 

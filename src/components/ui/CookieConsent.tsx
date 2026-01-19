@@ -84,7 +84,7 @@ export default function CookieConsent() {
                 🍪 Usamos cookies
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Utilizamos cookies para mejorar tu experiencia en Apapacho. Las cookies esenciales son necesarias 
+                Utilizamos cookies para mejorar tu experiencia en Appapacho. Las cookies esenciales son necesarias 
                 para el funcionamiento del sitio. Puedes elegir aceptar todas las cookies o personalizar tus preferencias.
                 {' '}
                 <Link href="/privacidad" className="text-pink-400 hover:text-pink-300 underline">

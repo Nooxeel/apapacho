@@ -774,7 +774,7 @@ export function CreatorProfileEditor() {
                     placeholder="tunombre"
                     value={profile.username}
                     onChange={(e) => setProfile(prev => ({ ...prev, username: e.target.value }))}
-                    helperText={`apapacho.com/${profile.username}`}
+                    helperText={`appapacho.cl/${profile.username}`}
                     leftIcon={<span className="text-white/50">@</span>}
                     disabled
                   />

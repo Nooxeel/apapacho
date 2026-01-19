@@ -73,7 +73,7 @@ export default function FontSelector({ value, onChange, disabled }: FontSelector
                   className="text-xl text-white/90 leading-tight mb-1"
                   style={{ fontFamily: getFontFamily(font.value) }}
                 >
-                  Apapacho
+                  Appapacho
                 </p>
                 <p
                   className="text-sm text-white/60"

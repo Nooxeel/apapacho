@@ -9,7 +9,7 @@ import { Check, Shield, Server, Lock, Headphones, Palette, Crown, ArrowRight, Do
 const HOLD_DIAS = 7;
 const FRECUENCIA_PAGO = 'semanal';
 const MIN_RETIRO = '$20.000';
-const EMAIL_SOPORTE = 'soporte@apapacho.com';
+const EMAIL_SOPORTE = 'soporte@appapacho.cl';
 
 export default function TarifasPage() {
   return (
@@ -109,7 +109,7 @@ export default function TarifasPage() {
                   <span className="text-5xl font-bold gradient-text">10%</span>
                   <span className="text-white/60">de comisión</span>
                 </div>
-                <p className="text-white/70">Para todos los creadores que ingresan a Apapacho</p>
+                <p className="text-white/70">Para todos los creadores que ingresan a Appapacho</p>
               </div>
               
               <ul className="space-y-3 mb-8">
@@ -223,7 +223,7 @@ export default function TarifasPage() {
                   <span className="font-semibold">$500.000 CLP</span>
                 </div>
                 <div className="flex justify-between border-b border-white/10 pb-2">
-                  <span>Comisión Apapacho (10%):</span>
+                  <span>Comisión Appapacho (10%):</span>
                   <span className="text-red-400">- $50.000 CLP</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-2">
@@ -245,7 +245,7 @@ export default function TarifasPage() {
                   <span className="font-semibold">$500.000 CLP</span>
                 </div>
                 <div className="flex justify-between border-b border-white/10 pb-2">
-                  <span>Comisión Apapacho (7%):</span>
+                  <span>Comisión Appapacho (7%):</span>
                   <span className="text-red-400">- $35.000 CLP</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-2">
@@ -421,7 +421,7 @@ export default function TarifasPage() {
                 ¿Hay cuota mensual o costo de inscripción?
               </h3>
               <p className="text-white/70">
-                No. Apapacho es 100% gratuito para empezar como creador. Solo cobramos el porcentaje (10% o 7%) sobre cada transacción exitosa que realices. Si no vendes nada, no pagas nada.
+                No. Appapacho es 100% gratuito para empezar como creador. Solo cobramos el porcentaje (10% o 7%) sobre cada transacción exitosa que realices. Si no vendes nada, no pagas nada.
               </p>
             </Card>
 
@@ -506,7 +506,7 @@ export default function TarifasPage() {
               Empieza a ganar hoy
             </h2>
             <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto">
-              Únete a Apapacho y monetiza tu contenido sin costos iniciales. Solo pagas cuando ganas.
+              Únete a Appapacho y monetiza tu contenido sin costos iniciales. Solo pagas cuando ganas.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/login">

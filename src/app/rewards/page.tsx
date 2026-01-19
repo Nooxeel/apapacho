@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
-import { gamificationApi, type UserLevelResponse } from '@/lib/api';
+import { gamificationApi, type UserLevelResponse, type UserPointsInfo } from '@/lib/api';
 import { 
   StreakDisplay, 
   Leaderboard, 
@@ -27,13 +27,15 @@ import {
   Zap,
   TrendingUp,
   Award,
-  Crown
+  Crown,
+  Coins
 } from 'lucide-react';
 
 export default function RewardsPage() {
   const router = useRouter();
   const { user, token, hasHydrated } = useAuthStore();
   const [levelData, setLevelData] = useState<UserLevelResponse | null>(null);
+  const [pointsData, setPointsData] = useState<UserPointsInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'missions' | 'badges' | 'perks' | 'leaderboard'>('missions');
 
@@ -49,8 +51,12 @@ export default function RewardsPage() {
   const loadLevelData = async () => {
     if (!token) return;
     try {
-      const data = await gamificationApi.getMyLevel(token);
-      setLevelData(data);
+      const [levelResponse, pointsResponse] = await Promise.all([
+        gamificationApi.getMyLevel(token),
+        gamificationApi.getPoints(token),
+      ]);
+      setLevelData(levelResponse);
+      setPointsData(pointsResponse);
     } catch (error) {
       console.error('Error loading level data:', error);
     } finally {
@@ -147,7 +153,7 @@ export default function RewardsPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl p-4 text-center border border-amber-500/20">
                 <Trophy className="w-6 h-6 text-amber-400 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-amber-400">{levelData?.level || 1}</p>
@@ -157,6 +163,11 @@ export default function RewardsPage() {
                 <Zap className="w-6 h-6 text-fuchsia-400 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-fuchsia-400">{levelData?.currentXp || 0}</p>
                 <p className="text-xs text-white/50">XP Total</p>
+              </div>
+              <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 rounded-xl p-4 text-center border border-yellow-500/20">
+                <Coins className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-yellow-400">{pointsData?.points || 0}</p>
+                <p className="text-xs text-white/50">Puntos</p>
               </div>
             </div>
           </div>

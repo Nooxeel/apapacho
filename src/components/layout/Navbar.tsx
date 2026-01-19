@@ -173,7 +173,7 @@ export function Navbar() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <span className="text-white font-bold text-xl">A</span>
             </div>
-            <span className="text-xl font-bold gradient-text">Apapacho</span>
+            <span className="text-xl font-bold gradient-text">Appapacho</span>
           </Link>
 
           {/* Desktop Navigation */}

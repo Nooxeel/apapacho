@@ -29,13 +29,13 @@ export default function PrivacidadPage() {
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">1. INTRODUCCIÓN</h2>
               <p>
-                En Apapacho (en adelante "nosotros", "nuestro" o "la plataforma") nos comprometemos a proteger 
+                En Appapacho (en adelante "nosotros", "nuestro" o "la plataforma") nos comprometemos a proteger 
                 la privacidad de nuestros usuarios. Esta Política de Privacidad explica cómo recopilamos, usamos, 
-                divulgamos y protegemos su información personal cuando utiliza nuestro sitio web www.apapacho.com 
+                divulgamos y protegemos su información personal cuando utiliza nuestro sitio web www.appapacho.cl 
                 y servicios relacionados.
               </p>
               <p className="mt-4">
-                Al utilizar Apapacho, usted acepta las prácticas descritas en esta política. Si no está de acuerdo 
+                Al utilizar Appapacho, usted acepta las prácticas descritas en esta política. Si no está de acuerdo 
                 con esta política, por favor no utilice nuestros servicios.
               </p>
             </section>
@@ -130,7 +130,7 @@ export default function PrivacidadPage() {
                 <li><strong>Oposición:</strong> oponerse al tratamiento de sus datos para fines específicos.</li>
               </ul>
               <p className="mt-4">
-                Para ejercer estos derechos, contáctenos a través de <a href="mailto:privacidad@apapacho.com" className="text-fuchsia-400 hover:text-fuchsia-300">privacidad@apapacho.com</a>.
+                Para ejercer estos derechos, contáctenos a través de <a href="mailto:privacidad@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">privacidad@appapacho.cl</a>.
               </p>
             </section>
 
@@ -151,7 +151,7 @@ export default function PrivacidadPage() {
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">9. MENORES DE EDAD</h2>
               <p>
-                Apapacho está destinado exclusivamente a usuarios mayores de 18 años. No recopilamos 
+                Appapacho está destinado exclusivamente a usuarios mayores de 18 años. No recopilamos 
                 intencionalmente información de menores de edad. Si descubrimos que hemos recopilado datos 
                 de un menor, los eliminaremos inmediatamente.
               </p>
@@ -182,8 +182,8 @@ export default function PrivacidadPage() {
                 puede contactarnos a:
               </p>
               <ul className="list-none mt-4 space-y-2">
-                <li><strong>Email:</strong> <a href="mailto:privacidad@apapacho.com" className="text-fuchsia-400 hover:text-fuchsia-300">privacidad@apapacho.com</a></li>
-                <li><strong>Sitio web:</strong> www.apapacho.com</li>
+                <li><strong>Email:</strong> <a href="mailto:privacidad@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">privacidad@appapacho.cl</a></li>
+                <li><strong>Sitio web:</strong> www.appapacho.cl</li>
               </ul>
             </section>
 

@@ -114,7 +114,7 @@ function LoginContent() {
           {/* Logo */}
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-fuchsia-500 to-pink-500 bg-clip-text text-transparent">
-              Apapacho
+              Appapacho
             </h2>
           </div>
 
@@ -123,7 +123,7 @@ function LoginContent() {
           </h1>
           <p className="text-gray-400 text-center mb-6">
             {isLogin 
-              ? 'Ingresa a tu cuenta de Apapacho' 
+              ? 'Ingresa a tu cuenta de Appapacho' 
               : 'Únete a la comunidad de creadores'}
           </p>
 

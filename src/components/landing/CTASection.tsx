@@ -14,7 +14,7 @@ export function CTASection() {
               ¿Listo para empezar a crear?
             </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto mb-10">
-              Únete a Apapacho hoy y comienza a monetizar tu contenido. 
+              Únete a Appapacho hoy y comienza a monetizar tu contenido. 
               Sin costos de entrada, solo pagas cuando ganas.
             </p>
 

@@ -11,7 +11,7 @@ export function Footer() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
                 <span className="text-white font-bold text-xl">A</span>
               </div>
-              <span className="text-xl font-bold gradient-text">Apapacho</span>
+              <span className="text-xl font-bold gradient-text">Appapacho</span>
             </Link>
             <p className="text-white/70 text-sm">
               La plataforma más personalizable para creadores de contenido.
@@ -103,7 +103,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
             <p className="text-white/60 text-sm">
-              © 2025 Apapacho. Todos los derechos reservados.
+              © 2025 Appapacho. Todos los derechos reservados.
             </p>
             <span className="text-white/50 text-xs font-mono">
               v1.0.0

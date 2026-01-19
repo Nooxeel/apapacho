@@ -30,12 +30,12 @@ export default function TerminosPage() {
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">1. GENERALIDADES</h2>
               <p>
                 El presente documento regula los términos y condiciones generales aplicables al acceso y uso que el Usuario 
-                realizará del Sitio Web: www.apapacho.com (en adelante "Apapacho", "www.apapacho.com", o "el sitio web" 
+                realizará del Sitio Web: www.appapacho.cl (en adelante "Appapacho", "www.appapacho.cl", o "el sitio web" 
                 indistintamente), así como a cualquier tipo de información, contenido, imagen, video, audio y otro material 
-                comunicado o presente en el sitio web, así como todo servicio ofrecido por Apapacho.
+                comunicado o presente en el sitio web, así como todo servicio ofrecido por Appapacho.
               </p>
               <p className="mt-4">
-                Apapacho es un sitio web que facilita a los profesionales, aficionados, artistas o creadores de contenido, 
+                Appapacho es un sitio web que facilita a los profesionales, aficionados, artistas o creadores de contenido, 
                 un lugar donde fundar su propia comunidad de seguidores, subir imágenes, videos y archivos, y generar ingresos 
                 por medio de la venta de contenido digital y de suscripciones a su perfil.
               </p>
@@ -66,20 +66,20 @@ export default function TerminosPage() {
               <p className="mt-4">
                 El Usuario asume totalmente su responsabilidad por el mantenimiento de la confidencialidad de su contraseña 
                 o clave secreta registrada en el Sitio Web. Dicha contraseña o clave secreta es de uso personal, por lo que 
-                su entrega voluntaria a terceros por parte del Usuario no conlleva responsabilidad alguna por parte de Apapacho.
+                su entrega voluntaria a terceros por parte del Usuario no conlleva responsabilidad alguna por parte de Appapacho.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">3. RESPONSABILIDAD DE LOS USUARIOS</h2>
               <p>
-                Apapacho entrega al Usuario un servicio caracterizado por la diversidad del contenido proporcionado. 
+                Appapacho entrega al Usuario un servicio caracterizado por la diversidad del contenido proporcionado. 
                 El Usuario asume su responsabilidad al ingresar al Sitio Web, para realizar un correcto uso de este y 
                 sus contenidos. Así, esta responsabilidad se extenderá a:
               </p>
               <ul className="list-disc list-inside mt-4 space-y-2">
                 <li>
-                  Usar la información, los contenidos y/o servicios y datos ofrecidos por Apapacho, sin que sea contrario 
+                  Usar la información, los contenidos y/o servicios y datos ofrecidos por Appapacho, sin que sea contrario 
                   a estos Términos y condiciones, así como al Ordenamiento Jurídico Chileno, la Moral y el Orden Público.
                 </li>
                 <li>
@@ -87,7 +87,7 @@ export default function TerminosPage() {
                   presentes en el Sitio Web.
                 </li>
                 <li>
-                  Notificar de forma inmediata a Apapacho acerca de cualquier hecho relacionado con el uso indebido de 
+                  Notificar de forma inmediata a Appapacho acerca de cualquier hecho relacionado con el uso indebido de 
                   información registrada, tales como robo, hurto, extravío, acceso no autorizado a identificadores y/o contraseñas.
                 </li>
               </ul>
@@ -97,20 +97,20 @@ export default function TerminosPage() {
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">4. CAPACIDAD LEGAL</h2>
               <p>
                 El Usuario declara ser mayor de edad, por tanto, tener capacidad legal necesaria y suficiente para vincularse 
-                por los presentes Términos y condiciones. Por lo tanto, Apapacho no se dirige a menores de edad, declinando 
+                por los presentes Términos y condiciones. Por lo tanto, Appapacho no se dirige a menores de edad, declinando 
                 cualquier responsabilidad por el incumplimiento de este requisito.
               </p>
               <p className="mt-4">
-                En Apapacho los Creadores pueden ofrecer contenido no apto para menores de edad, por lo que usted, como usuario, 
+                En Appapacho los Creadores pueden ofrecer contenido no apto para menores de edad, por lo que usted, como usuario, 
                 declara y garantiza tener 18 años o la mayoría de edad correspondiente a su país de origen para registrarse 
-                y usar el sitio web como Creador y formar parte de un contrato vinculante con Apapacho.
+                y usar el sitio web como Creador y formar parte de un contrato vinculante con Appapacho.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">5. FUNCIONAMIENTO DEL SITIO</h2>
               <p>
-                Apapacho es una red social de pago, un sitio web de venta de contenido digital y debe ser utilizada únicamente 
+                Appapacho es una red social de pago, un sitio web de venta de contenido digital y debe ser utilizada únicamente 
                 para este fin. Para convertirse en usuario, debe registrarse proporcionando una dirección de correo válida, 
                 un nombre de usuario y una contraseña. Es una condición de uso del sitio web que toda la información suministrada 
                 sea correcta, verídica, actual y completa.
@@ -133,8 +133,8 @@ export default function TerminosPage() {
                 Los pagos se realizarán mediante transferencia bancaria u otros medios de pago disponibles en la plataforma.
               </p>
               <p className="mt-4">
-                Apapacho declara cumplir con todas las obligaciones tributarias que se devenguen por la prestación de los 
-                servicios incluidos en el sitio web. No es responsabilidad ni obligación de Apapacho el pago de los impuestos 
+                Appapacho declara cumplir con todas las obligaciones tributarias que se devenguen por la prestación de los 
+                servicios incluidos en el sitio web. No es responsabilidad ni obligación de Appapacho el pago de los impuestos 
                 con cargo a las utilidades que los y las creadoras puedan obtener por sus ventas a través del sitio web.
               </p>
             </section>
@@ -146,7 +146,7 @@ export default function TerminosPage() {
                 <li>La publicación de números de teléfono o de contacto directo en publicaciones o biografía.</li>
                 <li>La incitación o invitación a adquirir contenido fuera del sitio web.</li>
                 <li>La publicación de comentarios o mensajes de hostigamiento, difamatorios, discriminatorios de cualquier tipo.</li>
-                <li>La realización de publicaciones ajenas a la finalidad y función principal de Apapacho.</li>
+                <li>La realización de publicaciones ajenas a la finalidad y función principal de Appapacho.</li>
                 <li>La extracción de contenido de cualquier forma desde el sitio web.</li>
                 <li>Hacer mal uso de la herramienta de reportes de usuarios o publicaciones.</li>
                 <li>La publicación y/o venta de contenido de terceras personas sin su consentimiento.</li>
@@ -167,7 +167,7 @@ export default function TerminosPage() {
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">9. LIMITACIÓN DE RESPONSABILIDAD</h2>
               <p>
-                Apapacho no responderá por:
+                Appapacho no responderá por:
               </p>
               <ul className="list-disc list-inside mt-4 space-y-2">
                 <li>Uso indebido que Usuarios realicen del contenido almacenado.</li>
@@ -181,12 +181,12 @@ export default function TerminosPage() {
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">10. PROTECCIÓN DE DATOS PERSONALES</h2>
               <p>
                 En conformidad con lo establecido en la Ley No. 19.628 sobre la Protección de Datos Personales, los datos 
-                que se suministren al Sitio Web, pasan a formar parte de una base de datos perteneciente a Apapacho y serán 
+                que se suministren al Sitio Web, pasan a formar parte de una base de datos perteneciente a Appapacho y serán 
                 destinados exclusivamente para los fines que motivaron su entrega. Estos datos nunca serán comunicados o 
                 compartidos con otras empresas sin expresa autorización de su titular.
               </p>
               <p className="mt-4">
-                Apapacho garantiza a todos sus Usuarios el libre ejercicio de los derechos contemplados en la Ley No. 19.628 
+                Appapacho garantiza a todos sus Usuarios el libre ejercicio de los derechos contemplados en la Ley No. 19.628 
                 sobre la Protección de Datos Personales en lo relativo a la información, modificación, cancelación y bloqueo 
                 de sus datos personales.
               </p>
@@ -197,7 +197,7 @@ export default function TerminosPage() {
               <p>
                 Los derechos presentes en el Sitio Web, incluyendo la Propiedad Intelectual respecto al mismo Sitio Web, 
                 páginas y otro tipo de contenido (textos, material gráfico o audiovisual, logos, íconos, material descargable, 
-                códigos fuente) son de propiedad de Apapacho.
+                códigos fuente) son de propiedad de Appapacho.
               </p>
               <p className="mt-4">
                 El contenido subido por los creadores es de su propiedad y ellos son responsables de tener los derechos 
@@ -213,7 +213,7 @@ export default function TerminosPage() {
               </p>
               <p className="mt-4">
                 Es de completa responsabilidad del usuario leer estos términos antes de hacer uso del sitio web. El usuario 
-                acepta en completa conformidad los acuerdos pactados en estos términos al momento de registrarse en Apapacho 
+                acepta en completa conformidad los acuerdos pactados en estos términos al momento de registrarse en Appapacho 
                 y hacer uso de este.
               </p>
             </section>
@@ -222,7 +222,7 @@ export default function TerminosPage() {
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">13. CONTACTO</h2>
               <p>
                 Para cualquier tipo de comunicación, consulta o reclamo relacionado con el uso o funcionamiento del Sitio Web, 
-                puede contactarnos a través del correo electrónico: <span className="text-fuchsia-400">contacto@apapacho.com</span>
+                puede contactarnos a través del correo electrónico: <span className="text-fuchsia-400">contacto@appapacho.cl</span>
               </p>
             </section>
           </div>
