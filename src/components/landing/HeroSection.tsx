@@ -6,11 +6,12 @@ import Link from 'next/link'
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 bg-gradient-to-b from-[#0d0d1a] via-[#12101f] to-[#1a1528]">
-      {/* Background Effects - Optimized with GPU acceleration */}
+      {/* Background Effects - Simplified for faster paint */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[120px] animate-pulse-slow" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600/15 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-indigo-600/10 rounded-full blur-[150px]" />
+        {/* Use CSS gradients instead of blur for instant paint */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full opacity-50" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600/10 rounded-full opacity-50" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/5 rounded-full" />
       </div>
 
       {/* Subtle vignette effect */}
@@ -33,7 +34,7 @@ export function HeroSection() {
           <span className="gradient-text">tu estilo</span>
         </h1>
 
-        {/* Subtitle */}
+        {/* Subtitle - This is the LCP element */}
         <p className="text-lg md:text-xl text-white/75 max-w-3xl mx-auto mb-12 leading-relaxed">
           ¿Recuerdas cuando tu perfil era realmente <span className="text-purple-300 font-medium">tuyo</span>?
           <br className="hidden md:block" />

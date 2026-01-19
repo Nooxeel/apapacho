@@ -1,6 +1,17 @@
+import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { HeroSection } from '@/components/landing/HeroSection'
-import { Navbar } from '@/components/layout/Navbar'
+
+// Navbar is a client component - load it without blocking the hero
+const Navbar = dynamic(
+  () => import('@/components/layout/Navbar').then(mod => ({ default: mod.Navbar })),
+  { 
+    ssr: true,
+    loading: () => (
+      <nav className="fixed top-0 left-0 right-0 z-50 h-16 bg-transparent" />
+    )
+  }
+)
 
 // Lazy load below-fold components for better LCP
 // Using loading skeletons to prevent layout shift
@@ -32,9 +43,14 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Navbar />
+      {/* Hero is a pure Server Component - renders immediately without JS */}
       <HeroSection />
-      <FeaturesSection />
-      <CreatorsShowcase />
+      <Suspense fallback={<div className="h-96 bg-transparent" />}>
+        <FeaturesSection />
+      </Suspense>
+      <Suspense fallback={<div className="h-96 bg-transparent" />}>
+        <CreatorsShowcase />
+      </Suspense>
       <Footer />
     </main>
   )
