@@ -8,6 +8,7 @@ const nextConfig = {
   // Experimental optimizations for better performance
   experimental: {
     optimizeCss: true, // Optimize CSS for faster loads
+    optimizePackageImports: ['lucide-react', 'date-fns', 'lodash'], // Tree-shake large packages
   },
   
   // Reduce bundle size by excluding unused modules
@@ -15,7 +16,16 @@ const nextConfig = {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{member}}',
     },
+    'date-fns': {
+      transform: 'date-fns/{{member}}',
+    },
   },
+  
+  // Enable SWC minification (faster than Terser)
+  swcMinify: true,
+  
+  // Enable gzip compression
+  compress: true,
   
   images: {
     remotePatterns: [

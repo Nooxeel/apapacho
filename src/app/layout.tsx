@@ -13,7 +13,8 @@ const inter = Inter({
   variable: '--font-inter',
   display: 'swap',
   weight: ['400', '600', '700'],
-  preload: true, // Only preload the critical font
+  preload: true,
+  fallback: ['system-ui', 'sans-serif'], // Use system font immediately
 })
 
 // Poppins: Secondary font (headings) - also used for decorative headings
@@ -21,8 +22,9 @@ const poppins = Poppins({
   weight: ['400', '600', '700'],
   subsets: ['latin'],
   variable: '--font-poppins',
-  display: 'optional', // Don't block rendering - use fallback if not loaded
+  display: 'swap', // Changed from 'optional' to 'swap' for faster perceived load
   preload: false, // Load on-demand to reduce render-blocking
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 export const metadata: Metadata = {
@@ -57,10 +59,31 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Creator profile customization fonts - async loaded with display=swap */}
+        {/* Creator profile customization fonts - loaded async via media trick */}
         <link 
+          rel="preload"
+          as="style"
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@400;600;700&display=swap"
+        />
+        <link 
+          id="google-fonts"
           rel="stylesheet" 
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@400;600;700&display=swap"
+          media="print"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.getElementById('google-fonts').addEventListener('load', function() {
+                this.media = 'all';
+              });
+              // Fallback for when load event already fired
+              setTimeout(function() {
+                var gf = document.getElementById('google-fonts');
+                if (gf) gf.media = 'all';
+              }, 100);
+            `
+          }}
         />
         
         {/* Viewport optimization */}
