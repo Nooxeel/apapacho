@@ -12,6 +12,7 @@ import {
   BadgesDisplay, 
   LevelDisplay, 
   LevelBadge, 
+  LevelPerksDisplay,
   MissionsDisplay,
   AvatarWithProgress 
 } from '@/components/gamification';
@@ -34,7 +35,7 @@ export default function RewardsPage() {
   const { user, token, hasHydrated } = useAuthStore();
   const [levelData, setLevelData] = useState<UserLevelResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'missions' | 'badges' | 'leaderboard'>('missions');
+  const [activeTab, setActiveTab] = useState<'missions' | 'badges' | 'perks' | 'leaderboard'>('missions');
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -46,8 +47,9 @@ export default function RewardsPage() {
   }, [hasHydrated, token, router]);
 
   const loadLevelData = async () => {
+    if (!token) return;
     try {
-      const data = await gamificationApi.getUserLevel();
+      const data = await gamificationApi.getMyLevel(token);
       setLevelData(data);
     } catch (error) {
       console.error('Error loading level data:', error);
@@ -131,8 +133,10 @@ export default function RewardsPage() {
                             />
                           </div>
                           <div className="flex justify-between mt-1 text-xs text-white/50">
-                            <span>{levelData.xp} XP</span>
-                            <span>{levelData.progress.xpForNextLevel} XP para {levelData.progress.nextLevelName}</span>
+                            <span>{levelData.currentXp} XP</span>
+                            {levelData.nextLevel && (
+                              <span>{levelData.nextLevel.xpNeeded} XP para {levelData.nextLevel.name}</span>
+                            )}
                           </div>
                         </>
                       )}
@@ -143,7 +147,7 @@ export default function RewardsPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl p-4 text-center border border-amber-500/20">
                 <Trophy className="w-6 h-6 text-amber-400 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-amber-400">{levelData?.level || 1}</p>
@@ -151,13 +155,8 @@ export default function RewardsPage() {
               </div>
               <div className="bg-gradient-to-br from-fuchsia-500/20 to-fuchsia-600/10 rounded-xl p-4 text-center border border-fuchsia-500/20">
                 <Zap className="w-6 h-6 text-fuchsia-400 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-fuchsia-400">{levelData?.xp || 0}</p>
+                <p className="text-2xl font-bold text-fuchsia-400">{levelData?.currentXp || 0}</p>
                 <p className="text-xs text-white/50">XP Total</p>
-              </div>
-              <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl p-4 text-center border border-orange-500/20">
-                <Flame className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-orange-400">{levelData?.streak?.currentStreak || 0}</p>
-                <p className="text-xs text-white/50">Racha</p>
               </div>
             </div>
           </div>
@@ -189,6 +188,17 @@ export default function RewardsPage() {
             >
               <Medal className="w-5 h-5" />
               Insignias
+            </button>
+            <button
+              onClick={() => setActiveTab('perks')}
+              className={`flex items-center gap-2 px-6 py-4 font-medium transition-all border-b-2 ${
+                activeTab === 'perks' 
+                  ? 'text-green-400 border-green-400' 
+                  : 'text-white/60 border-transparent hover:text-white/80'
+              }`}
+            >
+              <Gift className="w-5 h-5" />
+              Beneficios
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
@@ -253,6 +263,57 @@ export default function RewardsPage() {
                 </div>
               </div>
               <BadgesDisplay />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'perks' && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <LevelPerksDisplay />
+            
+            {/* Benefits Info */}
+            <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                  <Gift className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Cómo obtener beneficios</h2>
+                  <p className="text-white/60 text-sm">Sube de nivel para desbloquear más recompensas</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <h3 className="font-semibold text-green-400 mb-2">💰 Descuentos en Suscripciones</h3>
+                  <p className="text-sm text-white/60">
+                    A partir del nivel 5, obtienes descuentos automáticos en todas las suscripciones. 
+                    Hasta un 15% en el nivel máximo.
+                  </p>
+                </div>
+                
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <h3 className="font-semibold text-purple-400 mb-2">⚡ Bonus de XP</h3>
+                  <p className="text-sm text-white/60">
+                    Gana XP extra en todas tus actividades. Los niveles más altos 
+                    otorgan hasta +25% de XP adicional.
+                  </p>
+                </div>
+                
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <h3 className="font-semibold text-blue-400 mb-2">⭐ Acceso Beta</h3>
+                  <p className="text-sm text-white/60">
+                    Los niveles 8+ pueden probar nuevas funciones antes que nadie.
+                  </p>
+                </div>
+                
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <h3 className="font-semibold text-yellow-400 mb-2">🛡️ Soporte Prioritario</h3>
+                  <p className="text-sm text-white/60">
+                    Alcanza el nivel 10 para obtener atención preferente del equipo de soporte.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

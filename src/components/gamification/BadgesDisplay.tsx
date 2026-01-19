@@ -33,6 +33,9 @@ const CATEGORY_NAMES: Record<BadgeCategory, string> = {
   SOCIAL: 'Social',
   LOYALTY: 'Lealtad',
   MILESTONE: 'Hitos',
+  SPENDING: 'Gasto',
+  MISSIONS: 'Misiones',
+  CREATOR: 'Creador',
   SPECIAL: 'Especiales',
 };
 

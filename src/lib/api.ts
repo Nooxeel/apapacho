@@ -1100,7 +1100,7 @@ export interface MyRankResponse {
 
 // ==================== BADGES & LEVELS TYPES ====================
 
-export type BadgeCategory = 'TIPPING' | 'STREAK' | 'SOCIAL' | 'LOYALTY' | 'MILESTONE' | 'SPECIAL';
+export type BadgeCategory = 'TIPPING' | 'STREAK' | 'SOCIAL' | 'LOYALTY' | 'MILESTONE' | 'SPENDING' | 'MISSIONS' | 'CREATOR' | 'SPECIAL';
 export type BadgeRarity = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
 export interface Badge {
@@ -1112,6 +1112,10 @@ export interface Badge {
   category: BadgeCategory
   rarity: BadgeRarity
   pointsReward: number
+  xpReward?: number
+  unlockType?: string
+  unlockValue?: number
+  isHidden?: boolean
   earned?: boolean
   earnedAt?: string | null
 }
@@ -1134,6 +1138,20 @@ export interface FanLevel {
   icon: string
   color: string
   perks: string[]
+  discountPercent?: number
+  bonusXpPercent?: number
+  canAccessBeta?: boolean
+  prioritySupport?: boolean
+}
+
+export interface LevelPerks {
+  level: number
+  name: string
+  discountPercent: number
+  bonusXpPercent: number
+  perks: string[]
+  canAccessBeta: boolean
+  prioritySupport: boolean
 }
 
 export interface UserLevelResponse {
@@ -1143,6 +1161,8 @@ export interface UserLevelResponse {
   levelIcon: string
   levelColor: string
   perks: string[]
+  discountPercent?: number
+  bonusXpPercent?: number
   nextLevel: {
     level: number
     name: string
@@ -1220,6 +1240,9 @@ export const gamificationApi = {
 
   getMyLevel: (token: string) =>
     api<UserLevelResponse>('/gamification/my-level', { token }),
+
+  getMyPerks: (token: string) =>
+    api<LevelPerks>('/gamification/my-perks', { token }),
 }
 
 // ==================== MISSIONS API ====================
@@ -1232,7 +1255,7 @@ export interface UserMission {
   description: string
   icon: string
   type: 'DAILY' | 'WEEKLY'
-  category: 'ENGAGEMENT' | 'TIPPING' | 'SOCIAL' | 'DISCOVERY'
+  category: 'ENGAGEMENT' | 'TIPPING' | 'SOCIAL' | 'DISCOVERY' | 'MESSAGING' | 'SPENDING' | 'CONTENT' | 'CREATOR_ENGAGEMENT' | 'GROWTH' | 'CREATOR_GROWTH'
   actionType: string
   targetCount: number
   progress: number
