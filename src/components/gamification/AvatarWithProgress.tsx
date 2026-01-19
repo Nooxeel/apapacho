@@ -88,6 +88,20 @@ const ProgressRing = memo(function ProgressRing({
 const progressCache = new Map<string, { data: ProgressData; timestamp: number }>();
 const CACHE_TTL = 60000; // 1 minute cache
 
+// Export function to invalidate cache (call after XP changes)
+export function invalidateProgressCache(userId?: string) {
+  if (userId) {
+    progressCache.delete(userId);
+  } else {
+    progressCache.delete('self');
+  }
+}
+
+// Export function to invalidate all cache
+export function invalidateAllProgressCache() {
+  progressCache.clear();
+}
+
 function AvatarWithProgressComponent({
   userId,
   size,
@@ -100,10 +114,22 @@ function AvatarWithProgressComponent({
   const { token, user } = useAuthStore();
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Determine the effective user ID
   const effectiveUserId = userId || user?.id;
   const cacheKey = effectiveUserId || 'self';
+
+  // Listen for XP updates
+  useEffect(() => {
+    const handleXpUpdate = () => {
+      invalidateProgressCache(userId);
+      setRefreshKey(k => k + 1);
+    };
+    
+    window.addEventListener('xp-updated', handleXpUpdate);
+    return () => window.removeEventListener('xp-updated', handleXpUpdate);
+  }, [userId]);
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -149,7 +175,7 @@ function AvatarWithProgressComponent({
     };
 
     fetchProgress();
-  }, [userId, token, cacheKey]);
+  }, [userId, token, cacheKey, refreshKey]);
 
   // Use accent color as fallback while loading
   const ringColor = progressData?.color || accentColor;
@@ -227,6 +253,18 @@ export const AvatarWithProgressCompact = memo(function AvatarWithProgressCompact
 }) {
   const { token } = useAuthStore();
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Listen for XP updates
+  useEffect(() => {
+    const handleXpUpdate = () => {
+      invalidateProgressCache();
+      setRefreshKey(k => k + 1);
+    };
+    
+    window.addEventListener('xp-updated', handleXpUpdate);
+    return () => window.removeEventListener('xp-updated', handleXpUpdate);
+  }, []);
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -255,7 +293,7 @@ export const AvatarWithProgressCompact = memo(function AvatarWithProgressCompact
     };
 
     fetchProgress();
-  }, [token]);
+  }, [token, refreshKey]);
 
   const ringColor = progressData?.color || '#d946ef';
   const percentage = progressData?.percentage || 0;

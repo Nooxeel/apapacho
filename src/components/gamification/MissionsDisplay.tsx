@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { missionsApi, UserMission, MissionsResponse } from '@/lib/api';
+import { invalidateProgressCache } from './AvatarWithProgress';
 import { Check, Clock, Gift, Target, Star, Flame } from 'lucide-react';
 
 interface MissionCardProps {
@@ -131,8 +132,12 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
     setClaimingId(userMissionId);
     try {
       await missionsApi.claimReward(token, userMissionId);
-      // Reload to update state
+      // Invalidate progress cache so avatar updates immediately
+      invalidateProgressCache();
+      // Reload missions to update state
       await loadMissions();
+      // Trigger a window event to notify other components to refresh
+      window.dispatchEvent(new CustomEvent('xp-updated'));
     } catch (error) {
       console.error('Error claiming reward:', error);
     } finally {
