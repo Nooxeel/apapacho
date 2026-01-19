@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui'
+
+// Server Component - No JavaScript sent to browser
+// All styling is pure CSS, no client-side interactivity needed
 
 export function HeroSection() {
   return (
@@ -40,38 +42,33 @@ export function HeroSection() {
           La nostalgia de MySpace con las herramientas de hoy.
         </p>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons - Pure HTML/CSS, no JS needed */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <Link href="/login">
-            <Button 
-              variant="primary" 
-              size="lg"
-              className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 border-0 px-8 py-4 text-base font-medium tracking-wide shadow-lg shadow-purple-500/25"
+          <Link 
+            href="/login"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 px-8 py-4 text-base font-medium tracking-wide shadow-lg shadow-purple-500/25 rounded-xl text-white transition-all duration-200"
+          >
+            Crea tu Espacio
+            <svg
+              className="w-5 h-5 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
             >
-              Crea tu Espacio
-              <svg
-                className="w-5 h-5 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </Button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
           </Link>
-          <Link href="/explore">
-            <Button 
-              variant="ghost" 
-              size="lg"
-              className="text-purple-200/80 hover:text-white hover:bg-purple-500/10 border border-purple-500/20 px-8 py-4"
-            >
-              Ver Ejemplos
-            </Button>
+          <Link 
+            href="/explore"
+            className="inline-flex items-center justify-center text-purple-200/80 hover:text-white hover:bg-purple-500/10 border border-purple-500/20 px-8 py-4 rounded-xl transition-all duration-200"
+          >
+            Ver Ejemplos
           </Link>
         </div>
 
@@ -104,6 +101,7 @@ export function HeroSection() {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
