@@ -1241,16 +1241,23 @@ export interface UserMission {
   pointsReward: number
   xpReward: number
   expiresAt: string
+  forCreators?: boolean
 }
 
 export interface MissionsResponse {
   daily: UserMission[]
   weekly: UserMission[]
+  creatorDaily: UserMission[]
+  creatorWeekly: UserMission[]
   summary: {
     dailyCompleted: number
     dailyTotal: number
     weeklyCompleted: number
     weeklyTotal: number
+    creatorDailyCompleted: number
+    creatorDailyTotal: number
+    creatorWeeklyCompleted: number
+    creatorWeeklyTotal: number
     unclaimedRewards: number
   }
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { missionsApi, UserMission, MissionsResponse } from '@/lib/api';
 import { invalidateProgressCache } from './AvatarWithProgress';
-import { Check, Clock, Gift, Target, Star, Flame } from 'lucide-react';
+import { Check, Clock, Gift, Target, Star, Flame, Sparkles } from 'lucide-react';
 
 interface MissionCardProps {
   mission: UserMission;
@@ -21,6 +21,11 @@ function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
       case 'TIPPING': return 'from-yellow-500 to-orange-500';
       case 'SOCIAL': return 'from-pink-500 to-fuchsia-500';
       case 'DISCOVERY': return 'from-purple-500 to-indigo-500';
+      case 'MESSAGING': return 'from-green-500 to-emerald-500';
+      case 'SPENDING': return 'from-amber-500 to-yellow-500';
+      case 'CONTENT': return 'from-rose-500 to-pink-500';
+      case 'CREATOR_ENGAGEMENT': return 'from-violet-500 to-purple-500';
+      case 'CREATOR_GROWTH': return 'from-emerald-500 to-teal-500';
       default: return 'from-gray-500 to-gray-600';
     }
   };
@@ -102,12 +107,17 @@ interface MissionsDisplayProps {
   compact?: boolean;
 }
 
+type TabType = 'daily' | 'weekly' | 'creatorDaily' | 'creatorWeekly';
+
 export default function MissionsDisplay({ compact = false }: MissionsDisplayProps) {
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
   const [missions, setMissions] = useState<MissionsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [claimingId, setClaimingId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
+  const [activeTab, setActiveTab] = useState<TabType>('daily');
+
+  const isCreator = user?.isCreator || false;
+  const hasCreatorMissions = missions && (missions.creatorDaily?.length > 0 || missions.creatorWeekly?.length > 0);
 
   const loadMissions = useCallback(async () => {
     if (!token) return;
@@ -156,13 +166,25 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
 
   if (!missions) return null;
 
-  const currentMissions = activeTab === 'daily' ? missions.daily : missions.weekly;
+  const getCurrentMissions = () => {
+    switch (activeTab) {
+      case 'daily': return missions.daily || [];
+      case 'weekly': return missions.weekly || [];
+      case 'creatorDaily': return missions.creatorDaily || [];
+      case 'creatorWeekly': return missions.creatorWeekly || [];
+      default: return [];
+    }
+  };
+
+  const currentMissions = getCurrentMissions();
   const unclaimedCount = missions.summary.unclaimedRewards;
 
   if (compact) {
     // Compact view: just show summary
-    const totalCompleted = missions.summary.dailyCompleted + missions.summary.weeklyCompleted;
-    const totalMissions = missions.summary.dailyTotal + missions.summary.weeklyTotal;
+    const totalCompleted = missions.summary.dailyCompleted + missions.summary.weeklyCompleted +
+      (missions.summary.creatorDailyCompleted || 0) + (missions.summary.creatorWeeklyCompleted || 0);
+    const totalMissions = missions.summary.dailyTotal + missions.summary.weeklyTotal +
+      (missions.summary.creatorDailyTotal || 0) + (missions.summary.creatorWeeklyTotal || 0);
     
     return (
       <div className="bg-white/5 rounded-xl p-4">
@@ -213,7 +235,7 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         <button
           onClick={() => setActiveTab('daily')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -234,6 +256,37 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
         >
           Semanales ({missions.summary.weeklyCompleted}/{missions.summary.weeklyTotal})
         </button>
+        
+        {/* Creator missions tabs - only show if user has creator missions */}
+        {hasCreatorMissions && (
+          <>
+            <div className="w-full h-px bg-white/10 my-2" />
+            <div className="flex items-center gap-2 w-full mb-1">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-xs text-amber-400 font-medium">Misiones de Creador</span>
+            </div>
+            <button
+              onClick={() => setActiveTab('creatorDaily')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'creatorDaily'
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              Diarias ({missions.summary.creatorDailyCompleted || 0}/{missions.summary.creatorDailyTotal || 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('creatorWeekly')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'creatorWeekly'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              Semanales ({missions.summary.creatorWeeklyCompleted || 0}/{missions.summary.creatorWeeklyTotal || 0})
+            </button>
+          </>
+        )}
       </div>
 
       {/* Missions List */}
@@ -241,7 +294,12 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
         {currentMissions.length === 0 ? (
           <div className="text-center py-8 text-white/40">
             <Target className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>No hay misiones {activeTab === 'daily' ? 'diarias' : 'semanales'} asignadas</p>
+            <p>
+              {activeTab === 'daily' && 'No hay misiones diarias asignadas'}
+              {activeTab === 'weekly' && 'No hay misiones semanales asignadas'}
+              {activeTab === 'creatorDaily' && 'No hay misiones de creador diarias'}
+              {activeTab === 'creatorWeekly' && 'No hay misiones de creador semanales'}
+            </p>
           </div>
         ) : (
           currentMissions.map(mission => (
