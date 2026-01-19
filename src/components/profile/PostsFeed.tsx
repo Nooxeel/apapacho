@@ -5,7 +5,8 @@ import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send
 import { Button } from '@/components/ui'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
-import { postApi } from '@/lib/api'
+import { postApi, missionsApi } from '@/lib/api'
+import { useBadgeNotification } from '@/components/gamification'
 import { sanitizePostDescription, sanitizeComment } from '@/lib/sanitize'
 import type { PostVisibility, PostComment } from '@/types'
 import { useRouter } from 'next/navigation'
@@ -44,6 +45,7 @@ interface PostsFeedProps {
 export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false, showPostTipping = true }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
+  const { checkForNewBadges } = useBadgeNotification()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -161,6 +163,12 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
           : p
       ))
       setLikedPosts(prev => ({ ...prev, [postId]: data.liked }))
+
+      // Track mission progress and check for new badges (only if liked, not unliked)
+      if (data.liked) {
+        missionsApi.trackProgress(token, 'like').catch(() => {})
+        checkForNewBadges()
+      }
     } catch (error) {
       // Revert on error
       setLikedPosts(prev => ({ ...prev, [postId]: currentLiked }))

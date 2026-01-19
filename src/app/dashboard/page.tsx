@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
-import { uploadApi, ApiError, subscriptionsApi } from '@/lib/api';
+import { uploadApi, ApiError, subscriptionsApi, gamificationApi, type UserLevelResponse } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay, LevelBadge } from '@/components/gamification';
+import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay, LevelBadge, MissionsDisplay } from '@/components/gamification';
+import { Navbar } from '@/components/layout';
 import {
   User,
   Heart,
@@ -24,7 +25,8 @@ import {
   Image as ImageIcon,
   ArrowRight,
   Users,
-  Trophy
+  Trophy,
+  Star
 } from 'lucide-react';
 
 interface Subscription {
@@ -124,6 +126,7 @@ export default function DashboardPage() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [levelData, setLevelData] = useState<UserLevelResponse | null>(null);
 
   useEffect(() => {
     // Esperar a que el store se hidrate desde localStorage
@@ -135,7 +138,18 @@ export default function DashboardPage() {
     }
 
     loadData();
+    loadLevelData();
   }, [token, router, hasHydrated]);
+
+  const loadLevelData = async () => {
+    if (!token) return;
+    try {
+      const data = await gamificationApi.getMyLevel(token);
+      setLevelData(data);
+    } catch (error) {
+      console.error('Error loading level:', error);
+    }
+  };
 
   const loadData = async () => {
     if (!token) return;
@@ -319,8 +333,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0f0f14] text-white">
+      {/* Navbar */}
+      <Navbar />
+      
       {/* Header */}
-      <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-16">
+      <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-16 pt-20">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-6">
             {/* Avatar con opción de subir */}
@@ -355,7 +372,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Info */}
-            <div className="text-center md:text-left">
+            <div className="text-center md:text-left flex-1">
               <div className="flex items-center gap-3 justify-center md:justify-start">
                 <h1 className="text-2xl font-bold">{user.displayName}</h1>
                 <LevelBadge />
@@ -363,12 +380,34 @@ export default function DashboardPage() {
               <p className="text-white/70">@{user.username}</p>
               <p className="text-white/50 text-sm mt-1">{user.email}</p>
               
-              {/* Streak compacto */}
-              <div className="mt-3">
+              {/* Level + Streak row */}
+              <div className="flex items-center gap-4 mt-3 justify-center md:justify-start flex-wrap">
+                {/* Level Progress */}
+                {levelData && (
+                  <div className="flex items-center gap-2 bg-black/20 rounded-full px-3 py-1.5">
+                    <span className="text-lg">{levelData.levelIcon}</span>
+                    <div className="text-left">
+                      <p className="text-xs text-white/70">Nivel {levelData.level}</p>
+                      <p className="text-sm font-medium" style={{ color: levelData.levelColor }}>
+                        {levelData.levelName}
+                      </p>
+                    </div>
+                    {levelData.progress && (
+                      <div className="w-16 h-1.5 bg-white/20 rounded-full overflow-hidden ml-2">
+                        <div 
+                          className="h-full rounded-full"
+                          style={{ width: `${levelData.progress.percentage}%`, backgroundColor: levelData.levelColor }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Streak compacto */}
                 <StreakDisplay variant="compact" />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 mt-3">
+              <div className="flex flex-col sm:flex-row gap-2 mt-3 justify-center md:justify-start">
                 {user.isCreator ? (
                   <Link
                     href="/creator/edit"
@@ -900,6 +939,9 @@ export default function DashboardPage() {
               <LevelDisplay variant="full" />
               <StreakDisplay variant="full" />
             </div>
+            
+            {/* Missions */}
+            <MissionsDisplay />
             
             {/* Badges */}
             <BadgesDisplay variant="full" />

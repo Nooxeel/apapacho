@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/lib/config';
 import { sanitizeComment } from '@/lib/sanitize';
-import { LevelBadge } from '@/components/gamification';
+import { missionsApi } from '@/lib/api';
+import { LevelBadge, useBadgeNotification } from '@/components/gamification';
 import Image from 'next/image';
 
 interface CommentUser {
@@ -33,6 +34,7 @@ interface CommentsProps {
 
 export default function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: CommentsProps) {
   const { user, token } = useAuthStore();
+  const { checkForNewBadges } = useBadgeNotification();
   const [comments, setComments] = useState<Comment[]>([]);
   const [pendingComments, setPendingComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -103,6 +105,12 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
       if (response.ok) {
         const comment = await response.json();
         setNewComment('');
+        
+        // Track mission progress
+        missionsApi.trackProgress(token, 'comment').catch(() => {});
+        
+        // Verificar si se desbloquearon nuevos badges
+        checkForNewBadges();
         
         if (comment.isApproved) {
           // Si fue auto-aprobado (es el dueño), añadir a comentarios visibles

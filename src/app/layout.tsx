@@ -3,6 +3,7 @@ import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 import { AgeVerificationProvider } from '@/components/providers/AgeVerificationProvider'
+import { BadgeNotificationProvider } from '@/components/gamification'
 import { ContentProtection } from '@/components/ui/ContentProtection'
 import CookieConsent from '@/components/ui/CookieConsent'
 
@@ -66,7 +67,9 @@ export default function RootLayout({
         <ContentProtection />
         <FontProvider>
           <AgeVerificationProvider>
-            {children}
+            <BadgeNotificationProvider>
+              {children}
+            </BadgeNotificationProvider>
           </AgeVerificationProvider>
         </FontProvider>
         <CookieConsent />

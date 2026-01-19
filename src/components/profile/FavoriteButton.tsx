@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/lib/config';
+import { missionsApi } from '@/lib/api';
+import { useBadgeNotification } from '@/components/gamification';
 
 interface FavoriteButtonProps {
   creatorId: string;
@@ -19,6 +21,7 @@ export default function FavoriteButton({
   showCount = false
 }: FavoriteButtonProps) {
   const { user, token } = useAuthStore();
+  const { checkForNewBadges } = useBadgeNotification();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [count, setCount] = useState(0);
@@ -112,6 +115,12 @@ export default function FavoriteButton({
         if (response.ok) {
           setIsFavorite(true);
           if (showCount) setCount(prev => prev + 1);
+          
+          // Track mission progress
+          missionsApi.trackProgress(token, 'favorite').catch(() => {});
+          
+          // Verificar si se desbloquearon nuevos badges
+          checkForNewBadges();
         }
       }
     } catch (err) {

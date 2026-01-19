@@ -1217,4 +1217,63 @@ export const gamificationApi = {
     api<UserLevelResponse>('/gamification/my-level', { token }),
 }
 
+// ==================== MISSIONS API ====================
+
+export interface UserMission {
+  id: string
+  missionId: string
+  code: string
+  name: string
+  description: string
+  icon: string
+  type: 'DAILY' | 'WEEKLY'
+  category: 'ENGAGEMENT' | 'TIPPING' | 'SOCIAL' | 'DISCOVERY'
+  actionType: string
+  targetCount: number
+  progress: number
+  completed: boolean
+  claimed: boolean
+  pointsReward: number
+  xpReward: number
+  expiresAt: string
+}
+
+export interface MissionsResponse {
+  daily: UserMission[]
+  weekly: UserMission[]
+  summary: {
+    dailyCompleted: number
+    dailyTotal: number
+    weeklyCompleted: number
+    weeklyTotal: number
+    unclaimedRewards: number
+  }
+}
+
+export interface ClaimRewardResponse {
+  success: boolean
+  reward: {
+    points: number
+    xp: number
+  }
+  message: string
+}
+
+export const missionsApi = {
+  // Get user's current missions
+  getMissions: (token: string) =>
+    api<MissionsResponse>('/missions', { token }),
+
+  // Claim a completed mission's reward
+  claimReward: (token: string, userMissionId: string) =>
+    api<ClaimRewardResponse>(`/missions/${userMissionId}/claim`, { token, method: 'POST' }),
+
+  // Track mission progress (called internally after actions)
+  trackProgress: (token: string, actionType: string, count?: number) =>
+    api<{ success: boolean; missionsUpdated: number; completedMissions: string[] }>(
+      '/missions/track',
+      { token, method: 'POST', body: { actionType, count: count || 1 } }
+    ),
+}
+
 export default api

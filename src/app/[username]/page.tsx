@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { creatorApi, subscriptionsApi, promocodesApi } from '@/lib/api'
+import { creatorApi, subscriptionsApi, promocodesApi, missionsApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
@@ -197,6 +197,11 @@ export default function CreatorPublicProfile() {
             setIsSubscriber(subCheck.isSubscribed)
           } catch (error) {
             console.error('Error checking subscription:', error)
+          }
+
+          // Track profile visit for missions (only if not viewing own profile)
+          if (user.id !== data.id) {
+            missionsApi.trackProgress(token, 'visit').catch(() => {})
           }
         }
       } catch (err) {
