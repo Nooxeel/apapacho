@@ -88,7 +88,7 @@ export default function CookieConsent() {
                 para el funcionamiento del sitio. Puedes elegir aceptar todas las cookies o personalizar tus preferencias.
                 {' '}
                 <Link href="/privacidad" className="text-pink-400 hover:text-pink-300 underline">
-                  Más información
+                  Consulta nuestra Política de Privacidad
                 </Link>
               </p>
             </div>
