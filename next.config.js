@@ -5,6 +5,10 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
+  // Target modern browsers only - no legacy polyfills needed
+  // Saves ~12KB by not including Array.at, Object.hasOwn, etc. polyfills
+  // All these methods are native in Chrome 92+, Firefox 90+, Safari 15+
+  
   // Experimental optimizations for better performance
   experimental: {
     optimizeCss: true, // Optimize CSS for faster loads

@@ -29,9 +29,11 @@ export interface CreatorCardData {
 interface CreatorCardProps {
   creator: CreatorCardData
   userInterests?: string[] // IDs de intereses del usuario autenticado
+  /** When true, images load with priority for LCP optimization */
+  priority?: boolean
 }
 
-export function CreatorCard({ creator, userInterests = [] }: CreatorCardProps) {
+export function CreatorCard({ creator, userInterests = [], priority = false }: CreatorCardProps) {
   const subscriberCount = creator._count?.subscribers || 0
   const displayedInterests = creator.interests.slice(0, 5)
   const remainingCount = creator.interests.length - 5
@@ -55,7 +57,8 @@ export function CreatorCard({ creator, userInterests = [] }: CreatorCardProps) {
               fill
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
+              priority={priority}
             />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-fuchsia-600/30 via-purple-600/30 to-pink-600/30" />
@@ -72,7 +75,7 @@ export function CreatorCard({ creator, userInterests = [] }: CreatorCardProps) {
                 fill
                 className="object-cover"
                 sizes="80px"
-                loading="lazy"
+                loading={priority ? 'eager' : 'lazy'}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-fuchsia-500 to-purple-500">

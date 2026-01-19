@@ -11,6 +11,8 @@ interface CreatorsGridProps {
   onLoadMore?: () => void
   userInterests?: string[]
   emptyMessage?: string
+  /** Whether this is the first batch (enables priority loading for first items) */
+  isFirstBatch?: boolean
 }
 
 export function CreatorsGrid({
@@ -19,7 +21,8 @@ export function CreatorsGrid({
   hasMore,
   onLoadMore,
   userInterests = [],
-  emptyMessage = 'No se encontraron creadores'
+  emptyMessage = 'No se encontraron creadores',
+  isFirstBatch = false
 }: CreatorsGridProps) {
   // Loading state (first load)
   if (isLoading && creators.length === 0) {
@@ -73,11 +76,12 @@ export function CreatorsGrid({
   return (
     <div className="space-y-8">
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {creators.map(creator => (
+        {creators.map((creator, index) => (
           <CreatorCard
             key={creator.id}
             creator={creator}
             userInterests={userInterests}
+            priority={isFirstBatch && index < 4}
           />
         ))}
       </div>

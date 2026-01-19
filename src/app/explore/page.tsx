@@ -162,6 +162,7 @@ export default function ExplorePage() {
             onLoadMore={handleLoadMore}
             userInterests={userInterests}
             emptyMessage="No se encontraron creadores"
+            isFirstBatch={offset <= LIMIT}
           />
         </div>
       </main>
