@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { uploadApi, ApiError, subscriptionsApi } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay } from '@/components/gamification';
+import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay, LevelBadge } from '@/components/gamification';
 import {
   User,
   Heart,
@@ -356,9 +356,17 @@ export default function DashboardPage() {
 
             {/* Info */}
             <div className="text-center md:text-left">
-              <h1 className="text-2xl font-bold">{user.displayName}</h1>
+              <div className="flex items-center gap-3 justify-center md:justify-start">
+                <h1 className="text-2xl font-bold">{user.displayName}</h1>
+                <LevelBadge />
+              </div>
               <p className="text-white/70">@{user.username}</p>
               <p className="text-white/50 text-sm mt-1">{user.email}</p>
+              
+              {/* Streak compacto */}
+              <div className="mt-3">
+                <StreakDisplay variant="compact" />
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-2 mt-3">
                 {user.isCreator ? (
