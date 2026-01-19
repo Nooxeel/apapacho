@@ -2,18 +2,36 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { RouletteWheel } from '@/components/roulette'
 import { useAuthStore } from '@/stores'
 import api from '@/lib/api'
-import { Sparkles, Gift, Zap } from 'lucide-react'
+import { Sparkles, Gift, Zap, Trophy, Ticket } from 'lucide-react'
+
+interface SpinResult {
+  prizeId: number
+  prizeLabel: string
+  prizeType: string
+  pointsWon: number
+  newPoints: number
+  specialPrize?: {
+    type: 'subscription' | 'discount'
+    creatorUsername?: string | null
+    discountPercent?: number
+    spinId: string
+    expiresAt: string
+    message: string
+  }
+}
 
 export default function RouletaPage() {
   const router = useRouter()
   const { token, hasHydrated } = useAuthStore()
   const [points, setPoints] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [specialPrizes, setSpecialPrizes] = useState<any[]>([])
 
   useEffect(() => {
     if (!hasHydrated) return
@@ -23,6 +41,7 @@ export default function RouletaPage() {
     }
 
     loadPoints()
+    loadPrizes()
   }, [token, hasHydrated, router])
 
   const loadPoints = async () => {
@@ -40,13 +59,24 @@ export default function RouletaPage() {
     }
   }
 
-  const handleSpin = async (): Promise<number> => {
+  const loadPrizes = async () => {
+    if (!token) return
+    
+    try {
+      const response = await api<{ prizes: any[] }>('/roulette/prizes', { token })
+      setSpecialPrizes(response.prizes || [])
+    } catch (error) {
+      console.error('Error loading prizes:', error)
+    }
+  }
+
+  const handleSpin = async (): Promise<SpinResult> => {
     if (!token) throw new Error('No token')
     
     console.log('🎰 Spinning roulette, current points:', points)
     
     try {
-      const response = await api<{ prizeId: number; newPoints: number }>('/roulette/spin', {
+      const response = await api<SpinResult>('/roulette/spin', {
         method: 'POST',
         token,
       })
@@ -56,10 +86,30 @@ export default function RouletaPage() {
       // Update points after spin
       setPoints(response.newPoints)
       
-      return response.prizeId
+      // Reload prizes if we won a special prize
+      if (response.specialPrize) {
+        loadPrizes()
+      }
+      
+      return response
     } catch (error: any) {
       console.error('Error spinning roulette:', error)
       throw error
+    }
+  }
+
+  const handleRedeemPrize = async (spinId: string) => {
+    if (!token) return
+    
+    try {
+      await api(`/roulette/redeem/${spinId}`, {
+        method: 'POST',
+        token,
+      })
+      loadPrizes()
+      alert('¡Premio reclamado exitosamente!')
+    } catch (error: any) {
+      alert(error.message || 'Error al reclamar premio')
     }
   }
 
@@ -106,8 +156,71 @@ export default function RouletaPage() {
           onSpin={handleSpin}
           canSpin={points >= 10}
           points={points}
+          onPrizeWon={() => loadPrizes()}
         />
       </div>
+
+      {/* My Prizes Section */}
+      {specialPrizes.length > 0 && (
+        <div className="container mx-auto px-4 mt-16">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-white text-center mb-8 flex items-center justify-center gap-3">
+              <Trophy className="h-8 w-8 text-fuchsia-400" />
+              Mis Premios
+            </h2>
+
+            <div className="space-y-4">
+              {specialPrizes.map((prize) => (
+                <div
+                  key={prize.id}
+                  className={`p-6 rounded-xl border ${
+                    prize.prizeType === 'SUBSCRIPTION'
+                      ? 'bg-emerald-500/10 border-emerald-500/50'
+                      : 'bg-orange-500/10 border-orange-500/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-4xl">
+                        {prize.prizeType === 'SUBSCRIPTION' ? '🎁' : '🎟️'}
+                      </span>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{prize.prizeLabel}</h3>
+                        <p className="text-sm text-white/60">
+                          {prize.targetCreator 
+                            ? `Para @${prize.targetCreator}`
+                            : prize.discountPercent 
+                            ? `${prize.discountPercent}% de descuento`
+                            : 'Cualquier creador'}
+                        </p>
+                        <p className="text-xs text-white/40 mt-1">
+                          Expira: {new Date(prize.expiresAt).toLocaleDateString('es-CL')}
+                        </p>
+                      </div>
+                    </div>
+                    {prize.prizeType === 'SUBSCRIPTION' && (
+                      <button
+                        onClick={() => handleRedeemPrize(prize.id)}
+                        className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors"
+                      >
+                        Reclamar
+                      </button>
+                    )}
+                    {prize.prizeType === 'DISCOUNT' && (
+                      <Link
+                        href={prize.targetCreator ? `/${prize.targetCreator}` : '/creators'}
+                        className="px-4 py-2 rounded-lg bg-orange-500 text-white font-medium hover:bg-orange-600 transition-colors"
+                      >
+                        Usar Cupón
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* How it Works */}
       <div className="container mx-auto px-4 mt-20">
@@ -159,6 +272,9 @@ export default function RouletaPage() {
 
           <div className="space-y-3">
             {[
+              { icon: '�', name: 'Suscripción GRATIS @imperfecto', chance: 'Ultra Raro', special: true },
+              { icon: '🎟️', name: '50% OFF en @gatitaveve', chance: 'Muy Raro', special: true },
+              { icon: '🎫', name: '25% OFF en cualquier sub', chance: 'Ultra Raro', special: true },
               { icon: '🏆', name: '¡Jackpot! 50 Puntos', chance: 'Ultra Raro' },
               { icon: '💎', name: '10 Puntos', chance: 'Raro' },
               { icon: '⭐', name: '5 Puntos', chance: 'Poco Común' },
@@ -169,13 +285,28 @@ export default function RouletaPage() {
             ].map((prize, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-fuchsia-500/50 transition-colors"
+                className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
+                  prize.special
+                    ? 'bg-gradient-to-r from-fuchsia-500/10 to-purple-500/10 border-fuchsia-500/50 hover:border-fuchsia-400'
+                    : 'bg-white/5 border-white/10 hover:border-fuchsia-500/50'
+                }`}
               >
                 <div className="flex items-center gap-4">
                   <span className="text-3xl">{prize.icon}</span>
-                  <span className="font-medium text-white">{prize.name}</span>
+                  <span className={`font-medium ${prize.special ? 'text-fuchsia-300' : 'text-white'}`}>
+                    {prize.name}
+                  </span>
+                  {prize.special && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30">
+                      ¡ESPECIAL!
+                    </span>
+                  )}
                 </div>
-                <span className="text-sm text-white/60 px-3 py-1 rounded-full bg-white/5">
+                <span className={`text-sm px-3 py-1 rounded-full ${
+                  prize.special 
+                    ? 'bg-fuchsia-500/20 text-fuchsia-300' 
+                    : 'bg-white/5 text-white/60'
+                }`}>
                   {prize.chance}
                 </span>
               </div>

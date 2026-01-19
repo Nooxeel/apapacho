@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui'
-import { Sparkles, Trophy } from 'lucide-react'
+import { Sparkles, Trophy, Gift, Ticket, Star } from 'lucide-react'
 
 interface Prize {
   id: number
@@ -10,28 +10,52 @@ interface Prize {
   color: string
   icon: string
   probability: number
+  type: 'POINTS' | 'SUBSCRIPTION' | 'DISCOUNT' | 'RETRY'
 }
 
 const prizes: Prize[] = [
-  { id: 1, label: '10 Puntos', color: '#d946ef', icon: '💎', probability: 0.05 },
-  { id: 2, label: '5 Puntos', color: '#f43f5e', icon: '⭐', probability: 0.15 },
-  { id: 3, label: '3 Puntos', color: '#ec4899', icon: '🎁', probability: 0.20 },
-  { id: 4, label: '2 Puntos', color: '#a855f7', icon: '🎉', probability: 0.25 },
-  { id: 5, label: '1 Punto', color: '#8b5cf6', icon: '✨', probability: 0.30 },
-  { id: 6, label: 'Intenta de nuevo', color: '#6366f1', icon: '🔄', probability: 0.03 },
-  { id: 7, label: '¡Jackpot! 50 Puntos', color: '#fbbf24', icon: '🏆', probability: 0.02 },
+  { id: 1, label: '10 Puntos', color: '#d946ef', icon: '💎', probability: 0.05, type: 'POINTS' },
+  { id: 2, label: '5 Puntos', color: '#f43f5e', icon: '⭐', probability: 0.13, type: 'POINTS' },
+  { id: 3, label: '3 Puntos', color: '#ec4899', icon: '🎁', probability: 0.18, type: 'POINTS' },
+  { id: 4, label: '2 Puntos', color: '#a855f7', icon: '🎉', probability: 0.23, type: 'POINTS' },
+  { id: 5, label: '1 Punto', color: '#8b5cf6', icon: '✨', probability: 0.28, type: 'POINTS' },
+  { id: 6, label: 'Intenta de nuevo', color: '#6366f1', icon: '🔄', probability: 0.05, type: 'RETRY' },
+  { id: 7, label: '50 Puntos', color: '#fbbf24', icon: '🏆', probability: 0.02, type: 'POINTS' },
+  { id: 8, label: 'Sub @imperfecto', color: '#10b981', icon: '🎁', probability: 0.02, type: 'SUBSCRIPTION' },
+  { id: 9, label: '50% @gatitaveve', color: '#f97316', icon: '🎟️', probability: 0.03, type: 'DISCOUNT' },
+  { id: 10, label: '25% cualquier', color: '#06b6d4', icon: '🎫', probability: 0.01, type: 'DISCOUNT' },
 ]
 
-interface RouletteWheelProps {
-  onSpin: () => Promise<number> // Returns prize ID
-  canSpin: boolean
-  points: number
+interface SpecialPrize {
+  type: 'subscription' | 'discount'
+  creatorUsername?: string | null
+  discountPercent?: number
+  spinId: string
+  expiresAt: string
+  message: string
 }
 
-export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
+interface SpinResult {
+  prizeId: number
+  prizeLabel: string
+  prizeType: string
+  pointsWon: number
+  newPoints: number
+  specialPrize?: SpecialPrize
+}
+
+interface RouletteWheelProps {
+  onSpin: () => Promise<SpinResult>
+  canSpin: boolean
+  points: number
+  onPrizeWon?: (prize: SpecialPrize) => void
+}
+
+export function RouletteWheel({ onSpin, canSpin, points, onPrizeWon }: RouletteWheelProps) {
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [winner, setWinner] = useState<Prize | null>(null)
+  const [specialPrize, setSpecialPrize] = useState<SpecialPrize | null>(null)
   const wheelRef = useRef<HTMLDivElement>(null)
 
   const handleSpin = async () => {
@@ -39,10 +63,11 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
 
     setIsSpinning(true)
     setWinner(null)
+    setSpecialPrize(null)
 
     try {
-      const prizeId = await onSpin()
-      const prizeIndex = prizes.findIndex(p => p.id === prizeId)
+      const result = await onSpin()
+      const prizeIndex = prizes.findIndex(p => p.id === result.prizeId)
       
       if (prizeIndex !== -1) {
         // Calculate rotation to land on the prize
@@ -56,6 +81,10 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
         // Wait for animation to complete
         setTimeout(() => {
           setWinner(prizes[prizeIndex])
+          if (result.specialPrize) {
+            setSpecialPrize(result.specialPrize)
+            onPrizeWon?.(result.specialPrize)
+          }
           setIsSpinning(false)
         }, 6000)
       }
@@ -178,11 +207,59 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
       {/* Winner Display */}
       {winner && (
         <div className="animate-bounce-in">
-          <div className="bg-gradient-to-r from-fuchsia-500/20 to-purple-500/20 border-2 border-fuchsia-500 rounded-2xl p-6 max-w-md">
+          <div className={`border-2 rounded-2xl p-6 max-w-md ${
+            winner.type === 'SUBSCRIPTION' 
+              ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-emerald-500' 
+              : winner.type === 'DISCOUNT'
+              ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 border-orange-500'
+              : winner.type === 'RETRY'
+              ? 'bg-gradient-to-r from-slate-500/20 to-gray-500/20 border-slate-500'
+              : 'bg-gradient-to-r from-fuchsia-500/20 to-purple-500/20 border-fuchsia-500'
+          }`}>
             <div className="text-center">
               <div className="text-6xl mb-3">{winner.icon}</div>
-              <h3 className="text-2xl font-bold text-white mb-2">¡Felicidades!</h3>
-              <p className="text-xl text-white/80">Ganaste: {winner.label}</p>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                {winner.type === 'SUBSCRIPTION' ? '🎉 ¡PREMIO ESPECIAL!' : 
+                 winner.type === 'DISCOUNT' ? '🎟️ ¡CUPÓN GANADO!' :
+                 winner.type === 'RETRY' ? '😅 Próxima vez...' :
+                 '¡Felicidades!'}
+              </h3>
+              <p className="text-xl text-white/80">{winner.label}</p>
+              
+              {/* Special prize details */}
+              {specialPrize && (
+                <div className="mt-4 p-4 bg-black/30 rounded-xl">
+                  {specialPrize.type === 'subscription' ? (
+                    <>
+                      <p className="text-lg text-emerald-400 font-bold">
+                        <Gift className="inline h-5 w-5 mr-2" />
+                        ¡Suscripción GRATIS!
+                      </p>
+                      <p className="text-white/70 mt-2">
+                        Ganaste un mes gratis a <span className="text-white font-bold">@{specialPrize.creatorUsername}</span>
+                      </p>
+                      <p className="text-xs text-white/50 mt-2">
+                        Ve a &quot;Mis Premios&quot; para reclamar tu suscripción
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-lg text-orange-400 font-bold">
+                        <Ticket className="inline h-5 w-5 mr-2" />
+                        ¡Cupón de {specialPrize.discountPercent}% OFF!
+                      </p>
+                      <p className="text-white/70 mt-2">
+                        {specialPrize.creatorUsername 
+                          ? <>Válido para <span className="text-white font-bold">@{specialPrize.creatorUsername}</span></>
+                          : 'Válido para cualquier creador'}
+                      </p>
+                      <p className="text-xs text-white/50 mt-2">
+                        Expira el {new Date(specialPrize.expiresAt).toLocaleDateString('es-CL')}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -193,6 +270,9 @@ export function RouletteWheel({ onSpin, canSpin, points }: RouletteWheelProps) {
         <p className="text-sm text-white/60">
           Cada giro cuesta <span className="font-bold text-fuchsia-400">10 puntos</span>.
           Gana más puntos iniciando sesión diariamente (+1 punto por día).
+        </p>
+        <p className="text-xs text-white/40 mt-2">
+          🎁 Premios especiales: Suscripciones gratis y cupones de descuento
         </p>
       </div>
     </div>
