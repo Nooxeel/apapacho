@@ -177,14 +177,14 @@ export default function CookieConsent() {
               >
                 Guardar preferencias
               </button>
-            ) : (
-              <button
-                onClick={rejectOptional}
-                className="px-4 py-2.5 text-gray-300 hover:text-white border border-white/20 rounded-lg transition-colors text-sm font-medium"
-              >
-                Solo esenciales
-              </button>
-            )}
+            ) : null}
+            
+            <button
+              onClick={rejectOptional}
+              className="px-4 py-2.5 text-gray-300 hover:text-white border border-white/20 rounded-lg transition-colors text-sm font-medium"
+            >
+              Rechazar opcionales
+            </button>
             
             <button
               onClick={acceptAll}
