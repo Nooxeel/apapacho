@@ -5,6 +5,7 @@ interface ApiOptions {
   body?: any
   token?: string
   signal?: AbortSignal
+  skipRefresh?: boolean // Skip auto-refresh on 401 (to prevent loops)
 }
 
 export class ApiError extends Error {
@@ -20,8 +21,27 @@ export class ApiError extends Error {
   }
 }
 
+// Helper to refresh token
+async function tryRefreshToken(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_URL}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      return data.token
+    }
+  } catch {
+    // Refresh failed
+  }
+  return null
+}
+
 async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-  const { method = 'GET', body, token, signal } = options
+  const { method = 'GET', body, token, signal, skipRefresh = false } = options
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -39,6 +59,15 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
       signal,
       credentials: 'include', // Send httpOnly cookies for authentication
     })
+
+    // If 401 and not skipping refresh, try to refresh token and retry
+    if (response.status === 401 && !skipRefresh && token) {
+      const newToken = await tryRefreshToken()
+      if (newToken) {
+        // Retry with new token
+        return api<T>(endpoint, { ...options, token: newToken, skipRefresh: true })
+      }
+    }
 
     if (!response.ok) {
       let errorMessage = 'API request failed'
