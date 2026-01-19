@@ -67,7 +67,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#0d0d1a" />
       </head>
-      <body className={`${inter.variable} ${poppins.variable}`}>
+      <body className={`${inter.variable} ${poppins.variable} font-sans`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
         <ContentProtection />
         <FontProvider>
           <AgeVerificationProvider>

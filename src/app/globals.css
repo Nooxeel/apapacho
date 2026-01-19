@@ -28,9 +28,11 @@
   font-family: Montserrat, system-ui, sans-serif;
 }
 
-/* Default font for the entire app - Inter for performance */
-body {
-  font-family: var(--font-inter), system-ui, sans-serif;
+/* Default font utility classes - fonts are applied via inline styles on creator profiles */
+
+/* Force all elements to inherit font-family from their parent */
+* {
+  font-family: inherit;
 }
 
 :root {
