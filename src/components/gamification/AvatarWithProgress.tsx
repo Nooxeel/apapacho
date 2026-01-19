@@ -211,17 +211,19 @@ function AvatarWithProgressComponent({
 // Export memoized version for optimal performance
 export const AvatarWithProgress = memo(AvatarWithProgressComponent);
 
-// Compact version for navbar (smaller, no badge text)
+// Compact version for navbar (smaller, with level badge)
 export const AvatarWithProgressCompact = memo(function AvatarWithProgressCompact({
   size = 32,
   strokeWidth = 3,
   children,
   className = '',
+  showLevelBadge = true,
 }: {
   size?: number;
   strokeWidth?: number;
   children: React.ReactNode;
   className?: string;
+  showLevelBadge?: boolean;
 }) {
   const { token } = useAuthStore();
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
@@ -281,6 +283,23 @@ export const AvatarWithProgressCompact = memo(function AvatarWithProgressCompact
       >
         {children}
       </div>
+      
+      {/* Level Badge */}
+      {showLevelBadge && progressData && (
+        <div 
+          className="absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full font-bold shadow-lg border border-black/20"
+          style={{
+            width: Math.max(14, size * 0.4),
+            height: Math.max(14, size * 0.4),
+            backgroundColor: progressData.color,
+            color: '#fff',
+            fontSize: Math.max(8, size * 0.25),
+          }}
+          title={`Nivel ${progressData.level}`}
+        >
+          {progressData.level}
+        </div>
+      )}
     </div>
   );
 });
