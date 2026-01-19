@@ -136,63 +136,59 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-8 text-center">
-        {/* Warning Icon */}
-        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-          <svg className="w-10 h-10 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+      <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
+        {/* Warning Icon - smaller */}
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
+          <svg className="w-7 h-7 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-white mb-2">
+        <h2 className="text-xl font-bold text-white mb-2">
           Contenido para Adultos
         </h2>
 
-        <p className="text-zinc-400 mb-6">
+        <p className="text-zinc-400 text-sm mb-4">
           Esta plataforma contiene contenido explícito para adultos mayores de 18 años.
         </p>
 
         {step === 'confirm' ? (
           <>
-            <p className="text-zinc-300 mb-8">
+            <p className="text-zinc-300 text-sm mb-6">
               Al continuar, confirmas que tienes al menos <span className="text-fuchsia-400 font-bold">18 años</span> de edad y que es legal ver este tipo de contenido en tu jurisdicción.
             </p>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <button
                 onClick={handleConfirm}
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50 text-sm"
               >
                 {loading ? 'Verificando...' : 'Sí, tengo 18+ años'}
               </button>
               
               <button
                 onClick={handleDecline}
-                className="w-full py-3 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all"
+                className="w-full py-2.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all text-sm"
               >
                 No, salir del sitio
               </button>
             </div>
 
-            {token && (
-              <button
-                onClick={() => setStep('birthdate')}
-                className="mt-4 text-sm text-zinc-300 hover:text-white underline"
-              >
-                Verificar con fecha de nacimiento
-              </button>
-            )}
+            <p className="mt-4 text-xs text-zinc-500">
+              Al acceder aceptas nuestros{' '}
+              <a href="/terminos" className="text-fuchsia-400 hover:underline">Términos de Servicio</a>
+            </p>
           </>
         ) : (
           <form onSubmit={handleBirthdateSubmit}>
-            <p className="text-zinc-300 mb-6">
+            <p className="text-zinc-300 text-sm mb-4">
               Por favor ingresa tu fecha de nacimiento para verificar tu edad.
             </p>
 
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block text-sm text-zinc-400 mb-2 text-left">
                 Fecha de Nacimiento
               </label>
@@ -201,20 +197,20 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
                 value={birthdate}
                 onChange={(e) => setBirthdate(e.target.value)}
                 max={new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-fuchsia-500"
+                className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:border-fuchsia-500"
                 required
               />
             </div>
 
             {error && (
-              <p className="text-red-400 text-sm mb-4">{error}</p>
+              <p className="text-red-400 text-xs mb-3">{error}</p>
             )}
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50 text-sm"
               >
                 {loading ? 'Verificando...' : 'Verificar Edad'}
               </button>
@@ -222,7 +218,7 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
               <button
                 type="button"
                 onClick={handleDecline}
-                className="w-full py-3 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all"
+                className="w-full py-2.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all text-sm"
               >
                 Salir del sitio
               </button>
@@ -231,20 +227,12 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
             <button
               type="button"
               onClick={() => setStep('confirm')}
-              className="mt-4 text-sm text-zinc-300 hover:text-white underline"
+              className="mt-3 text-xs text-zinc-400 hover:text-white underline"
             >
               Volver
             </button>
           </form>
         )}
-
-        {/* Legal disclaimer */}
-        <p className="mt-6 text-xs text-zinc-400">
-          Al acceder aceptas nuestros{' '}
-          <a href="/terminos" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
-            Términos de Servicio
-          </a>
-        </p>
       </div>
     </div>
   )
