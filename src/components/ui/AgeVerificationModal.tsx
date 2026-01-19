@@ -129,110 +129,59 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
   // Don't render until we check status
   if (isVerified === null) {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90">
-        <div className="animate-spin w-8 h-8 border-4 border-fuchsia-500 border-t-transparent rounded-full" />
+      <div className="fixed bottom-0 left-0 right-0 z-[100] p-4">
+        <div className="max-w-4xl mx-auto bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 flex items-center justify-center">
+          <div className="animate-spin w-6 h-6 border-3 border-fuchsia-500 border-t-transparent rounded-full" />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-      <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
-        {/* Warning Icon - smaller */}
-        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-          <svg className="w-7 h-7 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
+    <div className="fixed bottom-0 left-0 right-0 z-[100] p-4 animate-in slide-in-from-bottom duration-500">
+      <div className="max-w-4xl mx-auto bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-start gap-4">
+            {/* Warning Icon */}
+            <div className="w-12 h-12 bg-fuchsia-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
 
-        {/* Title */}
-        <h2 className="text-xl font-bold text-white mb-2">
-          Contenido para Adultos
-        </h2>
+            {/* Content */}
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-1">
+                🔞 Contenido para Adultos
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Esta plataforma contiene contenido explícito para adultos mayores de 18 años. 
+                Al continuar, confirmas que tienes al menos <span className="text-fuchsia-400 font-bold">18 años</span> de edad.{' '}
+                <a href="/terminos" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
+                  Términos de Servicio
+                </a>
+              </p>
+            </div>
 
-        <p className="text-zinc-400 text-sm mb-4">
-          Esta plataforma contiene contenido explícito para adultos mayores de 18 años.
-        </p>
-
-        {step === 'confirm' ? (
-          <>
-            <p className="text-zinc-300 text-sm mb-6">
-              Al continuar, confirmas que tienes al menos <span className="text-fuchsia-400 font-bold">18 años</span> de edad y que es legal ver este tipo de contenido en tu jurisdicción.
-            </p>
-
-            <div className="flex flex-col gap-2">
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
               <button
                 onClick={handleConfirm}
                 disabled={loading}
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50 text-sm"
+                className="px-6 py-2.5 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50 text-sm whitespace-nowrap"
               >
                 {loading ? 'Verificando...' : 'Sí, tengo 18+ años'}
               </button>
               
               <button
                 onClick={handleDecline}
-                className="w-full py-2.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all text-sm"
+                className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all text-sm whitespace-nowrap"
               >
-                No, salir del sitio
+                Salir
               </button>
             </div>
-
-            <p className="mt-4 text-xs text-zinc-500">
-              Al acceder aceptas nuestros{' '}
-              <a href="/terminos" className="text-fuchsia-400 hover:underline">Términos de Servicio</a>
-            </p>
-          </>
-        ) : (
-          <form onSubmit={handleBirthdateSubmit}>
-            <p className="text-zinc-300 text-sm mb-4">
-              Por favor ingresa tu fecha de nacimiento para verificar tu edad.
-            </p>
-
-            <div className="mb-4">
-              <label className="block text-sm text-zinc-400 mb-2 text-left">
-                Fecha de Nacimiento
-              </label>
-              <input
-                type="date"
-                value={birthdate}
-                onChange={(e) => setBirthdate(e.target.value)}
-                max={new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-sm focus:outline-none focus:border-fuchsia-500"
-                required
-              />
-            </div>
-
-            {error && (
-              <p className="text-red-400 text-xs mb-3">{error}</p>
-            )}
-
-            <div className="flex flex-col gap-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-500 hover:to-pink-500 text-white font-semibold rounded-xl transition-all disabled:opacity-50 text-sm"
-              >
-                {loading ? 'Verificando...' : 'Verificar Edad'}
-              </button>
-              
-              <button
-                type="button"
-                onClick={handleDecline}
-                className="w-full py-2.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl transition-all text-sm"
-              >
-                Salir del sitio
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setStep('confirm')}
-              className="mt-3 text-xs text-zinc-400 hover:text-white underline"
-            >
-              Volver
-            </button>
-          </form>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   )
