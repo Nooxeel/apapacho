@@ -94,6 +94,14 @@ const ImportIcon = () => (
   </svg>
 )
 
+const TrophyIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8 21h8m-4-4v4m-4.5-8.5L12 17l4.5-4.5M6 4h12a2 2 0 012 2v2a6 6 0 01-6 6h0a6 6 0 01-6-6V6a2 2 0 012-2z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h1v4a4 4 0 004 4" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M20 6a2 2 0 00-2-2h-1v4a4 4 0 01-4 4" />
+  </svg>
+)
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -173,6 +181,10 @@ export function Navbar() {
             <Link href="/explore" className="text-white/70 hover:text-white transition-colors">
               Explorar
             </Link>
+            <Link href="/rewards" className="text-white/70 hover:text-white transition-colors flex items-center gap-1.5">
+              <TrophyIcon className="w-4 h-4" />
+              Recompensas
+            </Link>
             <Link href="/ruleta" className="text-white/70 hover:text-white transition-colors">
               Ruleta
             </Link>
@@ -238,6 +250,16 @@ export function Navbar() {
                         <UserIcon />
                         Dashboard
                       </Link>
+                      {user.isCreator && (
+                        <Link
+                          href="/creator/edit"
+                          className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <SettingsIcon />
+                          Editar Perfil
+                        </Link>
+                      )}
                       <Link
                         href={user.isCreator ? `/${user.username}` : '/profile/edit'}
                         className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
@@ -254,6 +276,16 @@ export function Navbar() {
                         <MessageCircleIcon className="w-4 h-4" />
                         Mensajes
                       </Link>
+                      {user.isCreator && (
+                        <Link
+                          href="/creator/posts"
+                          className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <FileTextIcon />
+                          Mis Posts
+                        </Link>
+                      )}
                       <Link
                         href="/settings"
                         className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
@@ -279,22 +311,6 @@ export function Navbar() {
                           >
                             <UsersIcon />
                             Suscripciones
-                          </Link>
-                          <Link
-                            href="/creator/posts"
-                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                            onClick={() => setShowUserMenu(false)}
-                          >
-                            <FileTextIcon />
-                            Mis Posts
-                          </Link>
-                          <Link
-                            href="/creator/edit"
-                            className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                            onClick={() => setShowUserMenu(false)}
-                          >
-                            <SettingsIcon />
-                            Editar Perfil
                           </Link>
                           <Link
                             href="/creator/blocked"
@@ -407,6 +423,13 @@ export function Navbar() {
                 className="text-white/70 hover:text-white transition-colors px-2 py-1"
               >
                 Explorar
+              </Link>
+              <Link
+                href="/rewards"
+                className="text-white/70 hover:text-white transition-colors px-2 py-1 flex items-center gap-2"
+              >
+                <TrophyIcon className="w-4 h-4" />
+                Recompensas
               </Link>
               <Link
                 href="/ruleta"

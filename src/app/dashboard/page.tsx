@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { uploadApi, ApiError, subscriptionsApi, gamificationApi, type UserLevelResponse } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay, LevelBadge, MissionsDisplay } from '@/components/gamification';
+import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay, LevelBadge, MissionsDisplay, AvatarWithProgress } from '@/components/gamification';
 import { Navbar } from '@/components/layout';
 import {
   User,
@@ -342,7 +342,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row items-center gap-6">
             {/* Avatar con opción de subir */}
             <div className="relative group">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 shadow-lg">
+              <AvatarWithProgress size={128}>
                 <Image
                   src={getUserAvatar()}
                   alt={user.displayName}
@@ -350,7 +350,7 @@ export default function DashboardPage() {
                   height={128}
                   className="object-cover w-full h-full"
                 />
-              </div>
+              </AvatarWithProgress>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
