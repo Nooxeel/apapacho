@@ -180,7 +180,7 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
             {token && (
               <button
                 onClick={() => setStep('birthdate')}
-                className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 underline"
+                className="mt-4 text-sm text-zinc-300 hover:text-white underline"
               >
                 Verificar con fecha de nacimiento
               </button>
@@ -231,7 +231,7 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
             <button
               type="button"
               onClick={() => setStep('confirm')}
-              className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 underline"
+              className="mt-4 text-sm text-zinc-300 hover:text-white underline"
             >
               Volver
             </button>
@@ -239,9 +239,9 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
         )}
 
         {/* Legal disclaimer */}
-        <p className="mt-6 text-xs text-zinc-600">
+        <p className="mt-6 text-xs text-zinc-400">
           Al acceder aceptas nuestros{' '}
-          <a href="/terminos" className="text-zinc-500 hover:text-zinc-300">
+          <a href="/terminos" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
             Términos de Servicio
           </a>
         </p>
