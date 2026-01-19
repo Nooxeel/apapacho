@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { creatorApi, subscriptionsApi, promocodesApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
+import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
 import { Navbar } from '@/components/layout'
 import ChatModal from '@/components/messages/ChatModal'
 import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
@@ -530,6 +531,7 @@ export default function CreatorPublicProfile() {
 
   return (
     <>
+      <ProfileFontsLoader />
       <Navbar />
       <div 
         className="min-h-screen"
