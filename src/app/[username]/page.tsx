@@ -548,15 +548,15 @@ export default function CreatorPublicProfile() {
         }}
       >
         {/* Cover Image - Responsive height based on viewport */}
-        <div className="relative w-full h-[40vw] min-h-[200px] max-h-[450px] overflow-hidden bg-black/40">
+        <div className="relative w-full h-[35vh] md:h-[40vh] lg:h-[45vh] max-h-[500px] overflow-hidden bg-black/40">
           <Image
             src={coverImageUrl}
             alt={`${creator.displayName} cover`}
             fill
-            className="object-cover object-center"
+            className="object-cover object-top"
             sizes="100vw"
             priority
-            quality={90}
+            unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
         </div>
