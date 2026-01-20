@@ -548,17 +548,19 @@ export default function CreatorPublicProfile() {
         }}
       >
         {/* Cover Image */}
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden bg-black/40">
-          <Image
-            src={coverImageUrl}
-            alt={`${creator.displayName} cover`}
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+        <div className="relative w-full max-w-7xl mx-auto">
+          <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden bg-black/40 md:rounded-b-2xl">
+            <Image
+              src={coverImageUrl}
+              alt={`${creator.displayName} cover`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1280px) 100vw, 1280px"
+              priority
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+          </div>
         </div>
 
       {/* Profile Section */}
