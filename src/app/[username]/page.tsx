@@ -553,7 +553,7 @@ export default function CreatorPublicProfile() {
             src={coverImageUrl}
             alt={`${creator.displayName} cover`}
             fill
-            className="object-contain"
+            className="object-cover"
             sizes="100vw"
             priority
             quality={95}

@@ -102,6 +102,28 @@ const TrophyIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
   </svg>
 )
 
+// Logo with A and heart
+const LogoIcon = ({ className = "w-8 h-8" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#a855f7" />
+        <stop offset="100%" stopColor="#ec4899" />
+      </linearGradient>
+    </defs>
+    {/* Letter A */}
+    <path 
+      d="M20 4L6 36h6l2.5-6h11l2.5 6h6L20 4zm0 10l3.5 10h-7L20 14z" 
+      fill="url(#logoGradient)"
+    />
+    {/* Small heart */}
+    <path 
+      d="M32 8c-1.5-1.5-4-1.5-5.5 0L26 8.5l-.5-.5c-1.5-1.5-4-1.5-5.5 0s-1.5 4 0 5.5L26 19l6-5.5c1.5-1.5 1.5-4 0-5.5z" 
+      fill="#ec4899"
+    />
+  </svg>
+)
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -170,9 +192,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" aria-label="Ir a página de inicio">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">A</span>
-            </div>
+            <LogoIcon className="w-8 h-8" />
             <span className="text-xl font-bold gradient-text">Appapacho</span>
           </Link>
 
