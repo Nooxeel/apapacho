@@ -183,7 +183,7 @@ export default function CookieConsent() {
               onClick={rejectOptional}
               className="px-4 py-2.5 text-gray-300 hover:text-white border border-white/20 rounded-lg transition-colors text-sm font-medium"
             >
-              Rechazar opcionales
+              Rechazar todas
             </button>
             
             <button
