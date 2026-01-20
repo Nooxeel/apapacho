@@ -547,13 +547,13 @@ export default function CreatorPublicProfile() {
           fontFamily: getFontStyle(profile.fontFamily),
         }}
       >
-        {/* Cover Image - Responsive height based on viewport */}
-        <div className="relative w-full h-[35vh] md:h-[40vh] lg:h-[45vh] max-h-[500px] overflow-hidden bg-black/40">
+        {/* Cover Image */}
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden bg-black/40">
           <Image
             src={coverImageUrl}
             alt={`${creator.displayName} cover`}
             fill
-            className="object-cover object-top"
+            className="object-cover"
             sizes="100vw"
             priority
             unoptimized
