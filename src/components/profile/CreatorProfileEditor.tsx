@@ -300,8 +300,11 @@ export function CreatorProfileEditor() {
 
     try {
       // 1. Upload images first (if changed) using uploadApi
+      let newProfileImageUrl: string | null = null
+      
       if (profileImageFile && token) {
-        await uploadApi.profile(profileImageFile, token)
+        const uploadResult = await uploadApi.profile(profileImageFile, token)
+        newProfileImageUrl = uploadResult.url
       }
 
       if (coverImageFile && token) {
@@ -374,8 +377,12 @@ export function CreatorProfileEditor() {
       setProfileImageFile(null)
       setCoverImageFile(null)
 
-      // Update auth store with new font family
-      updateUser({ fontFamily: profile.fontFamily })
+      // Update auth store with new font family and avatar
+      const updates: any = { fontFamily: profile.fontFamily }
+      if (newProfileImageUrl) {
+        updates.avatar = newProfileImageUrl
+      }
+      updateUser(updates)
 
       // Clear preview font since we saved it
       clearPreviewFont()
