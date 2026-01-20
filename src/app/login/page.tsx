@@ -85,6 +85,8 @@ function LoginContent() {
         }
       }
     } catch (err: any) {
+      console.error('Auth error:', err)
+      
       // Manejar errores de validación con detalles
       if (err.message === 'Validation failed' && err.details) {
         const errors: Record<string, string> = {}
@@ -99,8 +101,18 @@ function LoginContent() {
         if (firstError) {
           setError(firstError)
         }
+      } else if (err.details && Array.isArray(err.details)) {
+        // El ApiError puede tener details directamente
+        const errors: Record<string, string> = {}
+        err.details.forEach((detail: any) => {
+          const field = detail.path?.[0] || 'general'
+          errors[field] = detail.message
+        })
+        setFieldErrors(errors)
+        const firstError = Object.values(errors)[0]
+        setError(firstError || err.message || 'Error en la autenticación')
       } else {
-        setError(err.message || 'Error en la autenticación')
+        setError(err.message || 'Error en la autenticación. Por favor, intenta de nuevo.')
       }
     } finally {
       setIsLoading(false)
