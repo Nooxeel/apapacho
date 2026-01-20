@@ -15,14 +15,17 @@ export const FONT_CLASS_MAP: Record<string, string> = {
   'Montserrat': 'font-montserrat',
 }
 
+// Emoji font stack to append to all font families
+const EMOJI_FONTS = "'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'"
+
 // Map font names to CSS font-family values for inline styles
 export const FONT_CSS_VAR_MAP: Record<string, string> = {
-  'Inter': 'Inter, var(--font-inter), system-ui, sans-serif',
-  'Poppins': 'Poppins, var(--font-poppins), system-ui, sans-serif',
-  'Playfair Display': '"Playfair Display", Georgia, serif',
-  'Roboto': 'Roboto, system-ui, sans-serif',
-  'Open Sans': '"Open Sans", system-ui, sans-serif',
-  'Montserrat': 'Montserrat, system-ui, sans-serif',
+  'Inter': `Inter, var(--font-inter), system-ui, sans-serif, ${EMOJI_FONTS}`,
+  'Poppins': `Poppins, var(--font-poppins), system-ui, sans-serif, ${EMOJI_FONTS}`,
+  'Playfair Display': `"Playfair Display", Georgia, serif, ${EMOJI_FONTS}`,
+  'Roboto': `Roboto, system-ui, sans-serif, ${EMOJI_FONTS}`,
+  'Open Sans': `"Open Sans", system-ui, sans-serif, ${EMOJI_FONTS}`,
+  'Montserrat': `Montserrat, system-ui, sans-serif, ${EMOJI_FONTS}`,
 }
 
 /**
