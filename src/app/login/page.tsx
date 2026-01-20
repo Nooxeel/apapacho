@@ -26,12 +26,18 @@ function LoginContent() {
     acceptTerms: false
   })
 
-  // Capture referral code from URL (?ref=XXXXX)
+  // Capture referral code from URL (?ref=XXXXX) and mode (?mode=register)
   useEffect(() => {
     const ref = searchParams.get('ref')
+    const mode = searchParams.get('mode')
+    
     if (ref) {
       setReferralCode(ref.toUpperCase())
       setIsLogin(false) // Switch to register mode if referral code present
+    }
+    
+    if (mode === 'register') {
+      setIsLogin(false) // Switch to register mode if mode=register
     }
   }, [searchParams])
 
@@ -68,6 +74,14 @@ function LoginContent() {
           router.push('/dashboard')
         }
       } else {
+        console.log('[REGISTER] Starting registration with data:', {
+          email: formData.email,
+          username: formData.username,
+          displayName: formData.displayName,
+          isCreator: formData.isCreator,
+          hasReferralCode: !!referralCode
+        })
+        
         const result = await authApi.register({
           email: formData.email,
           password: formData.password,
@@ -76,6 +90,8 @@ function LoginContent() {
           isCreator: formData.isCreator,
           ...(referralCode ? { referralCode } : {})
         }) as any
+        
+        console.log('[REGISTER] Registration successful:', result)
         
         localStorage.setItem('apapacho-token', result.token)
         localStorage.setItem('apapacho-user', JSON.stringify(result.user))

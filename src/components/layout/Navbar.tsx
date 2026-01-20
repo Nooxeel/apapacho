@@ -372,7 +372,7 @@ export function Navbar() {
                       Iniciar Sesión
                     </Button>
                   </Link>
-                  <Link href="/login">
+                  <Link href="/login?mode=register">
                     <Button variant="primary" size="sm">
                       Comenzar Gratis
                     </Button>
@@ -449,7 +449,7 @@ export function Navbar() {
                     Iniciar Sesión
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/login?mode=register">
                   <Button variant="primary" size="sm" className="w-full justify-center">
                     Comenzar Gratis
                   </Button>

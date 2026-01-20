@@ -51,6 +51,12 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
     headers['Authorization'] = `Bearer ${token}`
   }
 
+  // Debug logging for auth endpoints
+  const isAuthEndpoint = endpoint.includes('/auth/')
+  if (isAuthEndpoint) {
+    console.log(`[API] ${method} ${endpoint}`, body ? { ...body, password: '***' } : undefined)
+  }
+
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method,
@@ -59,6 +65,10 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
       signal,
       credentials: 'include', // Send httpOnly cookies for authentication
     })
+
+    if (isAuthEndpoint) {
+      console.log(`[API] Response status: ${response.status}`)
+    }
 
     // If 401 and not skipping refresh, try to refresh token and retry
     if (response.status === 401 && !skipRefresh && token) {
@@ -75,15 +85,20 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
 
       try {
         const contentType = response.headers.get('content-type')
+        console.log(`[API] Error response content-type: ${contentType}`)
+        
         if (contentType && contentType.includes('application/json')) {
           const errorData = await response.json()
+          console.log(`[API] Error data:`, errorData)
           errorMessage = errorData.error || errorData.message || errorMessage
           errorDetails = errorData.details
         } else {
-          errorMessage = await response.text() || errorMessage
+          const textResponse = await response.text()
+          console.log(`[API] Error text response:`, textResponse.substring(0, 200))
+          errorMessage = textResponse || errorMessage
         }
-      } catch {
-        // If parsing error response fails, use generic message
+      } catch (parseError) {
+        console.error(`[API] Failed to parse error response:`, parseError)
       }
 
       throw new ApiError(errorMessage, response.status, endpoint, method, errorDetails)
@@ -96,6 +111,8 @@ async function api<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
     }
 
     if (error instanceof Error) {
+      console.error(`[API] Network/fetch error:`, error.message)
+      
       if (error.name === 'AbortError') {
         throw new ApiError('Request cancelled', undefined, endpoint, method)
       }
