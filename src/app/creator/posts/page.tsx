@@ -55,22 +55,18 @@ export default function CreatorPostsPage() {
   const loadPosts = async () => {
     try {
       setIsLoading(true);
-      console.log('[Posts] Fetching posts with token:', token?.substring(0, 20) + '...');
       const response = await fetch(`${API_URL}/posts/my-posts`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-
-      console.log('[Posts] Response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('[Posts] Posts loaded:', data.length);
         setPosts(data);
       } else {
         const errorData = await response.json();
-        console.error('[Posts] Error response:', errorData);
+        console.error('[Posts] Error loading:', errorData.error || 'Unknown error');
       }
     } catch (error) {
       console.error('[Posts] Error loading posts:', error);

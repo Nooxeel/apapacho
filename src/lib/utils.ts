@@ -93,3 +93,17 @@ export function timeAgo(date: Date): string {
 
   return 'ahora mismo'
 }
+
+/**
+ * Extrae mensaje de error de forma type-safe
+ * Usar en catch blocks en lugar de `catch (err: any)`
+ */
+export function getErrorMessage(error: unknown, fallback = 'Error desconocido'): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  return fallback
+}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { socialLinksApi } from '@/lib/api'
+import { getErrorMessage } from '@/lib/utils'
 import { SocialLink, SocialPlatform } from '@/types'
 import { Plus, Trash2, GripVertical, Eye, EyeOff, ExternalLink, Save, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
@@ -51,9 +52,8 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
 
       setLinks(linksData)
       setPlatforms(platformsData)
-    } catch (err: any) {
-      setError(err.message || 'Error al cargar enlaces')
-      console.error(err)
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al cargar enlaces'))
     } finally {
       setIsLoading(false)
     }
@@ -110,8 +110,8 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
       setIsAdding(false)
       setSuccess('Enlace agregado correctamente')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al agregar enlace')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al agregar enlace'))
     } finally {
       setIsSaving(false)
     }
@@ -127,8 +127,8 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
       setEditingId(null)
       setSuccess('Enlace actualizado')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al actualizar enlace')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al actualizar enlace'))
     } finally {
       setIsSaving(false)
     }
@@ -145,8 +145,8 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
       setLinks(links.filter(link => link.id !== id))
       setSuccess('Enlace eliminado')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al eliminar enlace')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al eliminar enlace'))
     } finally {
       setIsSaving(false)
     }
@@ -185,8 +185,8 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
       await socialLinksApi.reorder(linkIds, token)
       setSuccess('Orden actualizado')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al reordenar')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al reordenar'))
       // Reload to restore original order
       await loadData()
     } finally {

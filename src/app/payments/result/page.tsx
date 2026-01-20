@@ -45,11 +45,8 @@ function PaymentResultContent() {
       const TBK_TOKEN = searchParams.get('TBK_TOKEN');
       const TBK_ORDEN_COMPRA = searchParams.get('TBK_ORDEN_COMPRA');
       
-      console.log('[PaymentResult] Params:', { token_ws, TBK_TOKEN, TBK_ORDEN_COMPRA });
-      
       // Case 1: User cancelled (has TBK_TOKEN)
       if (TBK_TOKEN && TBK_ORDEN_COMPRA) {
-        console.log('[PaymentResult] User cancelled payment');
         setDetails({
           status: 'CANCELLED',
           success: false,
@@ -64,7 +61,6 @@ function PaymentResultContent() {
       
       // Case 2: Timeout (has TBK_ORDEN_COMPRA but no tokens)
       if (TBK_ORDEN_COMPRA && !token_ws && !TBK_TOKEN) {
-        console.log('[PaymentResult] Payment timeout');
         setDetails({
           status: 'TIMEOUT',
           success: false,

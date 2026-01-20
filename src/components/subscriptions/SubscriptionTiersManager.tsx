@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { subscriptionsApi } from '@/lib/api'
+import { getErrorMessage } from '@/lib/utils'
 import { Plus, Trash2, Edit2, Save, X, DollarSign, Users, Crown } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -64,8 +65,8 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
     try {
       const data = await subscriptionsApi.getMyTiers(token)
       setTiers(data)
-    } catch (err: any) {
-      setError(err.message || 'Error al cargar planes')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al cargar planes'))
     } finally {
       setIsLoading(false)
     }
@@ -101,8 +102,8 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
       setIsAdding(false)
       setSuccess('Plan creado correctamente')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al crear plan')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al crear plan'))
     } finally {
       setIsSaving(false)
     }
@@ -147,8 +148,8 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
       setEditingId(null)
       setSuccess('Plan actualizado')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al actualizar plan')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al actualizar plan'))
     } finally {
       setIsSaving(false)
     }
@@ -165,8 +166,8 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
       setTiers(tiers.filter(t => t.id !== tierId))
       setSuccess('Plan eliminado')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Error al eliminar plan')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al eliminar plan'))
     } finally {
       setIsSaving(false)
     }
@@ -179,8 +180,8 @@ export default function SubscriptionTiersManager({ token }: SubscriptionTiersMan
         isActive: !tier.isActive
       }, token)
       setTiers(tiers.map(t => t.id === tier.id ? updated : t))
-    } catch (err: any) {
-      setError(err.message || 'Error al actualizar estado')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error al actualizar estado'))
     } finally {
       setIsSaving(false)
     }

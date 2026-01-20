@@ -89,14 +89,10 @@ export function useWebpay() {
       });
 
       if (response.success && response.url && response.token) {
-        console.log('[Webpay] ✅ API Response received');
-        console.log('[Webpay] URL:', response.url);
-        console.log('[Webpay] Token length:', response.token.length);
-        console.log('[Webpay] BuyOrder:', response.buyOrder);
+        console.log('[Webpay] ✅ API Response received, redirecting to Webpay...');
         
         // Method 1: Direct form submission (most reliable)
         try {
-          console.log('[Webpay] 🔄 Creating form element...');
           
           const form = document.createElement('form');
           form.method = 'POST';
@@ -110,19 +106,13 @@ export function useWebpay() {
           form.appendChild(tokenInput);
           
           document.body.appendChild(form);
-          console.log('[Webpay] 📝 Form appended to body');
-          console.log('[Webpay] 📝 Form action:', form.action);
-          console.log('[Webpay] 📝 Form method:', form.method);
-          console.log('[Webpay] 📝 Token input value length:', tokenInput.value.length);
           
           // Submit after a micro-delay
-          console.log('[Webpay] 🚀 Submitting form in 50ms...');
           
           await new Promise(resolve => setTimeout(resolve, 50));
           
           console.log('[Webpay] 🚀 Calling form.submit() NOW');
           form.submit();
-          console.log('[Webpay] ✅ form.submit() called successfully');
           
           // If we reach here after 2 seconds, something went wrong
           await new Promise(resolve => setTimeout(resolve, 2000));
@@ -132,7 +122,6 @@ export function useWebpay() {
           console.error('[Webpay] ❌ Form creation/submit error:', formError);
           
           // Fallback: Open URL in new window with POST data
-          console.log('[Webpay] 🔄 Trying fallback: window.location...');
           const fallbackUrl = `${response.url}?token_ws=${encodeURIComponent(response.token)}`;
           window.location.href = fallbackUrl;
         }
