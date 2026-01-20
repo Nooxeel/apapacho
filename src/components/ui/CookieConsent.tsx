@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { X, Cookie, Shield, BarChart3, Settings } from 'lucide-react'
 
 const CONSENT_KEY = 'apapacho-cookie-consent'
+const AGE_VERIFIED_KEY = 'ageVerified'
 
 interface CookiePreferences {
   essential: boolean // Always true, can't be disabled
@@ -30,12 +31,46 @@ export default function CookieConsent() {
   useEffect(() => {
     // Check if user has already consented
     const stored = localStorage.getItem(CONSENT_KEY)
-    if (!stored) {
-      // Show banner after a small delay for better UX
-      const timer = setTimeout(() => setIsVisible(true), 1000)
-      return () => clearTimeout(timer)
+    if (stored) {
+      return // Already consented
     }
-  }, [])
+    
+    // Only show cookie banner after age verification is complete
+    const checkAgeVerification = () => {
+      const ageVerified = localStorage.getItem(AGE_VERIFIED_KEY) === 'true'
+      if (ageVerified) {
+        // Show banner after a small delay for better UX
+        const timer = setTimeout(() => setIsVisible(true), 500)
+        return () => clearTimeout(timer)
+      }
+    }
+    
+    // Check immediately
+    checkAgeVerification()
+    
+    // Also listen for storage changes (when age verification completes)
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === AGE_VERIFIED_KEY && e.newValue === 'true') {
+        setTimeout(() => setIsVisible(true), 500)
+      }
+    }
+    
+    window.addEventListener('storage', handleStorage)
+    
+    // Poll for changes in same tab (storage event doesn't fire in same tab)
+    const interval = setInterval(() => {
+      const ageVerified = localStorage.getItem(AGE_VERIFIED_KEY) === 'true'
+      const cookieConsent = localStorage.getItem(CONSENT_KEY)
+      if (ageVerified && !cookieConsent && !isVisible) {
+        setIsVisible(true)
+      }
+    }, 1000)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      clearInterval(interval)
+    }
+  }, [isVisible])
 
   const saveConsent = (prefs: CookiePreferences) => {
     const consentData: ConsentData = {
