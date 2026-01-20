@@ -547,21 +547,18 @@ export default function CreatorPublicProfile() {
           fontFamily: getFontStyle(profile.fontFamily),
         }}
       >
-        {/* Cover Image */}
-        <div className="relative w-full overflow-hidden bg-black/40">
-          {/* Aspect ratio container - maintains 21:9 ultrawide ratio with min/max heights */}
-          <div className="relative w-full aspect-[21/9] min-h-[200px] max-h-[500px]">
-            <Image
-              src={coverImageUrl}
-              alt={`${creator.displayName} cover`}
-              fill
-              className="object-cover object-center"
-              sizes="100vw"
-              priority
-              quality={90}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
-          </div>
+        {/* Cover Image - Responsive height based on viewport */}
+        <div className="relative w-full h-[40vw] min-h-[200px] max-h-[450px] overflow-hidden bg-black/40">
+          <Image
+            src={coverImageUrl}
+            alt={`${creator.displayName} cover`}
+            fill
+            className="object-cover object-center"
+            sizes="100vw"
+            priority
+            quality={90}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
         </div>
 
       {/* Profile Section */}
