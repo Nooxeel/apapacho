@@ -548,17 +548,20 @@ export default function CreatorPublicProfile() {
         }}
       >
         {/* Cover Image */}
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden bg-black/40">
-          <Image
-            src={coverImageUrl}
-            alt={`${creator.displayName} cover`}
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-            quality={95}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+        <div className="relative w-full overflow-hidden bg-black/40">
+          {/* Aspect ratio container - maintains 21:9 ultrawide ratio with min/max heights */}
+          <div className="relative w-full aspect-[21/9] min-h-[200px] max-h-[500px]">
+            <Image
+              src={coverImageUrl}
+              alt={`${creator.displayName} cover`}
+              fill
+              className="object-cover object-center"
+              sizes="100vw"
+              priority
+              quality={90}
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+          </div>
         </div>
 
       {/* Profile Section */}
