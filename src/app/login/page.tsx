@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { authApi } from '@/lib/api'
+import { authApi, missionsApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -59,6 +59,9 @@ function LoginContent() {
         localStorage.setItem('apapacho-user', JSON.stringify(result.user))
         login(result.user, result.token)
         
+        // Track login mission progress
+        missionsApi.trackProgress(result.token, 'login').catch(() => {})
+        
         if (result.user.isCreator) {
           router.push('/creator/edit')
         } else {
@@ -77,6 +80,9 @@ function LoginContent() {
         localStorage.setItem('apapacho-token', result.token)
         localStorage.setItem('apapacho-user', JSON.stringify(result.user))
         login(result.user, result.token)
+        
+        // Track login mission progress (first login counts too)
+        missionsApi.trackProgress(result.token, 'login').catch(() => {})
         
         if (result.user.isCreator) {
           router.push('/creator/edit')
