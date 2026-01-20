@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { authApi, missionsApi } from '@/lib/api'
@@ -16,6 +16,12 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [referralCode, setReferralCode] = useState<string | null>(null)
+  
+  // Refs for focusing on error fields
+  const emailRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
+  const usernameRef = useRef<HTMLInputElement>(null)
+  const displayNameRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
     email: '',
@@ -109,30 +115,60 @@ function LoginContent() {
     } catch (err: any) {
       console.error('Auth error:', err)
       
+      const errors: Record<string, string> = {}
+      let firstErrorField: string | null = null
+      
+      // Helper para parsear errores del formato "field: mensaje"
+      const parseErrorString = (errStr: string) => {
+        const colonIndex = errStr.indexOf(':')
+        if (colonIndex > 0) {
+          const field = errStr.substring(0, colonIndex).trim().toLowerCase()
+          const message = errStr.substring(colonIndex + 1).trim()
+          return { field, message }
+        }
+        return { field: 'general', message: errStr }
+      }
+      
       // Manejar errores de validación con detalles
       if (err.message === 'Validation failed' && err.details) {
-        const errors: Record<string, string> = {}
         err.details.forEach((detail: any) => {
-          const field = detail.path?.[0] || 'general'
-          errors[field] = detail.message
+          if (typeof detail === 'string') {
+            // Backend devuelve strings como "password: mensaje"
+            const { field, message } = parseErrorString(detail)
+            errors[field] = message
+            if (!firstErrorField) firstErrorField = field
+          } else if (detail.path && detail.message) {
+            const field = detail.path[0] || 'general'
+            errors[field] = detail.message
+            if (!firstErrorField) firstErrorField = field
+          }
         })
-        setFieldErrors(errors)
-        
-        // Mostrar el primer error como mensaje general también
-        const firstError = Object.values(errors)[0]
-        if (firstError) {
-          setError(firstError)
-        }
       } else if (err.details && Array.isArray(err.details)) {
-        // El ApiError puede tener details directamente
-        const errors: Record<string, string> = {}
         err.details.forEach((detail: any) => {
-          const field = detail.path?.[0] || 'general'
-          errors[field] = detail.message
+          if (typeof detail === 'string') {
+            const { field, message } = parseErrorString(detail)
+            errors[field] = message
+            if (!firstErrorField) firstErrorField = field
+          } else if (detail.path && detail.message) {
+            const field = detail.path[0] || 'general'
+            errors[field] = detail.message
+            if (!firstErrorField) firstErrorField = field
+          }
         })
+      }
+      
+      if (Object.keys(errors).length > 0) {
         setFieldErrors(errors)
         const firstError = Object.values(errors)[0]
-        setError(firstError || err.message || 'Error en la autenticación')
+        setError(firstError)
+        
+        // Focus en el campo con error
+        setTimeout(() => {
+          if (firstErrorField === 'password') passwordRef.current?.focus()
+          else if (firstErrorField === 'email') emailRef.current?.focus()
+          else if (firstErrorField === 'username') usernameRef.current?.focus()
+          else if (firstErrorField === 'displayname') displayNameRef.current?.focus()
+        }, 100)
       } else {
         setError(err.message || 'Error en la autenticación. Por favor, intenta de nuevo.')
       }
@@ -176,6 +212,7 @@ function LoginContent() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
+              ref={emailRef}
               label="Email"
               type="email"
               placeholder="tu@email.com"
@@ -188,6 +225,7 @@ function LoginContent() {
             {!isLogin && (
               <>
                 <Input
+                  ref={usernameRef}
                   label="Nombre de usuario"
                   placeholder="tunombre"
                   value={formData.username}
@@ -198,24 +236,26 @@ function LoginContent() {
                   error={fieldErrors.username}
                 />
                 <Input
+                  ref={displayNameRef}
                   label="Nombre para mostrar"
                   placeholder="Tu Nombre"
                   value={formData.displayName}
                   onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
                   required
-                  error={fieldErrors.displayName}
+                  error={fieldErrors.displayName || fieldErrors.displayname}
                 />
               </>
             )}
 
             <Input
+              ref={passwordRef}
               label="Contraseña"
               type="password"
               placeholder="••••••••"
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               required
-              helperText={!isLogin ? "Mínimo 8 caracteres" : undefined}
+              helperText={!isLogin ? "Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número" : undefined}
               error={fieldErrors.password}
             />
 
