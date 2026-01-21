@@ -122,8 +122,9 @@ export function countryCodeToFlag(countryCode: string): string {
 
 /**
  * Reemplaza códigos de país de 2 letras en un texto por sus emojis de bandera
- * Solo reemplaza códigos que están solos (no como parte de palabras) y en mayúsculas
+ * Solo reemplaza códigos que están al final del texto o precedidos por espacio
  * Ejemplo: "Hola desde CL" -> "Hola desde 🇨🇱"
+ * NO afecta palabras como "CHALECO", "DECLARAR", etc.
  */
 export function replaceCountryCodesWithFlags(text: string): string {
   // Lista de códigos de país comunes en Latinoamérica y otros
@@ -134,9 +135,12 @@ export function replaceCountryCodesWithFlags(text: string): string {
   
   let result = text
   for (const code of countryCodes) {
-    // Reemplazar solo cuando el código está al final del texto o seguido por espacios/puntuación
-    const regex = new RegExp(`\\b${code}\\b`, 'g')
-    result = result.replace(regex, countryCodeToFlag(code))
+    // Solo reemplazar cuando:
+    // - Está precedido por espacio o inicio de string (lookbehind)
+    // - Está seguido por espacio, puntuación, o fin de string (lookahead)
+    // Esto evita reemplazar "CL" dentro de palabras como "CHALECO"
+    const regex = new RegExp(`(^|\\s)${code}($|[\\s.,!?;:])`, 'g')
+    result = result.replace(regex, `$1${countryCodeToFlag(code)}$2`)
   }
   return result
 }
