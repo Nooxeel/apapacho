@@ -25,9 +25,6 @@ const nextConfig = {
     },
   },
   
-  // Enable SWC minification (faster than Terser)
-  swcMinify: true,
-  
   // Enable gzip compression
   compress: true,
   
