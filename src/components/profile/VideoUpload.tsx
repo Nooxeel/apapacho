@@ -22,6 +22,7 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [visibility, setVisibility] = useState<PostVisibility>('public')
+  const [price, setPrice] = useState<number>(0)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -120,7 +121,8 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
             thumbnail: null
           }
         ],
-        visibility: visibility
+        visibility: visibility,
+        price: visibility === 'ppv' ? price : null
       }
 
       const postRes = await fetch(`${API_URL}/posts`, {
@@ -260,6 +262,8 @@ export function VideoUpload({ onSuccess, onCancel }: VideoUploadProps) {
               onChange={setVisibility}
               disabled={uploading || loadingTiers}
               hasSubscriptionTiers={subscriptionTiers.length > 0}
+              price={price}
+              onPriceChange={setPrice}
             />
           </div>
         )}

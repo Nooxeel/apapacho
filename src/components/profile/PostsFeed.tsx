@@ -26,6 +26,9 @@ interface Post {
     isBlurred?: boolean
   }>
   visibility: PostVisibility
+  price?: number
+  isLocked?: boolean
+  lockReason?: 'subscription_required' | 'tier_required' | 'ppv'
   likes: number
   comments: number
   views: number
@@ -66,6 +69,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
   const [comments, setComments] = useState<Record<string, PostComment[]>>({})
   const [newComment, setNewComment] = useState<Record<string, string>>({})
   const [submittingComment, setSubmittingComment] = useState<Record<string, boolean>>({})
+
+  // PPV purchase states
+  const [purchasingPost, setPurchasingPost] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     loadPosts()
@@ -134,6 +140,39 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       console.error('Error loading batch like status:', error)
     }
   }, [token])
+
+  const handlePurchasePPV = useCallback(async (postId: string) => {
+    if (!token || !user) {
+      router.push('/login')
+      return
+    }
+
+    setPurchasingPost(prev => ({ ...prev, [postId]: true }))
+
+    try {
+      const response = await fetch(`${API_URL}/posts/${postId}/purchase`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        alert(error.error || 'Error al comprar el contenido')
+        return
+      }
+
+      // Reload posts to get the unlocked content
+      await loadPosts()
+    } catch (error) {
+      console.error('Error purchasing PPV content:', error)
+      alert('Error al procesar la compra')
+    } finally {
+      setPurchasingPost(prev => ({ ...prev, [postId]: false }))
+    }
+  }, [token, user, router])
 
   const handleLike = useCallback(async (postId: string) => {
     if (!token || !user) {
@@ -286,15 +325,21 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
   const canViewPost = useCallback((post: Post): boolean => {
     // El creador siempre puede ver su propio contenido
     if (isOwner) return true
+    // Si el backend marca como bloqueado, respetar eso
+    if (post.isLocked) return false
     if (post.visibility === 'public') return true
     if (post.visibility === 'authenticated') return isAuthenticated
     if (post.visibility === 'subscribers') {
       return isSubscriber
     }
+    if (post.visibility === 'ppv') {
+      // PPV requires purchase - backend will set isLocked=true if not purchased
+      return !post.isLocked
+    }
     return false
   }, [isOwner, isAuthenticated, isSubscriber])
 
-  const getVisibilityBadge = useCallback((visibility: PostVisibility) => {
+  const getVisibilityBadge = useCallback((visibility: PostVisibility, price?: number) => {
     switch (visibility) {
       case 'public':
         return { icon: Globe, label: 'Público', color: 'text-blue-400 bg-blue-500/10' }
@@ -302,6 +347,10 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
         return { icon: Lock, label: 'Solo usuarios', color: 'text-yellow-400 bg-yellow-500/10' }
       case 'subscribers':
         return { icon: Star, label: 'Solo suscriptores', color: 'text-fuchsia-400 bg-fuchsia-500/10' }
+      case 'ppv':
+        return { icon: DollarSign, label: price ? `$${price.toLocaleString('es-CL')}` : 'De pago', color: 'text-green-400 bg-green-500/10' }
+      default:
+        return { icon: Globe, label: 'Público', color: 'text-blue-400 bg-blue-500/10' }
     }
   }, [])
 
@@ -330,7 +379,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
             const imageContent = post.content.find(c => c.type === 'image')
             const mediaContent = videoContent || imageContent
             const canView = canViewPost(post)
-            const visibilityBadge = getVisibilityBadge(post.visibility)
+            const visibilityBadge = getVisibilityBadge(post.visibility, post.price)
             const VisibilityIcon = visibilityBadge.icon
             const isLiked = likedPosts[post.id] || false
             const showingComments = showComments[post.id] || false
@@ -426,39 +475,66 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-white mb-2">
-                              {post.visibility === 'authenticated' ? 'Inicia sesión para ver' : 'Suscríbete para desbloquear'}
+                              {post.visibility === 'authenticated' 
+                                ? 'Inicia sesión para ver' 
+                                : post.lockReason === 'ppv'
+                                  ? 'Contenido de pago'
+                                  : 'Suscríbete para desbloquear'}
                             </h3>
                             <p className="text-white/70 text-sm">
                               {post.visibility === 'authenticated'
                                 ? 'Este contenido está disponible solo para usuarios registrados'
-                                : 'Este contenido exclusivo está disponible solo para suscriptores'}
+                                : post.lockReason === 'ppv'
+                                  ? 'Compra este contenido exclusivo para desbloquearlo'
+                                  : 'Este contenido exclusivo está disponible solo para suscriptores'}
                             </p>
                           </div>
-                          <Button
-                            variant="primary"
-                            onClick={() => {
-                              if (post.visibility === 'authenticated') {
-                                router.push('/login')
-                              } else if (onSubscribeClick) {
-                                onSubscribeClick()
-                              } else {
-                                router.push('/pricing')
-                              }
-                            }}
-                            className="w-full"
-                          >
-                            {post.visibility === 'authenticated' ? (
-                              <>
-                                <LogIn className="w-4 h-4 mr-2" />
-                                Iniciar Sesión
-                              </>
-                            ) : (
-                              <>
-                                <Star className="w-4 h-4 mr-2" />
-                                Suscribirse
-                              </>
-                            )}
-                          </Button>
+                          {post.lockReason === 'ppv' ? (
+                            <Button
+                              variant="primary"
+                              onClick={() => handlePurchasePPV(post.id)}
+                              disabled={purchasingPost[post.id]}
+                              className="w-full"
+                            >
+                              {purchasingPost[post.id] ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Procesando...
+                                </>
+                              ) : (
+                                <>
+                                  <DollarSign className="w-4 h-4 mr-2" />
+                                  Comprar por ${post.price?.toLocaleString('es-CL') || '0'}
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="primary"
+                              onClick={() => {
+                                if (post.visibility === 'authenticated') {
+                                  router.push('/login')
+                                } else if (onSubscribeClick) {
+                                  onSubscribeClick()
+                                } else {
+                                  router.push('/pricing')
+                                }
+                              }}
+                              className="w-full"
+                            >
+                              {post.visibility === 'authenticated' ? (
+                                <>
+                                  <LogIn className="w-4 h-4 mr-2" />
+                                  Iniciar Sesión
+                                </>
+                              ) : (
+                                <>
+                                  <Star className="w-4 h-4 mr-2" />
+                                  Suscribirse
+                                </>
+                              )}
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>

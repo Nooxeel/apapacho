@@ -115,7 +115,7 @@ export interface Subscription {
 }
 
 // Content Types
-export type PostVisibility = 'public' | 'authenticated' | 'subscribers'
+export type PostVisibility = 'public' | 'authenticated' | 'subscribers' | 'ppv'
 
 export interface Post {
   id: string
@@ -129,8 +129,20 @@ export interface Post {
   likes: number
   comments: number
   views: number
+  isLocked?: boolean
+  lockReason?: 'subscription_required' | 'tier_required' | 'ppv'
   createdAt: Date
   updatedAt: Date
+}
+
+// Content Purchase (PPV)
+export interface ContentPurchase {
+  id: string
+  postId: string
+  userId: string
+  amount: number
+  currency: string
+  createdAt: Date
 }
 
 export interface PostContent {

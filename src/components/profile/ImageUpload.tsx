@@ -17,6 +17,7 @@ export function ImageUpload() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [visibility, setVisibility] = useState<PostVisibility>('public')
+  const [price, setPrice] = useState<number>(0)
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
   const [subscriptionTiers, setSubscriptionTiers] = useState<any[]>([])
   const [loadingTiers, setLoadingTiers] = useState(true)
@@ -130,7 +131,8 @@ export function ImageUpload() {
             url: imageUrl,
             thumbnail: null
           }],
-          visibility: visibility
+          visibility: visibility,
+          price: visibility === 'ppv' ? price : null
         })
       })
 
@@ -146,6 +148,7 @@ export function ImageUpload() {
       setTitle('')
       setDescription('')
       setVisibility('public')
+      setPrice(0)
       setUploadedUrl(null)
       setUploadProgress(0)
 
@@ -254,6 +257,8 @@ export function ImageUpload() {
               onChange={setVisibility}
               disabled={uploading || loadingTiers}
               hasSubscriptionTiers={subscriptionTiers.length > 0}
+              price={price}
+              onPriceChange={setPrice}
             />
 
             {/* Upload Progress */}
