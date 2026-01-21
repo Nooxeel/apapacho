@@ -483,7 +483,11 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                     <>
                       {/* Wrap premium content with protection */}
                       {(post.visibility === 'ppv' || post.visibility === 'subscribers') ? (
-                        <ProtectedMedia watermarkText={user ? `@${user.username}` : undefined}>
+                        <ProtectedMedia 
+                          watermarkText={user ? `@${user.username}` : undefined}
+                          postId={post.id}
+                          creatorId={creatorId}
+                        >
                           {videoContent ? (
                             <video
                               src={videoContent.url}

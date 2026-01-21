@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState, createContext, useContext, ReactNode } from 'react'
+import { useEffect, useState, createContext, useContext, ReactNode, useCallback, useRef } from 'react'
+import api from '@/lib/api'
+import { useAuthStore } from '@/stores/authStore'
 
 /**
  * ContentProtection component
@@ -11,6 +13,7 @@ import { useEffect, useState, createContext, useContext, ReactNode } from 'react
  * - Blur content when window loses focus (Alt+Tab, minimize)
  * - Detect PrintScreen key and screenshot shortcuts
  * - Show warning when screenshot attempt is detected
+ * - Report screenshot attempts to backend for tracking
  * 
  * This is a deterrent, not a security measure - determined users can bypass it.
  * Real protection comes from watermarking, low-res previews, and server-side controls.
@@ -20,13 +23,15 @@ import { useEffect, useState, createContext, useContext, ReactNode } from 'react
 interface ProtectionContextType {
   isBlurred: boolean
   showWarning: boolean
-  triggerWarning: () => void
+  triggerWarning: (method?: string, postId?: string, creatorId?: string) => void
+  setCurrentContent: (postId?: string, creatorId?: string) => void
 }
 
 const ProtectionContext = createContext<ProtectionContextType>({
   isBlurred: false,
   showWarning: false,
   triggerWarning: () => {},
+  setCurrentContent: () => {},
 })
 
 export const useProtection = () => useContext(ProtectionContext)
@@ -34,19 +39,55 @@ export const useProtection = () => useContext(ProtectionContext)
 interface ContentProtectionProps {
   children?: ReactNode
   blurOnFocusLoss?: boolean
+  creatorId?: string
 }
 
-export function ContentProtection({ children, blurOnFocusLoss = true }: ContentProtectionProps) {
+export function ContentProtection({ children, blurOnFocusLoss = true, creatorId }: ContentProtectionProps) {
   const [isBlurred, setIsBlurred] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
+  const { token } = useAuthStore()
+  
+  // Track current content being viewed
+  const currentPostId = useRef<string | undefined>(undefined)
+  const currentCreatorId = useRef<string | undefined>(creatorId)
 
-  const triggerWarning = () => {
+  const setCurrentContent = useCallback((postId?: string, cId?: string) => {
+    currentPostId.current = postId
+    if (cId) currentCreatorId.current = cId
+  }, [])
+
+  // Report screenshot attempt to backend
+  const reportScreenshotAttempt = useCallback(async (method: string, postId?: string, cId?: string) => {
+    if (!token) return // Only track logged-in users
+    
+    try {
+      await api('/security/screenshot-attempt', {
+        method: 'POST',
+        body: {
+          method,
+          postId: postId || currentPostId.current,
+          creatorId: cId || currentCreatorId.current,
+          pageUrl: window.location.pathname,
+        },
+        token,
+      })
+    } catch (error) {
+      // Silently fail - don't disrupt user experience
+      console.debug('Failed to report screenshot attempt:', error)
+    }
+  }, [token])
+
+  const triggerWarning = useCallback((method = 'unknown', postId?: string, cId?: string) => {
     setShowWarning(true)
     setIsBlurred(true)
+    
+    // Report to backend
+    reportScreenshotAttempt(method, postId, cId)
+    
     setTimeout(() => {
       setIsBlurred(false)
     }, 1000)
-  }
+  }, [reportScreenshotAttempt])
 
   useEffect(() => {
     // Prevent right-click context menu
@@ -59,7 +100,7 @@ export function ContentProtection({ children, blurOnFocusLoss = true }: ContentP
       }
       
       e.preventDefault()
-      triggerWarning()
+      triggerWarning('right-click')
       return false
     }
 
@@ -68,7 +109,7 @@ export function ContentProtection({ children, blurOnFocusLoss = true }: ContentP
       // Prevent Ctrl/Cmd + S (Save)
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
-        triggerWarning()
+        triggerWarning('ctrl-s')
         return false
       }
       
@@ -86,17 +127,17 @@ export function ContentProtection({ children, blurOnFocusLoss = true }: ContentP
 
       // Detect PrintScreen key
       if (e.key === 'PrintScreen') {
-        triggerWarning()
+        triggerWarning('printscreen')
       }
 
       // Windows + Shift + S (Windows Snipping Tool)
       if (e.key === 's' && e.shiftKey && (e.metaKey || e.ctrlKey)) {
-        triggerWarning()
+        triggerWarning('snipping-tool')
       }
 
       // Cmd + Shift + 3/4/5 (Mac screenshots)
       if ((e.key === '3' || e.key === '4' || e.key === '5') && e.shiftKey && e.metaKey) {
-        triggerWarning()
+        triggerWarning('mac-screenshot')
       }
     }
 
@@ -150,7 +191,7 @@ export function ContentProtection({ children, blurOnFocusLoss = true }: ContentP
       window.removeEventListener('blur', handleBlur)
       window.removeEventListener('focus', handleFocus)
     }
-  }, [blurOnFocusLoss])
+  }, [blurOnFocusLoss, triggerWarning])
 
   // Dismiss warning after 3 seconds
   useEffect(() => {
@@ -161,7 +202,7 @@ export function ContentProtection({ children, blurOnFocusLoss = true }: ContentP
   }, [showWarning])
 
   return (
-    <ProtectionContext.Provider value={{ isBlurred, showWarning, triggerWarning }}>
+    <ProtectionContext.Provider value={{ isBlurred, showWarning, triggerWarning, setCurrentContent }}>
       {children}
       
       {/* Global warning overlay */}
@@ -193,10 +234,18 @@ interface ProtectedMediaProps {
   children: ReactNode
   className?: string
   watermarkText?: string
+  postId?: string
+  creatorId?: string
 }
 
-export function ProtectedMedia({ children, className = '', watermarkText }: ProtectedMediaProps) {
-  const { isBlurred } = useProtection()
+export function ProtectedMedia({ children, className = '', watermarkText, postId, creatorId }: ProtectedMediaProps) {
+  const { isBlurred, triggerWarning } = useProtection()
+
+  // Handle right-click specifically on this media
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    triggerWarning('right-click-media', postId, creatorId)
+  }
 
   return (
     <div 
@@ -205,6 +254,7 @@ export function ProtectedMedia({ children, className = '', watermarkText }: Prot
         WebkitUserSelect: 'none',
         WebkitTouchCallout: 'none',
       }}
+      onContextMenu={handleContextMenu}
     >
       {/* Content with conditional blur */}
       <div className={`transition-all duration-300 ${isBlurred ? 'blur-xl opacity-50' : ''}`}>
