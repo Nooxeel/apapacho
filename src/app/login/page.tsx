@@ -6,6 +6,10 @@ import Link from 'next/link'
 import { authApi, missionsApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
+import { Eye, EyeOff } from 'lucide-react'
+
+// Key for storing remembered credentials
+const REMEMBER_KEY = 'apapacho-remember-credentials'
 
 function LoginContent() {
   const router = useRouter()
@@ -16,6 +20,8 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [referralCode, setReferralCode] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   
   // Refs for focusing on error fields
   const emailRef = useRef<HTMLInputElement>(null)
@@ -31,6 +37,20 @@ function LoginContent() {
     isCreator: true,
     acceptTerms: false
   })
+
+  // Load remembered credentials on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(REMEMBER_KEY)
+      if (saved) {
+        const { email, password } = JSON.parse(saved)
+        setFormData(prev => ({ ...prev, email, password }))
+        setRememberMe(true)
+      }
+    } catch {
+      // Ignore errors
+    }
+  }, [])
 
   // Capture referral code from URL (?ref=XXXXX) and mode (?mode=register)
   useEffect(() => {
@@ -66,6 +86,16 @@ function LoginContent() {
           email: formData.email,
           password: formData.password
         }) as any
+        
+        // Handle remember me
+        if (rememberMe) {
+          localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          }))
+        } else {
+          localStorage.removeItem(REMEMBER_KEY)
+        }
         
         localStorage.setItem('apapacho-token', result.token)
         localStorage.setItem('apapacho-user', JSON.stringify(result.user))
@@ -250,17 +280,36 @@ function LoginContent() {
             <Input
               ref={passwordRef}
               label="Contraseña"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={formData.password}
               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
               required
               helperText={!isLogin ? "Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número" : undefined}
               error={fieldErrors.password}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-white/50 hover:text-white/80 transition-colors focus:outline-none"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              }
             />
 
             {isLogin && (
-              <div className="text-right -mt-2">
+              <div className="flex items-center justify-between -mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-fuchsia-500 focus:ring-fuchsia-500"
+                  />
+                  <span className="text-white/60 text-sm">Recordarme</span>
+                </label>
                 <Link
                   href="/forgot-password"
                   className="text-sm text-pink-400 hover:text-pink-300 transition-colors"
