@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button, ProtectedMedia } from '@/components/ui'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
 import { postApi, missionsApi } from '@/lib/api'
@@ -481,28 +481,65 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                 <div className="relative bg-black">
                   {canView ? (
                     <>
-                      {videoContent ? (
-                        <video
-                          src={videoContent.url}
-                          className="w-full max-h-[500px] object-contain mx-auto"
-                          controls
-                          preload="metadata"
-                        />
-                      ) : imageContent ? (
-                        <div className="relative w-full" style={{ maxHeight: '500px', aspectRatio: '16/9' }}>
-                          <Image
-                            src={imageContent.url}
-                            alt={post.title || 'Post image'}
-                            fill
-                            className="object-contain"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
-                            loading="lazy"
-                          />
-                        </div>
+                      {/* Wrap premium content with protection */}
+                      {(post.visibility === 'ppv' || post.visibility === 'subscribers') ? (
+                        <ProtectedMedia watermarkText={user ? `@${user.username}` : undefined}>
+                          {videoContent ? (
+                            <video
+                              src={videoContent.url}
+                              className="w-full max-h-[500px] object-contain mx-auto"
+                              controls
+                              controlsList="nodownload"
+                              disablePictureInPicture
+                              preload="metadata"
+                              onContextMenu={(e) => e.preventDefault()}
+                            />
+                          ) : imageContent ? (
+                            <div className="relative w-full" style={{ maxHeight: '500px', aspectRatio: '16/9' }}>
+                              <Image
+                                src={imageContent.url}
+                                alt={post.title || 'Post image'}
+                                fill
+                                className="object-contain pointer-events-none"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
+                                loading="lazy"
+                                draggable={false}
+                                onContextMenu={(e) => e.preventDefault()}
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                              <Video className="w-16 h-16 text-white/30" />
+                            </div>
+                          )}
+                        </ProtectedMedia>
                       ) : (
-                        <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                          <Video className="w-16 h-16 text-white/30" />
-                        </div>
+                        /* Public content - no protection needed */
+                        <>
+                          {videoContent ? (
+                            <video
+                              src={videoContent.url}
+                              className="w-full max-h-[500px] object-contain mx-auto"
+                              controls
+                              preload="metadata"
+                            />
+                          ) : imageContent ? (
+                            <div className="relative w-full" style={{ maxHeight: '500px', aspectRatio: '16/9' }}>
+                              <Image
+                                src={imageContent.url}
+                                alt={post.title || 'Post image'}
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
+                                loading="lazy"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                              <Video className="w-16 h-16 text-white/30" />
+                            </div>
+                          )}
+                        </>
                       )}
                     </>
                   ) : (
