@@ -155,7 +155,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     }
   }, [token])
 
-  const handlePurchasePPV = useCallback(async (postId: string) => {
+  const handlePurchasePPV = useCallback(async (postId: string, price: number) => {
     if (!token || !user) {
       router.push('/login')
       return
@@ -164,7 +164,8 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     setPurchasingPost(prev => ({ ...prev, [postId]: true }))
 
     try {
-      const response = await fetch(`${API_URL}/posts/${postId}/purchase`, {
+      // Step 1: Verify the purchase is valid
+      const verifyResponse = await fetch(`${API_URL}/posts/${postId}/purchase`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -172,13 +173,57 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
         }
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        alert(error.error || 'Error al comprar el contenido')
+      if (!verifyResponse.ok) {
+        const error = await verifyResponse.json()
+        alert(error.error || 'Error al verificar la compra')
         return
       }
 
-      // Reload posts to get the unlocked content
+      const verifyData = await verifyResponse.json()
+
+      // Step 2: If requires payment, initiate Webpay
+      if (verifyData.requiresPayment) {
+        const paymentResponse = await fetch(`${API_URL}/payments/webpay/create`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount: verifyData.paymentInfo.amount,
+            paymentType: 'CONTENT',
+            creatorId: verifyData.paymentInfo.creatorId,
+            postId: verifyData.paymentInfo.postId
+          })
+        })
+
+        if (!paymentResponse.ok) {
+          const error = await paymentResponse.json()
+          alert(error.error || 'Error al iniciar el pago')
+          return
+        }
+
+        const paymentData = await paymentResponse.json()
+
+        // Redirect to Webpay using the form
+        // Create a temporary form and submit it
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = paymentData.url
+        
+        const tokenInput = document.createElement('input')
+        tokenInput.type = 'hidden'
+        tokenInput.name = 'token_ws'
+        tokenInput.value = paymentData.token
+        
+        form.appendChild(tokenInput)
+        document.body.appendChild(form)
+        form.submit()
+        
+        return // User will be redirected to Webpay
+      }
+
+      // If no payment required (shouldn't happen for PPV), reload posts
       await loadPosts()
     } catch (error) {
       console.error('Error purchasing PPV content:', error)
@@ -186,7 +231,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
     } finally {
       setPurchasingPost(prev => ({ ...prev, [postId]: false }))
     }
-  }, [token, user, router])
+  }, [token, user, router, loadPosts])
 
   const handleLike = useCallback(async (postId: string) => {
     if (!token || !user) {
@@ -507,7 +552,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                           {post.lockReason === 'ppv' ? (
                             <Button
                               variant="primary"
-                              onClick={() => handlePurchasePPV(post.id)}
+                              onClick={() => handlePurchasePPV(post.id, post.price || 0)}
                               disabled={purchasingPost[post.id]}
                               className="w-full"
                             >
