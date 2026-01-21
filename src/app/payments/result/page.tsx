@@ -31,13 +31,15 @@ interface CardsCheckResponse {
 function PaymentResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { token, hasHydrated } = useAuthStore();
+  const { token, hasHydrated, isRefreshing } = useAuthStore();
   const [details, setDetails] = useState<PaymentDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSaveCardPrompt, setShowSaveCardPrompt] = useState(false);
   const [hasSavedCards, setHasSavedCards] = useState(false);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
+  // Effect 1: Confirm payment with backend (doesn't need auth)
   useEffect(() => {
     const confirmPayment = async () => {
       // Get token from Webpay redirect
@@ -96,22 +98,7 @@ function PaymentResultContent() {
               authorizationCode: data.authorizationCode,
               cardNumber: data.cardNumber,
             });
-            
-            // Check if user has saved cards (to prompt for saving)
-            if (hasHydrated && token) {
-              try {
-                const cardsResponse = await api<CardsCheckResponse>('/cards', { token });
-                const cards = cardsResponse.cards || [];
-                setHasSavedCards(cards.length > 0);
-                
-                // Show save card prompt only if no cards saved yet
-                if (cards.length === 0) {
-                  setShowSaveCardPrompt(true);
-                }
-              } catch (e) {
-                console.log('[PaymentResult] Could not check saved cards');
-              }
-            }
+            setPaymentConfirmed(true);
           } else {
             setDetails({
               status: data.status || 'FAILED',
@@ -138,6 +125,33 @@ function PaymentResultContent() {
 
     confirmPayment();
   }, [searchParams]);
+
+  // Effect 2: Check saved cards after payment is confirmed AND auth is hydrated (and not refreshing)
+  useEffect(() => {
+    const checkSavedCards = async () => {
+      // Wait for hydration and any token refresh to complete
+      if (!paymentConfirmed || !hasHydrated || isRefreshing) return;
+      if (!token) {
+        console.log('[PaymentResult] No auth token, skipping card check');
+        return;
+      }
+      
+      try {
+        const cardsResponse = await api<CardsCheckResponse>('/cards', { token });
+        const cards = cardsResponse.cards || [];
+        setHasSavedCards(cards.length > 0);
+        
+        // Show save card prompt only if no cards saved yet
+        if (cards.length === 0) {
+          setShowSaveCardPrompt(true);
+        }
+      } catch (e) {
+        console.log('[PaymentResult] Could not check saved cards:', e);
+      }
+    };
+    
+    checkSavedCards();
+  }, [paymentConfirmed, hasHydrated, isRefreshing, token]);
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('es-CL', {
