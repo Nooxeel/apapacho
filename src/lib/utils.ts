@@ -107,3 +107,36 @@ export function getErrorMessage(error: unknown, fallback = 'Error desconocido'):
   }
   return fallback
 }
+
+/**
+ * Convierte códigos de país de 2 letras a emojis de banderas
+ * Ejemplo: "CL" -> "🇨🇱", "US" -> "🇺🇸"
+ */
+export function countryCodeToFlag(countryCode: string): string {
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0))
+  return String.fromCodePoint(...codePoints)
+}
+
+/**
+ * Reemplaza códigos de país de 2 letras en un texto por sus emojis de bandera
+ * Solo reemplaza códigos que están solos (no como parte de palabras) y en mayúsculas
+ * Ejemplo: "Hola desde CL" -> "Hola desde 🇨🇱"
+ */
+export function replaceCountryCodesWithFlags(text: string): string {
+  // Lista de códigos de país comunes en Latinoamérica y otros
+  const countryCodes = [
+    'CL', 'AR', 'MX', 'CO', 'PE', 'VE', 'EC', 'BR', 'UY', 'PY', 'BO', 'CR', 'PA', 'GT', 'SV', 'HN', 'NI', 'DO', 'PR', 'CU',
+    'US', 'CA', 'ES', 'PT', 'FR', 'DE', 'IT', 'GB', 'JP', 'CN', 'KR', 'AU', 'NZ'
+  ]
+  
+  let result = text
+  for (const code of countryCodes) {
+    // Reemplazar solo cuando el código está al final del texto o seguido por espacios/puntuación
+    const regex = new RegExp(`\\b${code}\\b`, 'g')
+    result = result.replace(regex, countryCodeToFlag(code))
+  }
+  return result
+}

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { creatorApi, subscriptionsApi, promocodesApi, missionsApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
+import { replaceCountryCodesWithFlags } from '@/lib/utils'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
 import { Navbar } from '@/components/layout'
@@ -586,7 +587,7 @@ export default function CreatorPublicProfile() {
 
             {/* Title with verification */}
             <div className="mt-4 flex items-center gap-2">
-              <h1 className="text-2xl font-bold">{profile.extendedInfoTitle || creator.username}</h1>
+              <h1 className="text-2xl font-bold">{replaceCountryCodesWithFlags(profile.extendedInfoTitle || creator.username)}</h1>
               {profile.isVerified && (
                 <BadgeCheck 
                   className="w-6 h-6" 
@@ -600,7 +601,7 @@ export default function CreatorPublicProfile() {
             {profile.extendedInfo && (
               <div className="mt-4 text-center text-gray-300 max-w-2xl whitespace-pre-line">
                 <p className="text-lg leading-relaxed">
-                  {profile.extendedInfo}
+                  {replaceCountryCodesWithFlags(profile.extendedInfo)}
                 </p>
               </div>
             )}

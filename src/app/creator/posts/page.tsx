@@ -6,7 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Card, Button } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
-import { Edit2, Trash2, Eye, Heart, MessageCircle, Image as ImageIcon, Video, Plus } from 'lucide-react';
+import { Edit2, Trash2, Eye, Heart, MessageCircle, Image as ImageIcon, Video, Plus, DollarSign, Globe, Lock, Star } from 'lucide-react';
 import Link from 'next/link';
 import { API_URL } from '@/lib/config';
 import { VisibilitySelector } from '@/components/profile/VisibilitySelector';
@@ -129,6 +129,21 @@ export default function CreatorPostsPage() {
     } catch (error) {
       console.error('Error deleting post:', error);
       alert('Error al eliminar el post');
+    }
+  };
+
+  const getVisibilityBadge = (visibility: PostVisibility, price: number | null) => {
+    switch (visibility) {
+      case 'public':
+        return { icon: Globe, label: 'Público', color: 'text-blue-400 bg-blue-500/20' };
+      case 'authenticated':
+        return { icon: Lock, label: 'Solo usuarios', color: 'text-yellow-400 bg-yellow-500/20' };
+      case 'subscribers':
+        return { icon: Star, label: 'Solo suscriptores', color: 'text-fuchsia-400 bg-fuchsia-500/20' };
+      case 'ppv':
+        return { icon: DollarSign, label: price ? `$${price.toLocaleString('es-CL')}` : 'De pago', color: 'text-green-400 bg-green-500/20' };
+      default:
+        return { icon: Globe, label: 'Público', color: 'text-blue-400 bg-blue-500/20' };
     }
   };
 
@@ -284,6 +299,18 @@ export default function CreatorPostsPage() {
                         <p className="text-white/60 text-sm mb-3 line-clamp-2">
                           {post.description || 'Sin descripción'}
                         </p>
+
+                        {/* Visibility Badge */}
+                        {(() => {
+                          const badge = getVisibilityBadge(post.visibility, post.price);
+                          const BadgeIcon = badge.icon;
+                          return (
+                            <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 ${badge.color}`}>
+                              <BadgeIcon className="w-3.5 h-3.5" />
+                              <span className="text-xs font-medium">{badge.label}</span>
+                            </div>
+                          );
+                        })()}
                         
                         <div className="flex items-center gap-4 text-sm text-white/40">
                           <div className="flex items-center gap-1">

@@ -403,7 +403,8 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                         {formatDate(post.createdAt)}
                       </p>
                     </div>
-                    {post.visibility !== 'public' && (
+                    {/* Mostrar badge siempre para PPV, o cuando no es público */}
+                    {(post.visibility === 'ppv' || post.visibility !== 'public') && (
                       <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${visibilityBadge.color}`}>
                         <VisibilityIcon className="w-4 h-4" />
                         <span className="text-xs font-medium">{visibilityBadge.label}</span>
