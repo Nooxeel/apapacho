@@ -868,6 +868,17 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ))}
+              
+              {/* Link to full transaction history */}
+              <div className="text-center pt-4">
+                <Link 
+                  href="/transactions"
+                  className="inline-flex items-center gap-2 px-6 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors"
+                >
+                  Ver historial completo
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="text-center py-12 text-white/40">

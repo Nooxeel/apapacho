@@ -94,6 +94,12 @@ const ImportIcon = () => (
   </svg>
 )
 
+const ReceiptIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+  </svg>
+)
+
 const TrophyIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M8 21h8m-4-4v4m-4.5-8.5L12 17l4.5-4.5M6 4h12a2 2 0 012 2v2a6 6 0 01-6 6h0a6 6 0 01-6-6V6a2 2 0 012-2z" />
@@ -295,6 +301,14 @@ export function Navbar() {
                       >
                         <MessageCircleIcon className="w-4 h-4" />
                         Mensajes
+                      </Link>
+                      <Link
+                        href="/transactions"
+                        className="flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <ReceiptIcon />
+                        Transacciones
                       </Link>
                       {user.isCreator && (
                         <Link
