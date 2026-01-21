@@ -75,7 +75,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
   useEffect(() => {
     loadPosts()
-  }, [creatorId])
+  }, [creatorId, token]) // Reload when token changes to get proper access
 
   // Trigger load more when scrolling to bottom
   useEffect(() => {
@@ -86,7 +86,14 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
   const loadPosts = async () => {
     try {
-      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}&limit=10`)
+      const headers: HeadersInit = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      
+      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}&limit=10`, {
+        headers
+      })
       if (response.ok) {
         const data = await response.json()
         setPosts(data.posts)
@@ -110,7 +117,14 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
     setLoadingMore(true)
     try {
-      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}&limit=10&cursor=${nextCursor}`)
+      const headers: HeadersInit = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      
+      const response = await fetch(`${API_URL}/posts?creatorId=${creatorId}&limit=10&cursor=${nextCursor}`, {
+        headers
+      })
       if (response.ok) {
         const data = await response.json()
         setPosts(prev => [...prev, ...data.posts])
