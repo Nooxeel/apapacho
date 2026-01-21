@@ -21,6 +21,8 @@ interface PaymentDetails {
   authorizationCode?: string;
   cardNumber?: string;
   error?: string;
+  paymentType?: string;
+  redirectTo?: string;
 }
 
 interface CardsCheckResponse { 
@@ -38,6 +40,7 @@ function PaymentResultContent() {
   const [showSaveCardPrompt, setShowSaveCardPrompt] = useState(false);
   const [hasSavedCards, setHasSavedCards] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
 
   // Effect 1: Confirm payment with backend (doesn't need auth)
   useEffect(() => {
@@ -97,8 +100,15 @@ function PaymentResultContent() {
               transactionId: data.transactionId || '',
               authorizationCode: data.authorizationCode,
               cardNumber: data.cardNumber,
+              paymentType: data.paymentType,
+              redirectTo: data.redirectTo,
             });
             setPaymentConfirmed(true);
+            
+            // Start countdown for auto-redirect if we have a redirect URL
+            if (data.redirectTo) {
+              setRedirectCountdown(5);
+            }
           } else {
             setDetails({
               status: data.status || 'FAILED',
@@ -152,6 +162,24 @@ function PaymentResultContent() {
     
     checkSavedCards();
   }, [paymentConfirmed, hasHydrated, isRefreshing, token]);
+
+  // Effect 3: Auto-redirect countdown for content purchases
+  useEffect(() => {
+    if (redirectCountdown === null || redirectCountdown <= 0) return;
+    
+    const timer = setTimeout(() => {
+      setRedirectCountdown(redirectCountdown - 1);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [redirectCountdown]);
+
+  // Effect 4: Perform redirect when countdown reaches 0
+  useEffect(() => {
+    if (redirectCountdown === 0 && details?.redirectTo) {
+      router.push(details.redirectTo);
+    }
+  }, [redirectCountdown, details?.redirectTo, router]);
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -319,20 +347,50 @@ function PaymentResultContent() {
           <div className="space-y-3">
             {details.success ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-xl font-medium transition-colors"
-                >
-                  <Home className="w-5 h-5" />
-                  Ir a mi Dashboard
-                </Link>
-                <Link
-                  href="/"
-                  className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  Volver al Inicio
-                </Link>
+                {/* Show redirect countdown for content purchases */}
+                {details.redirectTo && redirectCountdown !== null && redirectCountdown > 0 && (
+                  <div className="text-center mb-4">
+                    <p className="text-white/70 text-sm">
+                      Redirigiendo al contenido en <span className="font-bold text-fuchsia-400">{redirectCountdown}</span> segundos...
+                    </p>
+                  </div>
+                )}
+                
+                {details.redirectTo ? (
+                  <>
+                    <button
+                      onClick={() => router.push(details.redirectTo!)}
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-xl font-medium transition-colors"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                      Ver Contenido Ahora
+                    </button>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+                    >
+                      <Home className="w-5 h-5" />
+                      Ir a mi Dashboard
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-xl font-medium transition-colors"
+                    >
+                      <Home className="w-5 h-5" />
+                      Ir a mi Dashboard
+                    </Link>
+                    <Link
+                      href="/"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                      Volver al Inicio
+                    </Link>
+                  </>
+                )}
               </>
             ) : (
               <>
