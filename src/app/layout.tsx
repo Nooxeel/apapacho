@@ -5,6 +5,7 @@ import { FontProvider } from '@/contexts/FontContext'
 import { AgeVerificationProvider } from '@/components/providers/AgeVerificationProvider'
 import { BadgeNotificationProvider } from '@/components/gamification'
 import { ContentProtection } from '@/components/ui/ContentProtection'
+import { GoogleAnalytics } from '@/components/analytics'
 // Cookie consent disabled for now - not required in Chile
 // import CookieConsent from '@/components/ui/CookieConsent'
 
@@ -352,6 +353,7 @@ export default function RootLayout({
             })
           }}
         />
+        <GoogleAnalytics />
         <ContentProtection />
         <FontProvider>
           <AgeVerificationProvider>
