@@ -1,5 +1,14 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
+// Dynamic import to avoid circular dependency
+let authStoreModule: any = null
+async function getAuthStore() {
+  if (!authStoreModule) {
+    authStoreModule = await import('@/stores/authStore')
+  }
+  return authStoreModule.useAuthStore
+}
+
 interface ApiOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   body?: any
@@ -21,7 +30,7 @@ export class ApiError extends Error {
   }
 }
 
-// Helper to refresh token
+// Helper to refresh token and update Zustand store
 async function tryRefreshToken(): Promise<string | null> {
   try {
     const response = await fetch(`${API_URL}/auth/refresh`, {
@@ -32,6 +41,18 @@ async function tryRefreshToken(): Promise<string | null> {
     
     if (response.ok) {
       const data = await response.json()
+      
+      // Update Zustand store with new token
+      try {
+        const useAuthStore = await getAuthStore()
+        const state = useAuthStore.getState()
+        if (state.user) {
+          state.login(state.user, data.token, data.expiresIn)
+        }
+      } catch (storeError) {
+        console.warn('[API] Failed to update auth store after refresh:', storeError)
+      }
+      
       return data.token
     }
   } catch {
