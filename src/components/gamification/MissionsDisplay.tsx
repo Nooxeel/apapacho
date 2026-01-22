@@ -1,10 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { missionsApi, UserMission, MissionsResponse } from '@/lib/api';
 import { invalidateProgressCache } from './AvatarWithProgress';
 import { Check, Clock, Gift, Target, Star, Flame, Sparkles } from 'lucide-react';
+
+// Category color map - defined outside component to avoid recreation
+const CATEGORY_COLORS: Record<string, string> = {
+  'ENGAGEMENT': 'from-blue-500 to-cyan-500',
+  'TIPPING': 'from-yellow-500 to-orange-500',
+  'SOCIAL': 'from-pink-500 to-fuchsia-500',
+  'DISCOVERY': 'from-purple-500 to-indigo-500',
+  'MESSAGING': 'from-green-500 to-emerald-500',
+  'SPENDING': 'from-amber-500 to-yellow-500',
+  'CONTENT': 'from-rose-500 to-pink-500',
+  'CREATOR_ENGAGEMENT': 'from-violet-500 to-purple-500',
+  'CREATOR_GROWTH': 'from-emerald-500 to-teal-500',
+  'MILESTONE': 'from-amber-500 to-yellow-500',
+  'CREATOR_MILESTONE': 'from-rose-500 to-orange-500',
+};
 
 interface MissionCardProps {
   mission: UserMission;
@@ -12,25 +27,9 @@ interface MissionCardProps {
   isClaiming: boolean;
 }
 
-function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
+const MissionCard = memo(function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
   const progressPercent = Math.min((mission.progress / mission.targetCount) * 100, 100);
-  
-  const getCategoryColor = () => {
-    switch (mission.category) {
-      case 'ENGAGEMENT': return 'from-blue-500 to-cyan-500';
-      case 'TIPPING': return 'from-yellow-500 to-orange-500';
-      case 'SOCIAL': return 'from-pink-500 to-fuchsia-500';
-      case 'DISCOVERY': return 'from-purple-500 to-indigo-500';
-      case 'MESSAGING': return 'from-green-500 to-emerald-500';
-      case 'SPENDING': return 'from-amber-500 to-yellow-500';
-      case 'CONTENT': return 'from-rose-500 to-pink-500';
-      case 'CREATOR_ENGAGEMENT': return 'from-violet-500 to-purple-500';
-      case 'CREATOR_GROWTH': return 'from-emerald-500 to-teal-500';
-      case 'MILESTONE': return 'from-amber-500 to-yellow-500';
-      case 'CREATOR_MILESTONE': return 'from-rose-500 to-orange-500';
-      default: return 'from-gray-500 to-gray-600';
-    }
-  };
+  const categoryColor = CATEGORY_COLORS[mission.category] || 'from-gray-500 to-gray-600';
 
   return (
     <div 
@@ -44,7 +43,7 @@ function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
     >
       {/* Header */}
       <div className="flex items-start gap-3 mb-3">
-        <div className={`text-2xl p-2 rounded-lg bg-gradient-to-br ${getCategoryColor()} bg-opacity-20`}>
+        <div className={`text-2xl p-2 rounded-lg bg-gradient-to-br ${categoryColor} bg-opacity-20`}>
           {mission.icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -66,7 +65,7 @@ function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
         </div>
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <div 
-            className={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${getCategoryColor()}`}
+            className={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${categoryColor}`}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -103,7 +102,7 @@ function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
       </div>
     </div>
   );
-}
+});
 
 interface MissionsDisplayProps {
   compact?: boolean;
