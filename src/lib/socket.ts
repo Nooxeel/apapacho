@@ -18,7 +18,15 @@ class SocketService {
   connect(userId: string, token?: string) {
     this.connectionCount++
     this.currentUserId = userId
-    this.authToken = token || localStorage.getItem('apapacho-token')
+    
+    // Prefer passed token, fallback to stored token only if necessary
+    if (token) {
+      this.authToken = token
+    } else if (!this.authToken) {
+      // Only access localStorage as last resort fallback
+      this.authToken = typeof window !== 'undefined' ? localStorage.getItem('apapacho-token') : null
+    }
+    
     log(`[Socket] Connection count: ${this.connectionCount}, userId: ${userId}`)
     
     if (!this.authToken) {

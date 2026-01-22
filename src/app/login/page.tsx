@@ -38,14 +38,17 @@ function LoginContent() {
     acceptTerms: false
   })
 
-  // Load remembered credentials on mount
+  // Load remembered email on mount (password is NOT stored for security)
   useEffect(() => {
     try {
       const saved = localStorage.getItem(REMEMBER_KEY)
       if (saved) {
-        const { email, password } = JSON.parse(saved)
-        setFormData(prev => ({ ...prev, email, password }))
-        setRememberMe(true)
+        const parsed = JSON.parse(saved)
+        // Only load email - password should never be stored
+        if (parsed.email) {
+          setFormData(prev => ({ ...prev, email: parsed.email }))
+          setRememberMe(true)
+        }
       }
     } catch {
       // Ignore errors
@@ -87,18 +90,16 @@ function LoginContent() {
           password: formData.password
         }) as any
         
-        // Handle remember me
+        // Handle remember me - only save email for convenience (NOT password)
         if (rememberMe) {
           localStorage.setItem(REMEMBER_KEY, JSON.stringify({
-            email: formData.email,
-            password: formData.password
+            email: formData.email
           }))
         } else {
           localStorage.removeItem(REMEMBER_KEY)
         }
         
-        localStorage.setItem('apapacho-token', result.token)
-        localStorage.setItem('apapacho-user', JSON.stringify(result.user))
+        // Only use Zustand store (cookies are set by backend)
         login(result.user, result.token)
         
         // Track login mission progress
@@ -129,8 +130,7 @@ function LoginContent() {
         
         console.log('[REGISTER] Registration successful:', result)
         
-        localStorage.setItem('apapacho-token', result.token)
-        localStorage.setItem('apapacho-user', JSON.stringify(result.user))
+        // Only use Zustand store (cookies are set by backend)
         login(result.user, result.token)
         
         // Track login mission progress (first login counts too)

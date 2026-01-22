@@ -320,6 +320,7 @@ export const uploadApi = {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include', // Send cookies for fallback auth
         body: formData,
         signal,
       })
