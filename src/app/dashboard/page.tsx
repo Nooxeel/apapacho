@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { uploadApi, ApiError, subscriptionsApi, gamificationApi, type UserLevelResponse } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import { StreakDisplay, Leaderboard, BadgesDisplay, LevelDisplay, LevelBadge, MissionsDisplay, AvatarWithProgress } from '@/components/gamification';
+import { StreakDisplay, LevelDisplay, LevelBadge, AvatarWithProgress } from '@/components/gamification';
 import { Navbar } from '@/components/layout';
 import {
   User,
@@ -28,6 +29,31 @@ import {
   Trophy,
   Star
 } from 'lucide-react';
+
+// Lazy load heavy gamification components
+const Leaderboard = dynamic(
+  () => import('@/components/gamification').then(mod => mod.Leaderboard),
+  { 
+    loading: () => <div className="animate-pulse h-64 bg-white/5 rounded-xl" />,
+    ssr: false 
+  }
+);
+
+const BadgesDisplay = dynamic(
+  () => import('@/components/gamification').then(mod => mod.BadgesDisplay),
+  { 
+    loading: () => <div className="animate-pulse h-48 bg-white/5 rounded-xl" />,
+    ssr: false 
+  }
+);
+
+const MissionsDisplay = dynamic(
+  () => import('@/components/gamification').then(mod => mod.MissionsDisplay),
+  { 
+    loading: () => <div className="animate-pulse h-48 bg-white/5 rounded-xl" />,
+    ssr: false 
+  }
+);
 
 interface Subscription {
   id: string;
