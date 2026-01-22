@@ -222,6 +222,9 @@ export const authApi = {
   login: (data: { email: string; password: string }) =>
     api<{ user: any; token: string }>('/auth/login', { method: 'POST', body: data }),
 
+  googleLogin: (data: { credential: string; isCreator?: boolean; referralCode?: string }) =>
+    api<{ user: any; token: string; isNewUser: boolean }>('/auth/google', { method: 'POST', body: data }),
+
   getMe: (token: string) => api('/auth/me', { token }),
 }
 

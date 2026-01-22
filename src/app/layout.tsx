@@ -3,6 +3,7 @@ import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
 import { AgeVerificationProvider } from '@/components/providers/AgeVerificationProvider'
+import { GoogleAuthProvider } from '@/components/providers/GoogleAuthProvider'
 import { BadgeNotificationProvider } from '@/components/gamification'
 import { ContentProtection } from '@/components/ui/ContentProtection'
 import { GoogleAnalytics } from '@/components/analytics'
@@ -355,13 +356,15 @@ export default function RootLayout({
         />
         <GoogleAnalytics />
         <ContentProtection />
-        <FontProvider>
-          <AgeVerificationProvider>
-            <BadgeNotificationProvider>
-              {children}
-            </BadgeNotificationProvider>
-          </AgeVerificationProvider>
-        </FontProvider>
+        <GoogleAuthProvider>
+          <FontProvider>
+            <AgeVerificationProvider>
+              <BadgeNotificationProvider>
+                {children}
+              </BadgeNotificationProvider>
+            </AgeVerificationProvider>
+          </FontProvider>
+        </GoogleAuthProvider>
         {/* Cookie consent disabled for now - not required in Chile */}
       </body>
     </html>

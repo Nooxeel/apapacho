@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
 import { authApi, missionsApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
@@ -17,6 +18,7 @@ function LoginContent() {
   const { login } = useAuthStore()
   const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [referralCode, setReferralCode] = useState<string | null>(null)
@@ -207,6 +209,46 @@ function LoginContent() {
     }
   }
 
+  // Handle Google OAuth login
+  const handleGoogleSuccess = async (response: CredentialResponse) => {
+    if (!response.credential) {
+      setError('No se pudo obtener la credencial de Google')
+      return
+    }
+
+    setIsGoogleLoading(true)
+    setError(null)
+
+    try {
+      const result = await authApi.googleLogin({
+        credential: response.credential,
+        isCreator: !isLogin ? formData.isCreator : undefined,
+        referralCode: referralCode || undefined
+      }) as any
+
+      // Use Zustand store (cookies are set by backend)
+      login(result.user, result.token)
+
+      // Track login mission progress
+      missionsApi.trackProgress(result.token, 'login').catch(() => {})
+
+      if (result.user.isCreator) {
+        router.push('/creator/edit')
+      } else {
+        router.push('/dashboard')
+      }
+    } catch (err: any) {
+      console.error('Google auth error:', err)
+      setError(err.message || 'Error al iniciar sesión con Google')
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
+
+  const handleGoogleError = () => {
+    setError('Error al iniciar sesión con Google. Intenta de nuevo.')
+  }
+
   return (
     <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center px-4 py-8">
       <Card variant="glass" className="w-full max-w-md">
@@ -373,6 +415,37 @@ function LoginContent() {
             </Button>
           </form>
 
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-[#1a1a25] px-4 text-white/50">o continúa con</span>
+            </div>
+          </div>
+
+          {/* Google Sign In */}
+          <div className="flex justify-center">
+            {isGoogleLoading ? (
+              <div className="flex items-center gap-2 text-white/60 py-3">
+                <div className="animate-spin w-5 h-5 border-2 border-fuchsia-500 border-t-transparent rounded-full" />
+                <span>Conectando con Google...</span>
+              </div>
+            ) : (
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="filled_black"
+                size="large"
+                text={isLogin ? 'signin_with' : 'signup_with'}
+                shape="rectangular"
+                useOneTap={false}
+              />
+            )}
+          </div>
+
+          {/* Toggle between login/register */}
           <div className="mt-6 text-center">
             <button
               type="button"
