@@ -1,5 +1,5 @@
 # Apapacho - Plataforma de Contenido Adulto
-# https://apapacho.vercel.app
+# https://appapacho.cl
 
 # Allow all crawlers
 User-agent: *
@@ -28,4 +28,4 @@ Disallow: /cards/
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://apapacho.vercel.app/sitemap.xml
+Sitemap: https://appapacho.cl/sitemap.xml

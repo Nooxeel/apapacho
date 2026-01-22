@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://apapacho.vercel.app'
+  const baseUrl = 'https://appapacho.cl'
   
   // Static pages with SEO priority
   const staticPages: MetadataRoute.Sitemap = [

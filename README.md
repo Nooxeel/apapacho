@@ -80,9 +80,11 @@ src/
 
 | Tipo de Transacción | Comisión |
 |---------------------|----------|
-| Suscripciones       | 15%      |
-| Venta de Contenido  | 15%      |
-| Donaciones/Tips     | 15%      |
+| Suscripciones       | 7-10%    |
+| Venta de Contenido  | 7-10%    |
+| Donaciones/Tips     | 7-10%    |
+
+> 💡 La comisión más baja del mercado. OnlyFans cobra 20%.
 
 ## 🎯 Roadmap
 

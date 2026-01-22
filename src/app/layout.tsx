@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     'contenido para adultos chile',
     'plataforma +18'
   ],
-  metadataBase: new URL('https://apapacho.vercel.app'),
+  metadataBase: new URL('https://appapacho.cl'),
   alternates: {
     canonical: '/',
     languages: {
@@ -124,7 +124,7 @@ export default function RootLayout({
         {/* Age verification & adult content indicators */}
         <meta name="rating" content="adult" />
         <meta name="RATING" content="RTA-5042-1996-1400-1577-RTA" />
-        <meta httpEquiv="pics-label" content='(pics-1.1 "http://www.icra.org/ratingsv02.html" l gen true for "https://apapacho.vercel.app" r (nz 1 vz 1 lz 1 oz 1 cz 1) gen true for "https://*.apapacho.vercel.app" r (nz 1 vz 1 lz 1 oz 1 cz 1))' />
+        <meta httpEquiv="pics-label" content='(pics-1.1 "http://www.icra.org/ratingsv02.html" l gen true for "https://appapacho.cl" r (nz 1 vz 1 lz 1 oz 1 cz 1) gen true for "https://*.appapacho.cl" r (nz 1 vz 1 lz 1 oz 1 cz 1))' />
         
         {/* Geo targeting */}
         <meta name="geo.region" content="CL" />
@@ -142,24 +142,24 @@ export default function RootLayout({
               "@type": "WebSite",
               "name": "Apapacho",
               "alternateName": ["Apapacho Chile", "Plataforma Apapacho"],
-              "url": "https://apapacho.vercel.app",
+              "url": "https://appapacho.cl",
               "description": "La mejor plataforma de contenido adulto en Chile y Latinoamérica. Monetiza tu contenido exclusivo con suscripciones, propinas y ventas.",
               "inLanguage": "es-CL",
               "potentialAction": {
                 "@type": "SearchAction",
                 "target": {
                   "@type": "EntryPoint",
-                  "urlTemplate": "https://apapacho.vercel.app/creators?search={search_term_string}"
+                  "urlTemplate": "https://appapacho.cl/creators?search={search_term_string}"
                 },
                 "query-input": "required name=search_term_string"
               },
               "publisher": {
                 "@type": "Organization",
                 "name": "Apapacho",
-                "url": "https://apapacho.vercel.app",
+                "url": "https://appapacho.cl",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://apapacho.vercel.app/favicon.svg"
+                  "url": "https://appapacho.cl/favicon.svg"
                 }
               }
             })
@@ -172,8 +172,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Apapacho",
-              "url": "https://apapacho.vercel.app",
-              "logo": "https://apapacho.vercel.app/favicon.svg",
+              "url": "https://appapacho.cl",
+              "logo": "https://appapacho.cl/favicon.svg",
               "description": "Plataforma de contenido adulto para creadores en Chile y Latinoamérica",
               "foundingDate": "2024",
               "areaServed": ["CL", "419"],
@@ -242,7 +242,7 @@ export default function RootLayout({
                   "name": "¿Cuánto cobra Apapacho de comisión?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Apapacho cobra entre 15% y 20% de comisión, significativamente menos que otras plataformas internacionales. Además, ofrecemos pagos directos en pesos chilenos sin conversiones."
+                    "text": "Apapacho cobra solo 7% a 10% de comisión, la más baja del mercado. Además, ofrecemos pagos directos en pesos chilenos sin conversiones ni complicaciones."
                   }
                 },
                 {
@@ -285,19 +285,19 @@ export default function RootLayout({
                   "@type": "ListItem",
                   "position": 1,
                   "name": "Inicio",
-                  "item": "https://apapacho.vercel.app"
+                  "item": "https://appapacho.cl"
                 },
                 {
                   "@type": "ListItem",
                   "position": 2,
                   "name": "Creadores",
-                  "item": "https://apapacho.vercel.app/creators"
+                  "item": "https://appapacho.cl/creators"
                 },
                 {
                   "@type": "ListItem",
                   "position": 3,
                   "name": "Explorar",
-                  "item": "https://apapacho.vercel.app/explore"
+                  "item": "https://appapacho.cl/explore"
                 }
               ]
             })
