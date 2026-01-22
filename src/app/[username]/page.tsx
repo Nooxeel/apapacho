@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { creatorApi, subscriptionsApi, promocodesApi, missionsApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
@@ -9,7 +10,6 @@ import { replaceCountryCodesWithFlags } from '@/lib/utils'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
 import { Navbar } from '@/components/layout'
-import ChatModal from '@/components/messages/ChatModal'
 import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
 import { useAuthStore } from '@/stores/authStore'
 import { socketService } from '@/lib/socket'
@@ -30,6 +30,12 @@ import {
   X
 } from 'lucide-react'
 import { AvatarWithProgress } from '@/components/gamification'
+
+// Lazy load ChatModal - only loaded when user opens chat
+const ChatModal = dynamic(
+  () => import('@/components/messages/ChatModal'),
+  { ssr: false, loading: () => null }
+)
 
 interface CreatorProfile {
   id: string

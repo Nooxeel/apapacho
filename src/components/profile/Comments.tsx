@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/lib/config';
 import { sanitizeComment } from '@/lib/sanitize';
@@ -32,7 +32,7 @@ interface CommentsProps {
   accentColor?: string;
 }
 
-export default function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: CommentsProps) {
+function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: CommentsProps) {
   const { user, token } = useAuthStore();
   const { checkForNewBadges } = useBadgeNotification();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -363,3 +363,5 @@ export default function Comments({ creatorId, isOwner = false, accentColor = '#d
     </div>
   );
 }
+
+export default memo(Comments);

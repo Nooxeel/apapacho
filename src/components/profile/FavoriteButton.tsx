@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Heart } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/lib/config';
@@ -14,7 +14,7 @@ interface FavoriteButtonProps {
   showCount?: boolean;
 }
 
-export default function FavoriteButton({ 
+function FavoriteButton({ 
   creatorId, 
   accentColor = '#d946ef',
   size = 'md',
@@ -151,3 +151,5 @@ export default function FavoriteButton({
     </button>
   );
 }
+
+export default memo(FavoriteButton);
