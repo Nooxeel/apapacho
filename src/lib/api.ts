@@ -1271,8 +1271,8 @@ export interface UserMission {
   name: string
   description: string
   icon: string
-  type: 'DAILY' | 'WEEKLY'
-  category: 'ENGAGEMENT' | 'TIPPING' | 'SOCIAL' | 'DISCOVERY' | 'MESSAGING' | 'SPENDING' | 'CONTENT' | 'CREATOR_ENGAGEMENT' | 'GROWTH' | 'CREATOR_GROWTH'
+  type: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ACHIEVEMENT'
+  category: 'ENGAGEMENT' | 'TIPPING' | 'SOCIAL' | 'DISCOVERY' | 'MESSAGING' | 'SPENDING' | 'CONTENT' | 'CREATOR_ENGAGEMENT' | 'GROWTH' | 'CREATOR_GROWTH' | 'MILESTONE' | 'CREATOR_MILESTONE'
   actionType: string
   targetCount: number
   progress: number
@@ -1287,17 +1287,29 @@ export interface UserMission {
 export interface MissionsResponse {
   daily: UserMission[]
   weekly: UserMission[]
+  monthly: UserMission[]
+  achievements: UserMission[]
   creatorDaily: UserMission[]
   creatorWeekly: UserMission[]
+  creatorMonthly: UserMission[]
+  creatorAchievements: UserMission[]
   summary: {
     dailyCompleted: number
     dailyTotal: number
     weeklyCompleted: number
     weeklyTotal: number
+    monthlyCompleted: number
+    monthlyTotal: number
+    achievementsCompleted: number
+    achievementsTotal: number
     creatorDailyCompleted: number
     creatorDailyTotal: number
     creatorWeeklyCompleted: number
     creatorWeeklyTotal: number
+    creatorMonthlyCompleted: number
+    creatorMonthlyTotal: number
+    creatorAchievementsCompleted: number
+    creatorAchievementsTotal: number
     unclaimedRewards: number
   }
 }

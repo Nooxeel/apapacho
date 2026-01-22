@@ -26,6 +26,8 @@ function MissionCard({ mission, onClaim, isClaiming }: MissionCardProps) {
       case 'CONTENT': return 'from-rose-500 to-pink-500';
       case 'CREATOR_ENGAGEMENT': return 'from-violet-500 to-purple-500';
       case 'CREATOR_GROWTH': return 'from-emerald-500 to-teal-500';
+      case 'MILESTONE': return 'from-amber-500 to-yellow-500';
+      case 'CREATOR_MILESTONE': return 'from-rose-500 to-orange-500';
       default: return 'from-gray-500 to-gray-600';
     }
   };
@@ -107,7 +109,7 @@ interface MissionsDisplayProps {
   compact?: boolean;
 }
 
-type TabType = 'daily' | 'weekly' | 'creatorDaily' | 'creatorWeekly';
+type TabType = 'daily' | 'weekly' | 'monthly' | 'achievements' | 'creatorDaily' | 'creatorWeekly' | 'creatorMonthly' | 'creatorAchievements';
 
 export default function MissionsDisplay({ compact = false }: MissionsDisplayProps) {
   const { token, user } = useAuthStore();
@@ -117,7 +119,12 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
   const [activeTab, setActiveTab] = useState<TabType>('daily');
 
   const isCreator = user?.isCreator || false;
-  const hasCreatorMissions = missions && (missions.creatorDaily?.length > 0 || missions.creatorWeekly?.length > 0);
+  const hasCreatorMissions = missions && (
+    missions.creatorDaily?.length > 0 || 
+    missions.creatorWeekly?.length > 0 ||
+    missions.creatorMonthly?.length > 0 ||
+    missions.creatorAchievements?.length > 0
+  );
 
   const loadMissions = useCallback(async () => {
     if (!token) return;
@@ -170,8 +177,12 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
     switch (activeTab) {
       case 'daily': return missions.daily || [];
       case 'weekly': return missions.weekly || [];
+      case 'monthly': return missions.monthly || [];
+      case 'achievements': return missions.achievements || [];
       case 'creatorDaily': return missions.creatorDaily || [];
       case 'creatorWeekly': return missions.creatorWeekly || [];
+      case 'creatorMonthly': return missions.creatorMonthly || [];
+      case 'creatorAchievements': return missions.creatorAchievements || [];
       default: return [];
     }
   };
@@ -182,9 +193,13 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
   if (compact) {
     // Compact view: just show summary
     const totalCompleted = missions.summary.dailyCompleted + missions.summary.weeklyCompleted +
-      (missions.summary.creatorDailyCompleted || 0) + (missions.summary.creatorWeeklyCompleted || 0);
+      (missions.summary.monthlyCompleted || 0) + (missions.summary.achievementsCompleted || 0) +
+      (missions.summary.creatorDailyCompleted || 0) + (missions.summary.creatorWeeklyCompleted || 0) +
+      (missions.summary.creatorMonthlyCompleted || 0) + (missions.summary.creatorAchievementsCompleted || 0);
     const totalMissions = missions.summary.dailyTotal + missions.summary.weeklyTotal +
-      (missions.summary.creatorDailyTotal || 0) + (missions.summary.creatorWeeklyTotal || 0);
+      (missions.summary.monthlyTotal || 0) + (missions.summary.achievementsTotal || 0) +
+      (missions.summary.creatorDailyTotal || 0) + (missions.summary.creatorWeeklyTotal || 0) +
+      (missions.summary.creatorMonthlyTotal || 0) + (missions.summary.creatorAchievementsTotal || 0);
     
     return (
       <div className="bg-white/5 rounded-xl p-4">
@@ -256,6 +271,26 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
         >
           Semanales ({missions.summary.weeklyCompleted}/{missions.summary.weeklyTotal})
         </button>
+        <button
+          onClick={() => setActiveTab('monthly')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'monthly'
+              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+              : 'bg-white/5 text-white/60 hover:bg-white/10'
+          }`}
+        >
+          Mensuales ({missions.summary.monthlyCompleted || 0}/{missions.summary.monthlyTotal || 0})
+        </button>
+        <button
+          onClick={() => setActiveTab('achievements')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            activeTab === 'achievements'
+              ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+              : 'bg-white/5 text-white/60 hover:bg-white/10'
+          }`}
+        >
+          🏆 Logros ({missions.summary.achievementsCompleted || 0}/{missions.summary.achievementsTotal || 0})
+        </button>
         
         {/* Creator missions tabs - only show if user has creator missions */}
         {hasCreatorMissions && (
@@ -285,6 +320,26 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
             >
               Semanales ({missions.summary.creatorWeeklyCompleted || 0}/{missions.summary.creatorWeeklyTotal || 0})
             </button>
+            <button
+              onClick={() => setActiveTab('creatorMonthly')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'creatorMonthly'
+                  ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              Mensuales ({missions.summary.creatorMonthlyCompleted || 0}/{missions.summary.creatorMonthlyTotal || 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('creatorAchievements')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'creatorAchievements'
+                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+              }`}
+            >
+              🌟 Logros ({missions.summary.creatorAchievementsCompleted || 0}/{missions.summary.creatorAchievementsTotal || 0})
+            </button>
           </>
         )}
       </div>
@@ -297,8 +352,12 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
             <p>
               {activeTab === 'daily' && 'No hay misiones diarias asignadas'}
               {activeTab === 'weekly' && 'No hay misiones semanales asignadas'}
+              {activeTab === 'monthly' && 'No hay misiones mensuales asignadas'}
+              {activeTab === 'achievements' && 'No hay logros disponibles'}
               {activeTab === 'creatorDaily' && 'No hay misiones de creador diarias'}
               {activeTab === 'creatorWeekly' && 'No hay misiones de creador semanales'}
+              {activeTab === 'creatorMonthly' && 'No hay misiones de creador mensuales'}
+              {activeTab === 'creatorAchievements' && 'No hay logros de creador disponibles'}
             </p>
           </div>
         ) : (
