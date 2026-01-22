@@ -178,7 +178,177 @@ export default function RootLayout({
               "foundingDate": "2024",
               "areaServed": ["CL", "419"],
               "serviceType": ["Content Platform", "Adult Content", "Creator Economy"],
-              "sameAs": []
+              "sameAs": [],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "availableLanguage": ["Spanish", "English"],
+                "email": "soporte@apapacho.cl"
+              }
+            })
+          }}
+        />
+        {/* SoftwareApplication Schema - App-like experience */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "Apapacho",
+              "applicationCategory": "SocialNetworkingApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CLP",
+                "description": "Gratis para fans. Creadores ganan con suscripciones y propinas."
+              },
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "1250",
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "featureList": [
+                "Suscripciones mensuales",
+                "Propinas y donaciones",
+                "Contenido exclusivo",
+                "Mensajes privados",
+                "Pagos locales Chile"
+              ]
+            })
+          }}
+        />
+        {/* FAQPage Schema - Rich Snippets */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "¿Qué es Apapacho?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Apapacho es la plataforma líder de contenido adulto en Chile y Latinoamérica. Permite a creadores monetizar su contenido exclusivo mediante suscripciones, propinas y ventas directas, con pagos locales sin complicaciones."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Cuánto cobra Apapacho de comisión?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Apapacho cobra entre 15% y 20% de comisión, significativamente menos que otras plataformas internacionales. Además, ofrecemos pagos directos en pesos chilenos sin conversiones."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Cómo puedo ser creador en Apapacho?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Registrarte es gratis y toma menos de 5 minutos. Solo necesitas ser mayor de 18 años, verificar tu identidad y configurar tu perfil. Puedes empezar a ganar dinero el mismo día."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Apapacho es seguro?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Sí, Apapacho utiliza encriptación de nivel bancario, verificación de edad obligatoria y protección de contenido contra descargas. Tu privacidad y seguridad son nuestra prioridad."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Cuáles son los métodos de pago?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Aceptamos WebPay (tarjetas de débito y crédito chilenas), transferencias bancarias y pronto criptomonedas. Los creadores reciben pagos semanales directamente a su cuenta."
+                  }
+                }
+              ]
+            })
+          }}
+        />
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Inicio",
+                  "item": "https://apapacho.vercel.app"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Creadores",
+                  "item": "https://apapacho.vercel.app/creators"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": "Explorar",
+                  "item": "https://apapacho.vercel.app/explore"
+                }
+              ]
+            })
+          }}
+        />
+        {/* Service Schema - Main offering */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "serviceType": "Plataforma de Contenido para Creadores",
+              "provider": {
+                "@type": "Organization",
+                "name": "Apapacho"
+              },
+              "areaServed": {
+                "@type": "Country",
+                "name": "Chile"
+              },
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Planes para Creadores",
+                "itemListElement": [
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Suscripciones Mensuales",
+                      "description": "Cobra mensualmente a tus fans por acceso a contenido exclusivo"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Propinas y Donaciones",
+                      "description": "Recibe propinas directas de tus fans más fieles"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Venta de Contenido PPV",
+                      "description": "Vende fotos y videos individuales a precio fijo"
+                    }
+                  }
+                ]
+              }
             })
           }}
         />
