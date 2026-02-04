@@ -27,7 +27,8 @@ import {
   ArrowRight,
   Users,
   Trophy,
-  Star
+  Star,
+  Upload
 } from 'lucide-react';
 
 // Lazy load heavy gamification components
@@ -478,29 +479,17 @@ export default function DashboardPage() {
             Herramientas de Creador
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {/* Subir Video */}
+            {/* Subir Contenido */}
             <button
-              onClick={() => router.push('/creator/upload-video')}
-              className="group bg-gradient-to-br from-purple-500/10 to-fuchsia-500/10 hover:from-purple-500/20 hover:to-fuchsia-500/20 border border-purple-500/20 hover:border-purple-500/40 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20"
+              onClick={() => router.push('/creator/upload')}
+              className="group bg-gradient-to-br from-purple-500/10 via-fuchsia-500/10 to-pink-500/10 hover:from-purple-500/20 hover:via-fuchsia-500/20 hover:to-pink-500/20 border border-purple-500/20 hover:border-fuchsia-500/40 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-fuchsia-500/20 col-span-2"
             >
               <div className="flex flex-col items-center text-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Video className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Upload className="w-6 h-6" />
                 </div>
-                <h3 className="font-semibold text-sm text-white">Subir Video</h3>
-              </div>
-            </button>
-
-            {/* Subir Foto */}
-            <button
-              onClick={() => router.push('/creator/upload-image')}
-              className="group bg-gradient-to-br from-pink-500/10 to-rose-500/10 hover:from-pink-500/20 hover:to-rose-500/20 border border-pink-500/20 hover:border-pink-500/40 rounded-2xl p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-pink-500/20"
-            >
-              <div className="flex flex-col items-center text-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <ImageIcon className="w-6 h-6" />
-                </div>
-                <h3 className="font-semibold text-sm text-white">Subir Foto</h3>
+                <h3 className="font-semibold text-sm text-white">Subir Contenido</h3>
+                <p className="text-xs text-white/40">Fotos y Videos</p>
               </div>
             </button>
 

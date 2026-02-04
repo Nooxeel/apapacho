@@ -191,7 +191,7 @@ export default function CreatorPostsPage() {
               </h1>
               <p className="text-white/60">Administra tu contenido</p>
             </div>
-            <Link href="/creator/upload-image">
+            <Link href="/creator/upload">
               <Button variant="primary" className="flex items-center gap-2">
                 <Plus className="w-5 h-5" />
                 Crear Post
@@ -203,7 +203,7 @@ export default function CreatorPostsPage() {
           {posts.length === 0 ? (
             <Card variant="solid" className="p-12 text-center">
               <p className="text-white/60 mb-4">No tienes posts todavía</p>
-              <Link href="/creator/upload-image">
+              <Link href="/creator/upload">
                 <Button variant="primary">Crear tu primer post</Button>
               </Link>
             </Card>
