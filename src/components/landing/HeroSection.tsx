@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CursorParticles } from '@/components/ui/CursorParticles'
 
 // Server Component - No JavaScript sent to browser
 // All styling is pure CSS, no client-side interactivity needed
@@ -14,6 +15,9 @@ export function HeroSection() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/5 rounded-full" />
       </div>
 
+      {/* Cursor Particles Effect */}
+      <CursorParticles />
+
       {/* Subtle vignette effect */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" aria-hidden="true" />
 
@@ -25,7 +29,7 @@ export function HeroSection() {
         </div>
 
         {/* Main Title - Uses system font first, then Poppins when loaded */}
-        <h1 
+        <h1
           className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-8 tracking-wide"
           style={{ fontFamily: 'var(--font-poppins), system-ui, sans-serif' }}
         >
@@ -45,7 +49,7 @@ export function HeroSection() {
 
         {/* CTA Buttons - Pure HTML/CSS, no JS needed */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <Link 
+          <Link
             href="/login"
             className="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 px-8 py-4 text-base font-medium tracking-wide shadow-lg shadow-purple-500/25 rounded-xl text-white transition-all duration-200"
           >
@@ -65,7 +69,7 @@ export function HeroSection() {
               />
             </svg>
           </Link>
-          <Link 
+          <Link
             href="/explore"
             className="inline-flex items-center justify-center text-purple-200/80 hover:text-white hover:bg-purple-500/10 border border-purple-500/20 px-8 py-4 rounded-xl transition-all duration-200"
           >

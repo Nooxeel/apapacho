@@ -30,6 +30,7 @@ import {
   X
 } from 'lucide-react'
 import { AvatarWithProgress } from '@/components/gamification'
+import { CursorParticles } from '@/components/ui/CursorParticles'
 
 // Lazy load ChatModal - only loaded when user opens chat
 const ChatModal = dynamic(
@@ -126,7 +127,7 @@ export default function CreatorPublicProfile() {
   const router = useRouter()
   const username = params.username as string
   const { user, token } = useAuthStore()
-  
+
   const [creator, setCreator] = useState<CreatorProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -196,7 +197,7 @@ export default function CreatorPublicProfile() {
             const stats = await statsRes.json()
             setCommentsCount(stats.approved)
           }
-        } catch {}
+        } catch { }
 
         // Verificar si el usuario actual es suscriptor
         if (token && user && data.creatorProfile?.id) {
@@ -209,7 +210,7 @@ export default function CreatorPublicProfile() {
 
           // Track profile visit for missions (only if not viewing own profile)
           if (user.id !== data.id) {
-            missionsApi.trackProgress(token, 'visit').catch(() => {})
+            missionsApi.trackProgress(token, 'visit').catch(() => { })
           }
         }
       } catch (err) {
@@ -353,8 +354,8 @@ export default function CreatorPublicProfile() {
     }
 
     // Calcular precio final (con promocode si aplica)
-    const finalPrice = promoDiscount && selectedTierId === tierId 
-      ? promoDiscount.finalAmount 
+    const finalPrice = promoDiscount && selectedTierId === tierId
+      ? promoDiscount.finalAmount
       : tier.price
 
     setSubscribing(true)
@@ -362,7 +363,7 @@ export default function CreatorPublicProfile() {
       // Si el precio es 0 (promocode free trial), suscribir directamente
       if (finalPrice === 0) {
         const response = await subscriptionsApi.subscribe(creator.creatorProfile.id, tierId, token)
-        
+
         // Registrar redención del promocode
         if (promoDiscount) {
           try {
@@ -377,18 +378,18 @@ export default function CreatorPublicProfile() {
             console.error('Error redeeming promocode:', redeemError)
           }
         }
-        
+
         setIsSubscriber(true)
         setShowSubscribeModal(false)
         clearPromocode()
         setSelectedTierId(null)
-        
+
         setSuccessMessage({
           tierName: tier.name,
           endDate: new Date(response.subscription.endDate).toLocaleDateString('es-CL')
         })
         setShowSuccessModal(true)
-        
+
         const updatedCreator = await creatorApi.getByUsername(username)
         setCreator(updatedCreator as CreatorProfile)
         return
@@ -397,14 +398,14 @@ export default function CreatorPublicProfile() {
       // Usar Webpay para pagos con monto > 0
       // El usuario será redirigido a la página de Transbank
       const result = await payForSubscription(tierId, creator.creatorProfile.id, finalPrice)
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Error al iniciar pago')
       }
-      
+
       // Si llegamos aquí, el usuario fue redirigido a Webpay
       // La página /payments/result manejará el resultado
-      
+
     } catch (error: any) {
       console.error('Error al suscribirse:', error)
       alert(error.message || 'Error al procesar el pago. Intenta de nuevo.')
@@ -420,27 +421,27 @@ export default function CreatorPublicProfile() {
     setCancelling(true)
     try {
       await subscriptionsApi.unsubscribe(creator.creatorProfile.id, token)
-      
+
       setShowCancelConfirm(false)
       setShowManageModal(false)
-      
+
       // Recargar perfil para obtener el estado actualizado de la suscripción
       const updatedCreator = await creatorApi.getByUsername(username) as CreatorProfile
       setCreator(updatedCreator)
-      
+
       // Verificar estado de suscripción actualizado
       if (token && user) {
         try {
           const subCheck = await subscriptionsApi.checkSubscription(updatedCreator.creatorProfile.id, token)
           setIsSubscriber(subCheck.isSubscribed)
           setSubscriptionDetails(subCheck.subscription)
-          
+
           if (subCheck.subscription?.endDate) {
             const endDate = new Date(subCheck.subscription.endDate)
-            const formattedDate = endDate.toLocaleDateString('es-CL', { 
-              day: 'numeric', 
-              month: 'long', 
-              year: 'numeric' 
+            const formattedDate = endDate.toLocaleDateString('es-CL', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
             })
             alert(`✅ Suscripción cancelada. Mantendrás acceso hasta el ${formattedDate}.`)
           } else {
@@ -450,7 +451,7 @@ export default function CreatorPublicProfile() {
           console.error('Error checking subscription:', error)
         }
       }
-      
+
     } catch (error: any) {
       console.error('Error al cancelar suscripción:', error)
       alert(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.')
@@ -462,7 +463,7 @@ export default function CreatorPublicProfile() {
   // Cargar detalles de suscripción cuando se abre el modal
   const loadSubscriptionDetails = async () => {
     if (!token || !creator) return
-    
+
     try {
       const result = await subscriptionsApi.checkSubscription(creator.creatorProfile.id, token)
       if (result.subscription) {
@@ -527,35 +528,35 @@ export default function CreatorPublicProfile() {
   const profile = creator.creatorProfile
   const stats = profile.stats
   const mainTier = profile.subscriptionTiers[0]
-  
+
   // Verificar si el usuario actual es el dueño del perfil
   const isOwner = user?.id === creator.id
 
   // Build image URLs (images are now served from frontend /public/images)
-  const coverImageUrl = profile.coverImage 
-    ? profile.coverImage 
+  const coverImageUrl = profile.coverImage
+    ? profile.coverImage
     : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=600&fit=crop'
-  
-  const profileImageUrl = profile.profileImage 
-    ? profile.profileImage 
-    : creator.avatar 
-      ? creator.avatar 
+
+  const profileImageUrl = profile.profileImage
+    ? profile.profileImage
+    : creator.avatar
+      ? creator.avatar
       : `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.displayName)}&size=150&background=random`
 
   return (
     <>
       <ProfileFontsLoader />
       <Navbar />
-      <div 
+      <div
         className="min-h-screen"
-        style={{ 
+        style={{
           backgroundColor: profile.backgroundColor,
           color: profile.textColor,
           fontFamily: getFontStyle(profile.fontFamily),
         }}
       >
         {/* Cover Image */}
-        <div className="relative w-full max-w-7xl mx-auto">
+        <div className="relative z-10 w-full max-w-7xl mx-auto">
           <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden bg-black/40 md:rounded-b-2xl">
             <Image
               src={coverImageUrl}
@@ -570,268 +571,268 @@ export default function CreatorPublicProfile() {
           </div>
         </div>
 
-      {/* Profile Section */}
-      <div className="relative -mt-24 pb-6">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Profile Image */}
-          <div className="flex flex-col items-center">
-            <AvatarWithProgress
-              userId={creator.id}
-              size={152}
-              strokeWidth={5}
-              accentColor={profile.accentColor}
-              showLevelBadge={true}
-            >
-              <Image
-                src={profileImageUrl}
-                alt={creator.displayName}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 150px, 200px"
-              />
-            </AvatarWithProgress>
+        {/* Profile Section */}
+        <div className="relative z-10 -mt-24 pb-6">
+          <div className="max-w-4xl mx-auto px-4">
+            {/* Profile Image */}
+            <div className="flex flex-col items-center">
+              <AvatarWithProgress
+                userId={creator.id}
+                size={152}
+                strokeWidth={5}
+                accentColor={profile.accentColor}
+                showLevelBadge={true}
+              >
+                <Image
+                  src={profileImageUrl}
+                  alt={creator.displayName}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 150px, 200px"
+                />
+              </AvatarWithProgress>
 
-            {/* Title with verification */}
-            <div className="mt-4 flex items-center gap-2">
-              <h1 className="text-2xl font-bold">{replaceCountryCodesWithFlags(profile.extendedInfoTitle || creator.username)}</h1>
-              {profile.isVerified && (
-                <BadgeCheck 
-                  className="w-6 h-6" 
-                  style={{ color: profile.accentColor }}
-                  fill={profile.accentColor}
+              {/* Title with verification */}
+              <div className="mt-4 flex items-center gap-2">
+                <h1 className="text-2xl font-bold">{replaceCountryCodesWithFlags(profile.extendedInfoTitle || creator.username)}</h1>
+                {profile.isVerified && (
+                  <BadgeCheck
+                    className="w-6 h-6"
+                    style={{ color: profile.accentColor }}
+                    fill={profile.accentColor}
+                  />
+                )}
+              </div>
+
+              {/* Extended Info - Main content */}
+              {profile.extendedInfo && (
+                <div className="mt-4 text-center text-gray-300 max-w-2xl whitespace-pre-line">
+                  <p className="text-lg leading-relaxed">
+                    {replaceCountryCodesWithFlags(profile.extendedInfo)}
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                {/* Botón de Suscripción */}
+                {mainTier && !isOwner && !isSubscriber && (
+                  <button
+                    onClick={() => setShowSubscribeModal(true)}
+                    className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-transform hover:scale-105"
+                    style={{ backgroundColor: profile.accentColor }}
+                  >
+                    <Lock className="w-5 h-5" />
+                    Suscribirse {formatPriceCLP(mainTier.price)}/mes
+                  </button>
+                )}
+
+                {/* Botón de gestión si ya está suscrito */}
+                {isSubscriber && !isOwner && (
+                  <button
+                    onClick={() => {
+                      loadSubscriptionDetails()
+                      setShowManageModal(true)
+                    }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
+                    style={{ backgroundColor: profile.accentColor }}
+                  >
+                    <BadgeCheck className="w-5 h-5" />
+                    Suscrito
+                  </button>
+                )}
+
+                {/* Botón de Propina - Configurable */}
+                {(profile.visibilitySettings?.tabs?.tipping !== false) && (
+                  <button className="flex items-center gap-2 px-5 py-3 rounded-full border border-gray-600 bg-transparent hover:bg-white/5 transition-colors">
+                    <span className="text-lg">💰</span>
+                    Propina
+                  </button>
+                )}
+
+                {/* Botón de Favorito */}
+                {!isOwner && (
+                  <FavoriteButton
+                    creatorId={profile.id}
+                    accentColor={profile.accentColor}
+                    size="md"
+                  />
+                )}
+
+                {/* Botón de Mensaje - Con control de privacidad */}
+                {!isOwner && canSendMessage() && (
+                  <button
+                    onClick={handleSendMessage}
+                    className="flex items-center gap-2 px-5 py-3 rounded-full border-2 border-fuchsia-500/50 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 transition-colors text-white font-medium"
+                    title="Enviar mensaje"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span>Mensaje</span>
+                  </button>
+                )}
+
+                <button className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors">
+                  <Share2 className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Stats */}
+              <div className="mt-8 flex flex-wrap justify-center gap-6 md:gap-12">
+                {(profile.visibilitySettings?.tabs?.likes !== false) && (
+                  <StatItem
+                    icon={<Heart className="w-5 h-5" />}
+                    value={formatNumber(totalLikes || stats.totalLikes)}
+                    label="Likes"
+                    accentColor={profile.accentColor}
+                  />
+                )}
+                {(profile.visibilitySettings?.tabs?.posts !== false) && (
+                  <StatItem
+                    icon={<FileText className="w-5 h-5" />}
+                    value={formatNumber(stats.postsCount)}
+                    label="Posts"
+                    accentColor={profile.accentColor}
+                    active={activeTab === 'posts'}
+                    onClick={() => setActiveTab('posts')}
+                  />
+                )}
+                {/* Nuevo: Contador de comentarios de posts */}
+                {(profile.visibilitySettings?.tabs?.posts !== false) && totalPostComments > 0 && (
+                  <StatItem
+                    icon={<MessageCircle className="w-5 h-5" />}
+                    value={formatNumber(totalPostComments)}
+                    label="Comentarios"
+                    accentColor={profile.accentColor}
+                  />
+                )}
+                {(profile.visibilitySettings?.tabs?.photos !== false) && (
+                  <StatItem
+                    icon={<ImageIcon className="w-5 h-5" />}
+                    value={formatNumber(stats.photosCount)}
+                    label="Fotos"
+                    accentColor={profile.accentColor}
+                    active={activeTab === 'photos'}
+                    onClick={() => setActiveTab('photos')}
+                  />
+                )}
+                {(profile.visibilitySettings?.tabs?.videos !== false) && (
+                  <StatItem
+                    icon={<Video className="w-5 h-5" />}
+                    value={formatNumber(stats.videosCount)}
+                    label="Videos"
+                    accentColor={profile.accentColor}
+                    active={activeTab === 'videos'}
+                    onClick={() => setActiveTab('videos')}
+                  />
+                )}
+                {(profile.visibilitySettings?.tabs?.audio !== false) && (
+                  <StatItem
+                    icon={<Mic className="w-5 h-5" />}
+                    value={formatNumber(stats.audioCount)}
+                    label="Audio"
+                    accentColor={profile.accentColor}
+                    active={activeTab === 'audio'}
+                    onClick={() => setActiveTab('audio')}
+                  />
+                )}
+                {(profile.visibilitySettings?.tabs?.guestbook !== false) && (
+                  <StatItem
+                    icon={<MessageCircle className="w-5 h-5" />}
+                    value={formatNumber(commentsCount)}
+                    label="Libro de visitas"
+                    accentColor={profile.accentColor}
+                    active={activeTab === 'comments'}
+                    onClick={() => setActiveTab('comments')}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+            {/* About Me */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white/5 rounded-xl p-5 backdrop-blur-sm border border-white/10">
+                <h3 className="font-semibold text-lg mb-3">{profile.bioTitle || 'Acerca de mí'}</h3>
+                <p className="text-gray-300 text-sm whitespace-pre-line">
+                  {profile.bio || 'Este creador aún no ha agregado una descripción.'}
+                </p>
+
+                {/* Social Links */}
+                {profile.socialLinks.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <h4 className="font-medium text-sm mb-3">Enlaces</h4>
+                    <SocialLinksDisplay
+                      links={profile.socialLinks}
+                      variant="default"
+                    />
+                  </div>
+                )}
+
+                {/* Subscription Tiers */}
+                {profile.subscriptionTiers.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <h4 className="font-medium text-sm mb-3">Planes de Suscripción</h4>
+                    <div className="space-y-2">
+                      {profile.subscriptionTiers.map(tier => (
+                        <div
+                          key={tier.id}
+                          className="p-3 rounded-lg border border-white/20 hover:border-white/40 transition-colors cursor-pointer"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">{tier.name}</span>
+                            <span
+                              className="font-bold"
+                              style={{ color: profile.accentColor }}
+                            >
+                              ${tier.price.toFixed(2)}/mes
+                            </span>
+                          </div>
+                          {tier.description && (
+                            <p className="text-xs text-gray-400 mt-1">{tier.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Music Player */}
+              {profile.musicTracks && profile.musicTracks.length > 0 && (
+                <MusicPlayer
+                  tracks={profile.musicTracks}
+                  autoPlay={false}
+                  accentColor={profile.accentColor}
                 />
               )}
             </div>
 
-            {/* Extended Info - Main content */}
-            {profile.extendedInfo && (
-              <div className="mt-4 text-center text-gray-300 max-w-2xl whitespace-pre-line">
-                <p className="text-lg leading-relaxed">
-                  {replaceCountryCodesWithFlags(profile.extendedInfo)}
-                </p>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              {/* Botón de Suscripción */}
-              {mainTier && !isOwner && !isSubscriber && (
-                <button
-                  onClick={() => setShowSubscribeModal(true)}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-transform hover:scale-105"
-                  style={{ backgroundColor: profile.accentColor }}
-                >
-                  <Lock className="w-5 h-5" />
-                  Suscribirse {formatPriceCLP(mainTier.price)}/mes
-                </button>
-              )}
-
-              {/* Botón de gestión si ya está suscrito */}
-              {isSubscriber && !isOwner && (
-                <button
-                  onClick={() => {
-                    loadSubscriptionDetails()
-                    setShowManageModal(true)
-                  }}
-                  className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
-                  style={{ backgroundColor: profile.accentColor }}
-                >
-                  <BadgeCheck className="w-5 h-5" />
-                  Suscrito
-                </button>
-              )}
-
-              {/* Botón de Propina - Configurable */}
-              {(profile.visibilitySettings?.tabs?.tipping !== false) && (
-                <button className="flex items-center gap-2 px-5 py-3 rounded-full border border-gray-600 bg-transparent hover:bg-white/5 transition-colors">
-                  <span className="text-lg">💰</span>
-                  Propina
-                </button>
-              )}
-
-              {/* Botón de Favorito */}
-              {!isOwner && (
-                <FavoriteButton
+            {/* Posts Feed / Comments */}
+            <div className="lg:col-span-5">
+              {activeTab === 'comments' ? (
+                <Comments
+                  creatorId={profile.id}
+                  isOwner={isOwner}
+                  accentColor={profile.accentColor}
+                />
+              ) : (
+                <PostsFeed
                   creatorId={profile.id}
                   accentColor={profile.accentColor}
-                  size="md"
-                />
-              )}
-
-              {/* Botón de Mensaje - Con control de privacidad */}
-              {!isOwner && canSendMessage() && (
-                <button
-                  onClick={handleSendMessage}
-                  className="flex items-center gap-2 px-5 py-3 rounded-full border-2 border-fuchsia-500/50 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 transition-colors text-white font-medium"
-                  title="Enviar mensaje"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  <span>Mensaje</span>
-                </button>
-              )}
-
-              <button className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors">
-                <Share2 className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="mt-8 flex flex-wrap justify-center gap-6 md:gap-12">
-              {(profile.visibilitySettings?.tabs?.likes !== false) && (
-                <StatItem
-                  icon={<Heart className="w-5 h-5" />}
-                  value={formatNumber(totalLikes || stats.totalLikes)}
-                  label="Likes"
-                  accentColor={profile.accentColor}
-                />
-              )}
-              {(profile.visibilitySettings?.tabs?.posts !== false) && (
-                <StatItem
-                  icon={<FileText className="w-5 h-5" />}
-                  value={formatNumber(stats.postsCount)}
-                  label="Posts"
-                  accentColor={profile.accentColor}
-                  active={activeTab === 'posts'}
-                  onClick={() => setActiveTab('posts')}
-                />
-              )}
-              {/* Nuevo: Contador de comentarios de posts */}
-              {(profile.visibilitySettings?.tabs?.posts !== false) && totalPostComments > 0 && (
-                <StatItem
-                  icon={<MessageCircle className="w-5 h-5" />}
-                  value={formatNumber(totalPostComments)}
-                  label="Comentarios"
-                  accentColor={profile.accentColor}
-                />
-              )}
-              {(profile.visibilitySettings?.tabs?.photos !== false) && (
-                <StatItem 
-                  icon={<ImageIcon className="w-5 h-5" />} 
-                  value={formatNumber(stats.photosCount)} 
-                  label="Fotos" 
-                  accentColor={profile.accentColor}
-                  active={activeTab === 'photos'}
-                  onClick={() => setActiveTab('photos')}
-                />
-              )}
-              {(profile.visibilitySettings?.tabs?.videos !== false) && (
-                <StatItem 
-                  icon={<Video className="w-5 h-5" />} 
-                  value={formatNumber(stats.videosCount)} 
-                  label="Videos" 
-                  accentColor={profile.accentColor}
-                  active={activeTab === 'videos'}
-                  onClick={() => setActiveTab('videos')}
-                />
-              )}
-              {(profile.visibilitySettings?.tabs?.audio !== false) && (
-                <StatItem 
-                  icon={<Mic className="w-5 h-5" />} 
-                  value={formatNumber(stats.audioCount)} 
-                  label="Audio" 
-                  accentColor={profile.accentColor}
-                  active={activeTab === 'audio'}
-                  onClick={() => setActiveTab('audio')}
-                />
-              )}
-              {(profile.visibilitySettings?.tabs?.guestbook !== false) && (
-                <StatItem 
-                  icon={<MessageCircle className="w-5 h-5" />} 
-                  value={formatNumber(commentsCount)} 
-                  label="Libro de visitas" 
-                  accentColor={profile.accentColor}
-                  active={activeTab === 'comments'}
-                  onClick={() => setActiveTab('comments')}
+                  filterType={activeTab}
+                  onSubscribeClick={() => setShowSubscribeModal(true)}
+                  isSubscriber={isSubscriber}
+                  isOwner={isOwner}
+                  showPostTipping={profile.visibilitySettings?.tabs?.postTipping !== false}
                 />
               )}
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Content Section */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-          {/* About Me */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white/5 rounded-xl p-5 backdrop-blur-sm border border-white/10">
-              <h3 className="font-semibold text-lg mb-3">{profile.bioTitle || 'Acerca de mí'}</h3>
-              <p className="text-gray-300 text-sm whitespace-pre-line">
-                {profile.bio || 'Este creador aún no ha agregado una descripción.'}
-              </p>
-              
-              {/* Social Links */}
-              {profile.socialLinks.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <h4 className="font-medium text-sm mb-3">Enlaces</h4>
-                  <SocialLinksDisplay
-                    links={profile.socialLinks}
-                    variant="default"
-                  />
-                </div>
-              )}
-
-              {/* Subscription Tiers */}
-              {profile.subscriptionTiers.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <h4 className="font-medium text-sm mb-3">Planes de Suscripción</h4>
-                  <div className="space-y-2">
-                    {profile.subscriptionTiers.map(tier => (
-                      <div
-                        key={tier.id}
-                        className="p-3 rounded-lg border border-white/20 hover:border-white/40 transition-colors cursor-pointer"
-                      >
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium">{tier.name}</span>
-                          <span 
-                            className="font-bold"
-                            style={{ color: profile.accentColor }}
-                          >
-                            ${tier.price.toFixed(2)}/mes
-                          </span>
-                        </div>
-                        {tier.description && (
-                          <p className="text-xs text-gray-400 mt-1">{tier.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Music Player */}
-            {profile.musicTracks && profile.musicTracks.length > 0 && (
-              <MusicPlayer
-                tracks={profile.musicTracks}
-                autoPlay={false}
-                accentColor={profile.accentColor}
-              />
-            )}
-          </div>
-
-          {/* Posts Feed / Comments */}
-          <div className="lg:col-span-5">
-            {activeTab === 'comments' ? (
-              <Comments 
-                creatorId={profile.id}
-                isOwner={isOwner}
-                accentColor={profile.accentColor}
-              />
-            ) : (
-              <PostsFeed 
-                creatorId={profile.id}
-                accentColor={profile.accentColor}
-                filterType={activeTab}
-                onSubscribeClick={() => setShowSubscribeModal(true)}
-                isSubscriber={isSubscriber}
-                isOwner={isOwner}
-                showPostTipping={profile.visibilitySettings?.tabs?.postTipping !== false}
-              />
-            )}
-          </div>
-        </div>
-      </div>
       </div>
 
       {/* Chat Modal */}
@@ -853,7 +854,7 @@ export default function CreatorPublicProfile() {
 
       {/* Subscribe Modal */}
       {showSubscribeModal && creator && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           onClick={() => {
             setShowSubscribeModal(false)
@@ -861,20 +862,20 @@ export default function CreatorPublicProfile() {
             setSelectedTierId(null)
           }}
         >
-          <div 
+          <div
             className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full max-h-[90vh] overflow-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6">
               <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {creator.displayName}</h2>
               <p className="text-white/60 text-sm mb-6">Elige un plan para acceder a contenido exclusivo</p>
-              
+
               <div className="space-y-4">
                 {profile.subscriptionTiers.filter(t => t.isActive).map((tier) => {
                   const isSelected = selectedTierId === tier.id
                   const showDiscount = isSelected && promoDiscount
                   const finalPrice = showDiscount ? promoDiscount.finalAmount : tier.price
-                  
+
                   return (
                     <div
                       key={tier.id}
@@ -886,11 +887,10 @@ export default function CreatorPublicProfile() {
                           // La validación se hará al hacer click en aplicar
                         }
                       }}
-                      className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                        isSelected 
-                          ? 'border-pink-500 bg-pink-500/10' 
-                          : 'border-white/10 bg-white/5 hover:bg-white/10'
-                      }`}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer ${isSelected
+                        ? 'border-pink-500 bg-pink-500/10'
+                        : 'border-white/10 bg-white/5 hover:bg-white/10'
+                        }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold text-white">{tier.name}</h3>
@@ -906,11 +906,11 @@ export default function CreatorPublicProfile() {
                           </span>
                         </div>
                       </div>
-                      
+
                       {tier.description && (
                         <p className="text-sm text-white/60 mb-3">{tier.description}</p>
                       )}
-                      
+
                       {tier.benefits && (
                         <div className="text-sm text-white/50 mb-4 space-y-1">
                           {tier.benefits.split('\n').filter(b => b.trim()).map((benefit, i) => (
@@ -929,7 +929,7 @@ export default function CreatorPublicProfile() {
                             <Ticket className="w-4 h-4" />
                             <span>¿Tienes un código promocional?</span>
                           </div>
-                          
+
                           <div className="flex gap-2">
                             <div className="relative flex-1">
                               <input
@@ -992,7 +992,7 @@ export default function CreatorPublicProfile() {
                           )}
                         </div>
                       )}
-                      
+
                       <button
                         onClick={(e) => {
                           e.preventDefault()
@@ -1004,8 +1004,8 @@ export default function CreatorPublicProfile() {
                         style={{ backgroundColor: profile.accentColor }}
                       >
                         {subscribing ? 'Procesando...' : (
-                          showDiscount && promoDiscount.finalAmount === 0 
-                            ? '¡Suscribirse Gratis!' 
+                          showDiscount && promoDiscount.finalAmount === 0
+                            ? '¡Suscribirse Gratis!'
                             : `Suscribirse ${showDiscount ? `por ${formatPriceCLP(finalPrice)}` : ''}`
                         )}
                       </button>
@@ -1013,7 +1013,7 @@ export default function CreatorPublicProfile() {
                   )
                 })}
               </div>
-              
+
               <button
                 onClick={() => {
                   setShowSubscribeModal(false)
@@ -1031,11 +1031,11 @@ export default function CreatorPublicProfile() {
 
       {/* Success Modal */}
       {showSuccessModal && successMessage && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           onClick={() => setShowSuccessModal(false)}
         >
-          <div 
+          <div
             className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full p-6"
             onClick={(e) => e.stopPropagation()}
           >
@@ -1044,8 +1044,8 @@ export default function CreatorPublicProfile() {
               <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
                 style={{ backgroundColor: `${profile.accentColor}20` }}
               >
-                <BadgeCheck 
-                  className="w-10 h-10" 
+                <BadgeCheck
+                  className="w-10 h-10"
                   style={{ color: profile.accentColor }}
                   fill={profile.accentColor}
                 />
@@ -1081,11 +1081,11 @@ export default function CreatorPublicProfile() {
 
       {/* Manage Subscription Modal */}
       {showManageModal && subscriptionDetails && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           onClick={() => setShowManageModal(false)}
         >
-          <div 
+          <div
             className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
@@ -1122,18 +1122,17 @@ export default function CreatorPublicProfile() {
                 )}
                 <div className="flex justify-between items-start">
                   <span className="text-white/50 text-sm">Estado</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    subscriptionDetails.status === 'active' 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : subscriptionDetails.status === 'cancelled'
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${subscriptionDetails.status === 'active'
+                    ? 'bg-green-500/20 text-green-400'
+                    : subscriptionDetails.status === 'cancelled'
                       ? 'bg-yellow-500/20 text-yellow-400'
                       : 'bg-gray-500/20 text-gray-400'
-                  }`}>
-                    {subscriptionDetails.status === 'active' 
-                      ? 'Activa' 
+                    }`}>
+                    {subscriptionDetails.status === 'active'
+                      ? 'Activa'
                       : subscriptionDetails.status === 'cancelled'
-                      ? 'Cancelada'
-                      : subscriptionDetails.status}
+                        ? 'Cancelada'
+                        : subscriptionDetails.status}
                   </span>
                 </div>
                 {subscriptionDetails.autoRenew !== undefined && (
@@ -1175,10 +1174,10 @@ export default function CreatorPublicProfile() {
                   <p className="text-yellow-400 text-sm text-center">
                     Tu suscripción está cancelada. Mantendrás acceso hasta el{' '}
                     <span className="font-semibold">
-                      {new Date(subscriptionDetails.endDate).toLocaleDateString('es-CL', { 
-                        day: 'numeric', 
-                        month: 'long', 
-                        year: 'numeric' 
+                      {new Date(subscriptionDetails.endDate).toLocaleDateString('es-CL', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                       })}
                     </span>
                   </p>
@@ -1198,11 +1197,11 @@ export default function CreatorPublicProfile() {
 
       {/* Cancel Confirmation Modal */}
       {showCancelConfirm && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           onClick={() => !cancelling && setShowCancelConfirm(false)}
         >
-          <div 
+          <div
             className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full p-6"
             onClick={(e) => e.stopPropagation()}
           >
@@ -1244,9 +1243,9 @@ export default function CreatorPublicProfile() {
                   onClick={() => setShowCancelConfirm(false)}
                   disabled={cancelling}
                   className="w-full py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
-                  style={{ 
+                  style={{
                     backgroundColor: `${profile.accentColor}20`,
-                    color: profile.accentColor 
+                    color: profile.accentColor
                   }}
                 >
                   No, mantener suscripción
@@ -1278,10 +1277,9 @@ function StatItem({ icon, value, label, accentColor, active, onClick }: StatItem
       <div className="flex items-center gap-1.5">
         <span className="font-bold text-xl">{value}</span>
       </div>
-      <div 
-        className={`flex items-center gap-1 text-sm mt-1 pb-1 border-b-2 transition-colors ${
-          active ? 'border-current' : 'border-transparent'
-        }`}
+      <div
+        className={`flex items-center gap-1 text-sm mt-1 pb-1 border-b-2 transition-colors ${active ? 'border-current' : 'border-transparent'
+          }`}
         style={active ? { borderColor: accentColor, color: accentColor } : {}}
       >
         {icon}
