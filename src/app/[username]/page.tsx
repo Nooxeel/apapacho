@@ -30,7 +30,6 @@ import {
   X
 } from 'lucide-react'
 import { AvatarWithProgress } from '@/components/gamification'
-import { CursorParticles } from '@/components/ui/CursorParticles'
 
 // Lazy load ChatModal - only loaded when user opens chat
 const ChatModal = dynamic(

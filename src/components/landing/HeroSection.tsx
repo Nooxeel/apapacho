@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { CursorParticles } from '@/components/ui/CursorParticles'
 
-// Server Component - No JavaScript sent to browser
-// All styling is pure CSS, no client-side interactivity needed
+// Server Component — only CursorParticles is a client island
+// All other styling is pure CSS, no additional JS needed
 
 export function HeroSection() {
   return (
