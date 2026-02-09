@@ -35,10 +35,10 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-24 relative bg-gradient-to-b from-[#1a1528] to-[#0d0d1a]">
+    <section className="py-16 relative bg-gradient-to-b from-[#1a1528] to-[#0d0d1a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="font-poppins text-3xl md:text-5xl font-semibold text-white/95 mb-4 tracking-wide">
             La plataforma que <span className="gradient-text">extrañabas</span>
           </h2>
@@ -58,7 +58,7 @@ export function FeaturesSection() {
               hover
               className="group border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04] hover:border-purple-500/20"
             >
-              <CardContent>
+              <CardContent className="text-center">
                 <div
                   className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 mx-auto`}
                 >
