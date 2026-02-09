@@ -99,7 +99,10 @@ export const CursorParticles = React.memo(function CursorParticles() {
 
     // ── Intersection Observer — pause when offscreen ─────────
     const observer = new IntersectionObserver(
-      ([entry]) => { isVisible = entry.isIntersecting },
+      ([entry]) => {
+        isVisible = entry.isIntersecting
+        if (isVisible && !document.hidden) scheduleFrame()
+      },
       { threshold: 0 },
     )
     observer.observe(canvas)
