@@ -37,11 +37,6 @@ export function Footer() {
                   Precios
                 </Link>
               </li>
-              <li>
-                <Link href="/features" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
-                  Características
-                </Link>
-              </li>
             </ul>
           </div>
 
