@@ -60,7 +60,7 @@ export function FeaturesSection() {
             >
               <CardContent>
                 <div
-                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5`}
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 mx-auto`}
                 >
                   <div className="text-white">
                     {feature.icon}

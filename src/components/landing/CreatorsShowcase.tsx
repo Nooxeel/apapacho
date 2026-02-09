@@ -81,7 +81,7 @@ export function CreatorsShowcase() {
   }, [])
 
   return (
-    <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#0d0d1a] to-[#12101f]">
+    <section className="py-16 relative overflow-hidden bg-gradient-to-b from-[#0d0d1a] to-[#12101f]">
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
 
