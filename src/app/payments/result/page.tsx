@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-type PaymentStatus = 'AUTHORIZED' | 'FAILED' | 'CANCELLED' | 'TIMEOUT' | 'PENDING' | 'REVERSED' | 'REFUNDED';
+type PaymentStatus = 'AUTHORIZED' | 'APPROVED' | 'FAILED' | 'CANCELLED' | 'TIMEOUT' | 'PENDING' | 'REVERSED' | 'REFUNDED' | 'REJECTED' | 'IN_PROCESS';
 
 interface PaymentDetails {
   status: PaymentStatus;
@@ -45,6 +45,137 @@ function PaymentResultContent() {
   // Effect 1: Confirm payment with backend (doesn't need auth)
   useEffect(() => {
     const confirmPayment = async () => {
+      // Detect gateway from URL params
+      const gateway = searchParams.get('gateway');
+      
+      // ==================== MERCADOPAGO FLOW ====================
+      if (gateway === 'mercadopago') {
+        const mpStatus = searchParams.get('status') || searchParams.get('collection_status');
+        const externalReference = searchParams.get('external_reference');
+        const paymentId = searchParams.get('collection_id') || searchParams.get('payment_id');
+        const errorParam = searchParams.get('error');
+        
+        // Handle error from redirect
+        if (errorParam && !externalReference) {
+          setError(errorParam === 'unknown_state' 
+            ? 'Estado de pago desconocido' 
+            : decodeURIComponent(errorParam));
+          setLoading(false);
+          return;
+        }
+        
+        // If we have payment details in URL params (redirected from backend)
+        const successParam = searchParams.get('success');
+        const buyOrderParam = searchParams.get('buyOrder');
+        const amountParam = searchParams.get('amount');
+        
+        if (successParam && buyOrderParam) {
+          const isSuccess = successParam === 'true';
+          setDetails({
+            status: isSuccess ? 'APPROVED' : (mpStatus?.toUpperCase() as PaymentStatus || 'FAILED'),
+            success: isSuccess,
+            buyOrder: buyOrderParam,
+            amount: parseInt(amountParam || '0'),
+            transactionId: searchParams.get('transactionId') || '',
+            cardNumber: searchParams.get('cardNumber') || undefined,
+            paymentType: searchParams.get('paymentType') || undefined,
+            redirectTo: searchParams.get('redirectTo') || undefined,
+            error: errorParam ? decodeURIComponent(errorParam) : undefined,
+          });
+          if (isSuccess) {
+            setPaymentConfirmed(true);
+            const redirectTo = searchParams.get('redirectTo');
+            if (redirectTo) setRedirectCountdown(5);
+          }
+          setLoading(false);
+          return;
+        }
+        
+        // If we have a payment ID, confirm with backend
+        if (paymentId && paymentId !== 'null') {
+          try {
+            const response = await fetch(
+              `${API_URL}/payments/mercadopago/return?collection_id=${paymentId}&external_reference=${externalReference || ''}&status=${mpStatus || ''}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            const data = await response.json();
+            
+            if (data.success) {
+              setDetails({
+                status: 'APPROVED',
+                success: true,
+                buyOrder: data.buyOrder || '',
+                amount: data.amount || 0,
+                transactionId: data.transactionId || '',
+                cardNumber: data.cardLastFour,
+                paymentType: data.paymentType,
+                redirectTo: data.redirectTo,
+              });
+              setPaymentConfirmed(true);
+              if (data.redirectTo) setRedirectCountdown(5);
+            } else {
+              setDetails({
+                status: (data.status as PaymentStatus) || 'FAILED',
+                success: false,
+                buyOrder: data.buyOrder || '',
+                amount: data.amount || 0,
+                transactionId: data.transactionId || '',
+                error: data.error || 'El pago no pudo ser procesado',
+              });
+            }
+          } catch (err) {
+            console.error('[PaymentResult] Error confirming MercadoPago payment:', err);
+            setError('Error al confirmar el pago. Por favor contacta a soporte.');
+          }
+          setLoading(false);
+          return;
+        }
+        
+        // If we only have external_reference and status
+        if (externalReference) {
+          try {
+            const response = await fetch(
+              `${API_URL}/payments/mercadopago/return?external_reference=${externalReference}&status=${mpStatus || ''}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            const data = await response.json();
+            
+            setDetails({
+              status: data.success ? 'APPROVED' : ((data.status as PaymentStatus) || 'FAILED'),
+              success: data.success || false,
+              buyOrder: data.buyOrder || externalReference,
+              amount: data.amount || 0,
+              transactionId: data.transactionId || '',
+              error: data.error,
+            });
+            if (data.success) {
+              setPaymentConfirmed(true);
+              if (data.redirectTo) setRedirectCountdown(5);
+            }
+          } catch (err) {
+            // Fallback: use URL params directly
+            const isApproved = mpStatus === 'approved';
+            setDetails({
+              status: isApproved ? 'APPROVED' : 'FAILED',
+              success: isApproved,
+              buyOrder: externalReference,
+              amount: 0,
+              transactionId: '',
+              error: isApproved ? undefined : 'El pago no pudo ser procesado',
+            });
+            if (isApproved) setPaymentConfirmed(true);
+          }
+          setLoading(false);
+          return;
+        }
+        
+        // No valid MercadoPago parameters
+        setError('No se encontraron datos de pago válidos.');
+        setLoading(false);
+        return;
+      }
+      
+      // ==================== WEBPAY FLOW (existing) ====================
       // Get token from Webpay redirect
       const token_ws = searchParams.get('token_ws');
       const TBK_TOKEN = searchParams.get('TBK_TOKEN');
@@ -191,6 +322,7 @@ function PaymentResultContent() {
   const getStatusConfig = (status: PaymentStatus) => {
     switch (status) {
       case 'AUTHORIZED':
+      case 'APPROVED':
         return {
           icon: CheckCircle,
           color: 'text-green-400',
@@ -200,6 +332,7 @@ function PaymentResultContent() {
           message: 'Tu pago ha sido procesado correctamente.',
         };
       case 'FAILED':
+      case 'REJECTED':
         return {
           icon: XCircle,
           color: 'text-red-400',
@@ -225,6 +358,16 @@ function PaymentResultContent() {
           borderColor: 'border-orange-500/30',
           title: 'Tiempo Agotado',
           message: 'El tiempo para completar el pago ha expirado.',
+        };
+      case 'PENDING':
+      case 'IN_PROCESS':
+        return {
+          icon: Clock,
+          color: 'text-blue-400',
+          bgColor: 'bg-blue-500/20',
+          borderColor: 'border-blue-500/30',
+          title: 'Pago Pendiente',
+          message: 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.',
         };
       default:
         return {
@@ -413,13 +556,15 @@ function PaymentResultContent() {
           </div>
         </div>
 
-        {/* Webpay logo */}
+        {/* Payment provider logo */}
         <div className="text-center mt-6">
           <p className="text-white/30 text-xs">
             Pago procesado de forma segura por
           </p>
           <p className="text-white/50 text-sm font-medium mt-1">
-            Webpay Plus - Transbank
+            {searchParams.get('gateway') === 'mercadopago' 
+              ? 'MercadoPago' 
+              : 'Webpay Plus - Transbank'}
           </p>
         </div>
       </div>

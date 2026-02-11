@@ -14,7 +14,7 @@ import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
 import { useAuthStore } from '@/stores/authStore'
 import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
-import { useWebpay } from '@/hooks/useWebpay'
+import { usePayment } from '@/hooks/usePayment'
 import {
   Heart,
   FileText,
@@ -163,8 +163,8 @@ export default function CreatorPublicProfile() {
   // Real-time stats (sincronizado con polling de mensajes)
   const [totalLikes, setTotalLikes] = useState(0)
 
-  // Webpay hook
-  const { payForSubscription, loading: webpayLoading, error: webpayError } = useWebpay()
+  // Payment hook (supports Webpay + MercadoPago)
+  const { payForSubscription, loading: webpayLoading, error: webpayError, gateway, setGateway } = usePayment()
   const [totalPostComments, setTotalPostComments] = useState(0)
 
   // Set initial active tab based on visibility settings
@@ -394,8 +394,8 @@ export default function CreatorPublicProfile() {
         return
       }
 
-      // Usar Webpay para pagos con monto > 0
-      // El usuario será redirigido a la página de Transbank
+      // Usar pasarela de pago seleccionada para pagos con monto > 0
+      // El usuario será redirigido a Webpay o MercadoPago
       const result = await payForSubscription(tierId, creator.creatorProfile.id, finalPrice)
 
       if (!result.success) {
@@ -867,7 +867,31 @@ export default function CreatorPublicProfile() {
           >
             <div className="p-6">
               <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {creator.displayName}</h2>
-              <p className="text-white/60 text-sm mb-6">Elige un plan para acceder a contenido exclusivo</p>
+              <p className="text-white/60 text-sm mb-4">Elige un plan para acceder a contenido exclusivo</p>
+
+              {/* Gateway selector */}
+              <div className="flex gap-2 mb-6">
+                <button
+                  onClick={() => setGateway('webpay')}
+                  className={`flex-1 py-2.5 px-3 rounded-lg border text-sm font-medium transition-all ${
+                    gateway === 'webpay'
+                      ? 'border-pink-500 bg-pink-500/10 text-white'
+                      : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  💳 Webpay
+                </button>
+                <button
+                  onClick={() => setGateway('mercadopago')}
+                  className={`flex-1 py-2.5 px-3 rounded-lg border text-sm font-medium transition-all ${
+                    gateway === 'mercadopago'
+                      ? 'border-blue-500 bg-blue-500/10 text-white'
+                      : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  🟡 MercadoPago
+                </button>
+              </div>
 
               <div className="space-y-4">
                 {profile.subscriptionTiers.filter(t => t.isActive).map((tier) => {
