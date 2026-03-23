@@ -142,18 +142,24 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
     loadMissions();
   }, [loadMissions]);
 
+  const [cappedMessage, setCappedMessage] = useState<string | null>(null);
+
   const handleClaim = async (userMissionId: string) => {
     if (!token || claimingId) return;
-    
+
     setClaimingId(userMissionId);
     try {
-      await missionsApi.claimReward(token, userMissionId);
+      const result = await missionsApi.claimReward(token, userMissionId);
       // Invalidate progress cache so avatar updates immediately
       invalidateProgressCache();
       // Reload missions to update state
       await loadMissions();
       // Trigger a window event to notify other components to refresh
       window.dispatchEvent(new CustomEvent('xp-updated'));
+      // Show cap message if applicable
+      if (result.capped) {
+        setCappedMessage(result.message);
+      }
     } catch (error) {
       console.error('Error claiming reward:', error);
     } finally {
@@ -234,6 +240,17 @@ export default function MissionsDisplay({ compact = false }: MissionsDisplayProp
 
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 md:p-6">
+      {/* Daily cap reached banner */}
+      {cappedMessage && (
+        <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center gap-2">
+          <Star className="w-4 h-4 text-amber-400 shrink-0" />
+          <p className="text-sm text-amber-300">{cappedMessage}</p>
+          <button onClick={() => setCappedMessage(null)} className="ml-auto text-white/40 hover:text-white/60 text-xs">
+            &times;
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold flex items-center gap-2">

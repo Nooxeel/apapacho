@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     'contenido para adultos chile',
     'plataforma +18'
   ],
-  metadataBase: new URL('https://appapacho.cl'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://appapacho.cl'),
   alternates: {
     canonical: '/',
     languages: {
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     siteName: 'Apapacho',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'Apapacho - Plataforma de Contenido Adulto',
@@ -112,7 +112,9 @@ export default function RootLayout({
     <html lang="es">
       <head>
         {/* Preconnect for critical resources - must be first */}
-        <link rel="preconnect" href="https://apapacho-backend-production.up.railway.app" crossOrigin="anonymous" />
+        {process.env.NEXT_PUBLIC_API_URL && (
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL.replace('/api', '')} crossOrigin="anonymous" />
+        )}
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         
         {/* DNS Prefetch for resources used later */}

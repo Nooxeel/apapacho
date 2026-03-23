@@ -22,12 +22,23 @@ export interface StreakInfo {
   totalBonusEarned: number
 }
 
+export interface PremiumFeatures {
+  unlimitedSpins?: boolean
+  premiumPrizes?: boolean
+  fullRewards?: boolean
+  dailySpinLimit?: number
+  dailyPointCap?: number
+  rewardMultiplier?: number
+}
+
 export interface UserPointsInfo {
   points: number
   totalEarned: number
   totalSpent: number
   loginStreak: number
   lastLoginDate: string
+  hasDeposited: boolean
+  premiumFeatures: PremiumFeatures
   streak: {
     current: number
     nextMilestone: {
@@ -280,11 +291,14 @@ export interface MissionsResponse {
 
 export interface ClaimRewardResponse {
   success: boolean
+  capped?: boolean
   reward: {
     points: number
     xp: number
   }
   message: string
+  dailyLimit?: number
+  earnedToday?: number
 }
 
 export const missionsApi = {

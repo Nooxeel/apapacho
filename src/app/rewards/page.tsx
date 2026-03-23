@@ -174,6 +174,31 @@ export default function RewardsPage() {
         </div>
       </div>
 
+      {/* Premium Upgrade Banner (for free users) */}
+      {pointsData && !pointsData.hasDeposited && (
+        <div className="max-w-6xl mx-auto px-4 -mt-4 mb-4">
+          <div className="bg-gradient-to-r from-amber-500/20 via-fuchsia-500/20 to-purple-500/20 rounded-xl p-4 border border-amber-500/30 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <Star className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-amber-300 text-sm">Desbloquea recompensas premium</p>
+                <p className="text-white/50 text-xs">
+                  Apoya a un creador para obtener giros ilimitados, premios exclusivos y recompensas completas
+                </p>
+              </div>
+              <Link
+                href="/explore"
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-fuchsia-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+              >
+                Explorar creadores
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="sticky top-16 z-30 bg-[#0f0f14]/95 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4">

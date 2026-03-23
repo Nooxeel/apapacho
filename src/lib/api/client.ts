@@ -66,6 +66,7 @@ export async function api<T>(endpoint: string, options: ApiOptions = {}): Promis
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest', // CSRF protection for cookie-based auth
   }
 
   if (token) {
@@ -165,6 +166,7 @@ export async function uploadFile(
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
+        'X-Requested-With': 'XMLHttpRequest',
       },
       body: formData,
       signal,

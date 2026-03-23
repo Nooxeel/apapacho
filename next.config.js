@@ -29,7 +29,7 @@ const nextConfig = {
   compress: true,
   
   images: {
-    unoptimized: true, // Disable Vercel image optimization to avoid costs
+    unoptimized: false, // Enable image optimization (Vercel free tier includes 1000 optimizations/month)
     remotePatterns: [
       {
         protocol: 'https',

@@ -24,11 +24,14 @@ interface Post {
     url: string
     thumbnail: string | null
     isBlurred?: boolean
+    isLocked?: boolean
   }>
   visibility: PostVisibility
   price?: number
   isLocked?: boolean
   lockReason?: 'subscription_required' | 'tier_required' | 'ppv'
+  hasLockedVideos?: boolean
+  videoLockMessage?: string
   likes: number
   comments: number
   views: number
@@ -481,9 +484,44 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                 <div className="relative bg-black">
                   {canView ? (
                     <>
+                      {/* Video locked for non-depositors with roulette subscriptions */}
+                      {post.hasLockedVideos && videoContent?.isLocked && (
+                        <div className="relative">
+                          <div className="w-full h-64 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                            <div className="text-center space-y-3 px-6">
+                              <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto">
+                                <Video className="w-8 h-8 text-amber-400" />
+                              </div>
+                              <p className="text-amber-300 font-medium text-sm">
+                                {post.videoLockMessage || 'Los videos son exclusivos para suscriptores premium'}
+                              </p>
+                            </div>
+                          </div>
+                          {imageContent && (
+                            <ProtectedMedia
+                              watermarkText={user ? `@${user.username}` : undefined}
+                              postId={post.id}
+                              creatorId={creatorId}
+                            >
+                              <div className="relative w-full" style={{ maxHeight: '500px', aspectRatio: '16/9' }}>
+                                <Image
+                                  src={imageContent.url}
+                                  alt={post.title || 'Post image'}
+                                  fill
+                                  className="object-contain pointer-events-none"
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
+                                  loading="lazy"
+                                  draggable={false}
+                                  onContextMenu={(e) => e.preventDefault()}
+                                />
+                              </div>
+                            </ProtectedMedia>
+                          )}
+                        </div>
+                      )}
                       {/* Wrap premium content with protection */}
-                      {(post.visibility === 'ppv' || post.visibility === 'subscribers') ? (
-                        <ProtectedMedia 
+                      {!post.hasLockedVideos && (post.visibility === 'ppv' || post.visibility === 'subscribers') ? (
+                        <ProtectedMedia
                           watermarkText={user ? `@${user.username}` : undefined}
                           postId={post.id}
                           creatorId={creatorId}
