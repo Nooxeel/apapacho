@@ -1,5 +1,6 @@
 export { useApiError } from './useApiError'
 export { useWebpay } from './useWebpay'
 export { useMercadoPago } from './useMercadoPago'
+export { useFintoc } from './useFintoc'
 export { usePayment } from './usePayment'
 export type { PaymentGateway } from './usePayment'

@@ -869,28 +869,9 @@ export default function CreatorPublicProfile() {
               <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {creator.displayName}</h2>
               <p className="text-white/60 text-sm mb-4">Elige un plan para acceder a contenido exclusivo</p>
 
-              {/* Gateway selector */}
-              <div className="flex gap-2 mb-6">
-                <button
-                  onClick={() => setGateway('webpay')}
-                  className={`flex-1 py-2.5 px-3 rounded-lg border text-sm font-medium transition-all ${
-                    gateway === 'webpay'
-                      ? 'border-pink-500 bg-pink-500/10 text-white'
-                      : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
-                  }`}
-                >
-                  💳 Webpay
-                </button>
-                <button
-                  onClick={() => setGateway('mercadopago')}
-                  className={`flex-1 py-2.5 px-3 rounded-lg border text-sm font-medium transition-all ${
-                    gateway === 'mercadopago'
-                      ? 'border-blue-500 bg-blue-500/10 text-white'
-                      : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
-                  }`}
-                >
-                  🟡 MercadoPago
-                </button>
+              {/* Payment method indicator */}
+              <div className="flex items-center gap-2 mb-6 px-3 py-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+                <span className="text-sm font-medium text-white/80">Pago seguro con transferencia bancaria</span>
               </div>
 
               <div className="space-y-4">

@@ -184,13 +184,14 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
       const verifyData = await verifyResponse.json()
 
-      // Step 2: If requires payment, initiate Webpay
+      // Step 2: If requires payment, initiate Fintoc checkout
       if (verifyData.requiresPayment) {
-        const paymentResponse = await fetch(`${API_URL}/payments/webpay/create`, {
+        const paymentResponse = await fetch(`${API_URL}/payments/fintoc/create`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
           },
           body: JSON.stringify({
             amount: verifyData.paymentInfo.amount,
@@ -208,22 +209,14 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
         const paymentData = await paymentResponse.json()
 
-        // Redirect to Webpay using the form
-        // Create a temporary form and submit it
-        const form = document.createElement('form')
-        form.method = 'POST'
-        form.action = paymentData.url
-        
-        const tokenInput = document.createElement('input')
-        tokenInput.type = 'hidden'
-        tokenInput.name = 'token_ws'
-        tokenInput.value = paymentData.token
-        
-        form.appendChild(tokenInput)
-        document.body.appendChild(form)
-        form.submit()
-        
-        return // User will be redirected to Webpay
+        // Redirect to Fintoc hosted checkout
+        if (paymentData.redirectUrl) {
+          window.location.href = paymentData.redirectUrl
+          return
+        }
+
+        alert('Error: no se pudo obtener la URL de pago')
+        return
       }
 
       // If no payment required (shouldn't happen for PPV), reload posts

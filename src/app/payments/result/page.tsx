@@ -175,6 +175,73 @@ function PaymentResultContent() {
         return;
       }
       
+      // ==================== FINTOC FLOW ====================
+      if (gateway === 'fintoc') {
+        const fintocStatus = searchParams.get('status');
+        const externalReference = searchParams.get('external_reference');
+        const sessionId = searchParams.get('session_id');
+
+        if (fintocStatus === 'cancelled') {
+          setDetails({
+            status: 'CANCELLED',
+            success: false,
+            buyOrder: externalReference || '',
+            amount: 0,
+            transactionId: '',
+            error: 'Pago cancelado por el usuario',
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (externalReference || sessionId) {
+          try {
+            const params = new URLSearchParams();
+            if (sessionId) params.set('session_id', sessionId);
+            if (externalReference) params.set('external_reference', externalReference);
+            if (fintocStatus) params.set('status', fintocStatus);
+
+            const response = await fetch(
+              `${API_URL}/payments/fintoc/return?${params.toString()}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            const data = await response.json();
+
+            if (data.success) {
+              setDetails({
+                status: 'APPROVED',
+                success: true,
+                buyOrder: data.buyOrder || '',
+                amount: data.amount || 0,
+                transactionId: data.transactionId || '',
+                paymentType: data.paymentType,
+                redirectTo: data.redirectTo,
+              });
+              setPaymentConfirmed(true);
+              if (data.redirectTo) setRedirectCountdown(5);
+            } else {
+              setDetails({
+                status: (data.status as PaymentStatus) || 'FAILED',
+                success: false,
+                buyOrder: data.buyOrder || '',
+                amount: data.amount || 0,
+                transactionId: data.transactionId || '',
+                error: data.errorMessage || 'El pago no pudo ser procesado',
+              });
+            }
+          } catch (err) {
+            console.error('[PaymentResult] Error confirming Fintoc payment:', err);
+            setError('Error al confirmar el pago. Por favor contacta a soporte.');
+          }
+          setLoading(false);
+          return;
+        }
+
+        setError('No se encontraron datos de pago válidos.');
+        setLoading(false);
+        return;
+      }
+
       // ==================== WEBPAY FLOW (existing) ====================
       // Get token from Webpay redirect
       const token_ws = searchParams.get('token_ws');
