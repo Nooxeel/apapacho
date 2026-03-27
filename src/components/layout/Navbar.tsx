@@ -217,6 +217,9 @@ export function Navbar() {
             <Link href="/pricing" className="text-white/70 hover:text-white transition-colors">
               Tarifas
             </Link>
+            <Link href="/blog" className="text-white/70 hover:text-white transition-colors">
+              Blog
+            </Link>
           </div>
 
           {/* Auth Buttons / User Menu */}
@@ -476,6 +479,12 @@ export function Navbar() {
                 className="text-white/70 hover:text-white transition-colors px-2 py-1"
               >
                 Tarifas
+              </Link>
+              <Link
+                href="/blog"
+                className="text-white/70 hover:text-white transition-colors px-2 py-1"
+              >
+                Blog
               </Link>
               <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
                 <Link href="/login">

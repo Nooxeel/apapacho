@@ -37,6 +37,21 @@ export function Footer() {
                   Precios
                 </Link>
               </li>
+              <li>
+                <Link href="/blog" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link href="/calculadora" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Calculadora
+                </Link>
+              </li>
+              <li>
+                <Link href="/referidos" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Referidos
+                </Link>
+              </li>
             </ul>
           </div>
 
