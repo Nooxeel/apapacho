@@ -67,6 +67,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/blog/proteger-contenido-adulto-pirateria`,
+      lastModified: new Date('2026-01-05'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/blog/conseguir-suscriptores-contenido-adulto`,
+      lastModified: new Date('2025-12-28'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/blog/impuestos-creadores-contenido-chile`,
+      lastModified: new Date('2025-12-20'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/faq`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
