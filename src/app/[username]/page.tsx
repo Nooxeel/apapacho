@@ -15,6 +15,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
 import { usePayment } from '@/hooks/usePayment'
+import { GatewaySelector } from '@/components/payment/GatewaySelector'
 import {
   Heart,
   FileText,
@@ -869,10 +870,8 @@ export default function CreatorPublicProfile() {
               <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {creator.displayName}</h2>
               <p className="text-white/60 text-sm mb-4">Elige un plan para acceder a contenido exclusivo</p>
 
-              {/* Payment method indicator */}
-              <div className="flex items-center gap-2 mb-6 px-3 py-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
-                <span className="text-sm font-medium text-white/80">Pago seguro con transferencia bancaria</span>
-              </div>
+              {/* Payment gateway selector */}
+              <GatewaySelector selected={gateway} onChange={setGateway} />
 
               <div className="space-y-4">
                 {profile.subscriptionTiers.filter(t => t.isActive).map((tier) => {

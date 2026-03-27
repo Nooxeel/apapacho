@@ -10,6 +10,7 @@ import { useBadgeNotification } from '@/components/gamification'
 import { sanitizePostDescription, sanitizeComment } from '@/lib/sanitize'
 import type { PostVisibility, PostComment } from '@/types'
 import { useRouter } from 'next/navigation'
+import { usePayment } from '@/hooks/usePayment'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { useInView } from 'react-intersection-observer'
@@ -51,6 +52,7 @@ interface PostsFeedProps {
 export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false, showPostTipping = true }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
+  const { gateway, webpay, mercadoPago, fintoc } = usePayment()
   const { checkForNewBadges } = useBadgeNotification()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -184,9 +186,10 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
       const verifyData = await verifyResponse.json()
 
-      // Step 2: If requires payment, initiate Fintoc checkout
+      // Step 2: If requires payment, initiate payment with selected gateway
       if (verifyData.requiresPayment) {
-        const paymentResponse = await fetch(`${API_URL}/payments/fintoc/create`, {
+        const paymentEndpoint = `${API_URL}/payments/${gateway}/create`
+        const paymentResponse = await fetch(paymentEndpoint, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -209,9 +212,18 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
         const paymentData = await paymentResponse.json()
 
-        // Redirect to Fintoc hosted checkout
-        if (paymentData.redirectUrl) {
-          window.location.href = paymentData.redirectUrl
+        // Redirect to payment gateway
+        const redirectUrl = paymentData.redirectUrl || paymentData.initPoint || paymentData.url
+        if (redirectUrl) {
+          window.location.href = redirectUrl
+          return
+        }
+
+        // Webpay uses form HTML auto-submit
+        if (paymentData.formHtml) {
+          document.open()
+          document.write(paymentData.formHtml)
+          document.close()
           return
         }
 

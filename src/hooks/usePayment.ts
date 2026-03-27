@@ -21,7 +21,7 @@ import { useFintoc } from './useFintoc';
 
 export type PaymentGateway = 'webpay' | 'mercadopago' | 'fintoc';
 
-export function usePayment(defaultGateway: PaymentGateway = 'fintoc') {
+export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
   const [gateway, setGateway] = useState<PaymentGateway>(defaultGateway);
 
   const webpay = useWebpay();
