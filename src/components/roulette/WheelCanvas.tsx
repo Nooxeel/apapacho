@@ -48,30 +48,31 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
         />
       ))}
 
-      {/* Labels — positioned with trig, counter-rotated to stay upright */}
+      {/* Labels — radially oriented along each segment's center line */}
       {prizes.map((prize, index) => {
-        const midAngleDeg = index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2
-        const midAngleRad = (midAngleDeg * Math.PI) / 180
-        // Place label at ~32% from center (sweet spot inside segment)
-        const r = 32
-        const x = 50 + r * Math.sin(midAngleRad)
-        const y = 50 - r * Math.cos(midAngleRad)
+        // Angle to the middle of this segment (from 12 o'clock, clockwise)
+        const midDeg = index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2
         return (
           <div
             key={`label-${prize.id}`}
-            className="absolute pointer-events-none text-center"
-            style={{
-              top: `${y}%`,
-              left: `${x}%`,
-              transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
-            }}
+            className="absolute inset-0 pointer-events-none"
+            style={{ transform: `rotate(${midDeg}deg)` }}
           >
-            <div className="text-lg md:text-xl drop-shadow-lg leading-none">{prize.icon}</div>
+            {/* Content sits along the radius, reading outward from center */}
             <div
-              className="text-[7px] md:text-[9px] font-bold text-white whitespace-nowrap mt-0.5 leading-tight"
-              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7)' }}
+              className="absolute left-1/2 flex flex-col items-center"
+              style={{
+                top: '8%',
+                transform: 'translateX(-50%)',
+              }}
             >
-              {prize.label}
+              <span className="text-base md:text-lg leading-none drop-shadow-lg">{prize.icon}</span>
+              <span
+                className="text-[6px] md:text-[8px] font-bold text-white whitespace-nowrap leading-tight mt-0.5"
+                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.8)' }}
+              >
+                {prize.label}
+              </span>
             </div>
           </div>
         )
