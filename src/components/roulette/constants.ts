@@ -20,16 +20,16 @@ export const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bgCla
 }
 
 export const prizes: Prize[] = [
-  { id: 1,  label: '10 Puntos',       icon: '💎', probability: 0.05, type: 'POINTS',       rarity: 'epic',      segmentColors: ['#7c3aed', '#a855f7'], glowColor: '#a855f7' },
-  { id: 2,  label: '5 Puntos',        icon: '⭐', probability: 0.13, type: 'POINTS',       rarity: 'rare',      segmentColors: ['#2563eb', '#3b82f6'], glowColor: '#3b82f6' },
-  { id: 3,  label: '3 Puntos',        icon: '🎁', probability: 0.18, type: 'POINTS',       rarity: 'uncommon',  segmentColors: ['#16a34a', '#22c55e'], glowColor: '#22c55e' },
-  { id: 4,  label: '2 Puntos',        icon: '🎉', probability: 0.23, type: 'POINTS',       rarity: 'uncommon',  segmentColors: ['#15803d', '#22c55e'], glowColor: '#22c55e' },
-  { id: 5,  label: '1 Punto',         icon: '✨', probability: 0.28, type: 'POINTS',       rarity: 'common',    segmentColors: ['#4b5563', '#6b7280'], glowColor: '#6b7280' },
-  { id: 6,  label: 'Intenta de nuevo',icon: '🔄', probability: 0.05, type: 'RETRY',        rarity: 'common',    segmentColors: ['#374151', '#4b5563'], glowColor: '#6b7280' },
-  { id: 7,  label: '50 Puntos',       icon: '🏆', probability: 0.02, type: 'POINTS',       rarity: 'legendary', segmentColors: ['#b45309', '#f59e0b'], glowColor: '#f59e0b' },
-  { id: 8,  label: 'Sub GRATIS',      icon: '👑', probability: 0.02, type: 'SUBSCRIPTION', rarity: 'legendary', segmentColors: ['#a16207', '#eab308'], glowColor: '#eab308' },
-  { id: 9,  label: '50% OFF',         icon: '🎟️', probability: 0.03, type: 'DISCOUNT',     rarity: 'epic',      segmentColors: ['#9333ea', '#c084fc'], glowColor: '#c084fc' },
-  { id: 10, label: '25% cualquier',   icon: '🎫', probability: 0.01, type: 'DISCOUNT',     rarity: 'legendary', segmentColors: ['#92400e', '#f59e0b'], glowColor: '#f59e0b' },
+  { id: 1,  label: '10 Pts',     icon: '💎', probability: 0.05, type: 'POINTS',       rarity: 'epic',      segmentColors: ['#5b21b6', '#7c3aed'], glowColor: '#a855f7' },
+  { id: 2,  label: '5 Pts',      icon: '⭐', probability: 0.13, type: 'POINTS',       rarity: 'rare',      segmentColors: ['#1e40af', '#2563eb'], glowColor: '#3b82f6' },
+  { id: 3,  label: '3 Pts',      icon: '🎁', probability: 0.18, type: 'POINTS',       rarity: 'uncommon',  segmentColors: ['#166534', '#16a34a'], glowColor: '#22c55e' },
+  { id: 4,  label: '2 Pts',      icon: '🎉', probability: 0.23, type: 'POINTS',       rarity: 'uncommon',  segmentColors: ['#14532d', '#15803d'], glowColor: '#22c55e' },
+  { id: 5,  label: '1 Pt',       icon: '✨', probability: 0.28, type: 'POINTS',       rarity: 'common',    segmentColors: ['#1f2937', '#374151'], glowColor: '#6b7280' },
+  { id: 6,  label: 'Retry',      icon: '🔄', probability: 0.05, type: 'RETRY',        rarity: 'common',    segmentColors: ['#111827', '#1f2937'], glowColor: '#6b7280' },
+  { id: 7,  label: '50 Pts!',    icon: '🏆', probability: 0.02, type: 'POINTS',       rarity: 'legendary', segmentColors: ['#78350f', '#b45309'], glowColor: '#f59e0b' },
+  { id: 8,  label: 'Sub FREE',   icon: '👑', probability: 0.02, type: 'SUBSCRIPTION', rarity: 'legendary', segmentColors: ['#713f12', '#a16207'], glowColor: '#eab308' },
+  { id: 9,  label: '50% OFF',    icon: '🎟️', probability: 0.03, type: 'DISCOUNT',     rarity: 'epic',      segmentColors: ['#581c87', '#7e22ce'], glowColor: '#c084fc' },
+  { id: 10, label: '25% OFF',    icon: '🎫', probability: 0.01, type: 'DISCOUNT',     rarity: 'legendary', segmentColors: ['#451a03', '#78350f'], glowColor: '#f59e0b' },
 ]
 
 export const SEGMENT_ANGLE = 360 / prizes.length

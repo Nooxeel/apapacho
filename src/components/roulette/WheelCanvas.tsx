@@ -12,7 +12,7 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
       className="absolute inset-0 rounded-full overflow-hidden"
       style={{ transform: `rotate(${rotation}deg)` }}
     >
-      {/* Colored segments using clip-path triangles */}
+      {/* === Layer 1: Colored segment triangles === */}
       {prizes.map((prize, index) => {
         const startAngle = index * SEGMENT_ANGLE
         return (
@@ -34,23 +34,29 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
         )
       })}
 
-      {/* Divider lines */}
+      {/* === Layer 2: Divider lines === */}
       {prizes.map((_, i) => (
         <div
           key={`line-${i}`}
           className="absolute top-0 left-1/2 h-1/2 origin-bottom"
           style={{
             transform: `rotate(${i * SEGMENT_ANGLE}deg)`,
-            width: '1.5px',
-            marginLeft: '-0.75px',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0.05))',
+            width: '2px',
+            marginLeft: '-1px',
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.05))',
           }}
         />
       ))}
 
-      {/* Labels — radially oriented along each segment's center line */}
+      {/* === Layer 3: Labels — ALWAYS horizontal via counter-rotation ===
+       *
+       * Strategy:
+       * 1. Outer div rotates to point toward segment center (midDeg)
+       * 2. Inner div sits at top:12% (near outer edge along that radius)
+       * 3. Inner div counter-rotates by -(midDeg + wheelRotation) to stay
+       *    perfectly horizontal regardless of wheel position
+       */}
       {prizes.map((prize, index) => {
-        // Angle to the middle of this segment (from 12 o'clock, clockwise)
         const midDeg = index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2
         return (
           <div
@@ -58,18 +64,21 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
             className="absolute inset-0 pointer-events-none"
             style={{ transform: `rotate(${midDeg}deg)` }}
           >
-            {/* Content sits along the radius, reading outward from center */}
             <div
               className="absolute left-1/2 flex flex-col items-center"
               style={{
-                top: '8%',
-                transform: 'translateX(-50%)',
+                top: '12%',
+                transform: `translateX(-50%) rotate(${-(midDeg + rotation)}deg)`,
               }}
             >
-              <span className="text-base md:text-lg leading-none drop-shadow-lg">{prize.icon}</span>
+              <span className="text-sm md:text-base leading-none drop-shadow-lg">
+                {prize.icon}
+              </span>
               <span
-                className="text-[6px] md:text-[8px] font-bold text-white whitespace-nowrap leading-tight mt-0.5"
-                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.8)' }}
+                className="text-[7px] md:text-[9px] font-bold text-white whitespace-nowrap leading-tight mt-0.5"
+                style={{
+                  textShadow: '0 1px 2px rgba(0,0,0,1), 0 0 6px rgba(0,0,0,0.9)',
+                }}
               >
                 {prize.label}
               </span>
