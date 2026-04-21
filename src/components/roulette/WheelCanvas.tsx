@@ -12,16 +12,15 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
       className="absolute inset-0 rounded-full overflow-hidden"
       style={{ transform: `rotate(${rotation}deg)` }}
     >
-      {/* Segments using clip-path triangles (proven approach) */}
+      {/* Colored segments using clip-path triangles */}
       {prizes.map((prize, index) => {
         const startAngle = index * SEGMENT_ANGLE
         return (
           <div
-            key={prize.id}
+            key={`seg-${prize.id}`}
             className="absolute inset-0"
             style={{ transform: `rotate(${startAngle}deg)` }}
           >
-            {/* Triangle segment */}
             <div
               className="absolute top-0 left-1/2 origin-bottom h-1/2"
               style={{
@@ -31,21 +30,6 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
                 background: `linear-gradient(180deg, ${prize.segmentColors[1]} 0%, ${prize.segmentColors[0]} 100%)`,
               }}
             />
-            {/* Label positioned in the segment */}
-            <div
-              className="absolute top-[15%] left-1/2 -translate-x-1/2 text-center pointer-events-none"
-              style={{
-                transform: `translateX(-50%) rotate(${SEGMENT_ANGLE / 2}deg)`,
-              }}
-            >
-              <div className="text-xl md:text-2xl drop-shadow-lg">{prize.icon}</div>
-              <div
-                className="text-[8px] md:text-[10px] font-bold text-white whitespace-nowrap mt-0.5"
-                style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}
-              >
-                {prize.label}
-              </div>
-            </div>
           </div>
         )
       })}
@@ -63,6 +47,35 @@ export function WheelCanvas({ rotation }: WheelCanvasProps) {
           }}
         />
       ))}
+
+      {/* Labels — positioned with trig, counter-rotated to stay upright */}
+      {prizes.map((prize, index) => {
+        const midAngleDeg = index * SEGMENT_ANGLE + SEGMENT_ANGLE / 2
+        const midAngleRad = (midAngleDeg * Math.PI) / 180
+        // Place label at ~32% from center (sweet spot inside segment)
+        const r = 32
+        const x = 50 + r * Math.sin(midAngleRad)
+        const y = 50 - r * Math.cos(midAngleRad)
+        return (
+          <div
+            key={`label-${prize.id}`}
+            className="absolute pointer-events-none text-center"
+            style={{
+              top: `${y}%`,
+              left: `${x}%`,
+              transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
+            }}
+          >
+            <div className="text-lg md:text-xl drop-shadow-lg leading-none">{prize.icon}</div>
+            <div
+              className="text-[7px] md:text-[9px] font-bold text-white whitespace-nowrap mt-0.5 leading-tight"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7)' }}
+            >
+              {prize.label}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
