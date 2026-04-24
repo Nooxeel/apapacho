@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 import { FontProvider } from '@/contexts/FontContext'
@@ -103,11 +104,15 @@ export const metadata: Metadata = {
   classification: 'adult content platform',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Read the per-request CSP nonce injected by src/middleware.ts so we can
+  // stamp it on every inline <script> we render (R0-16). `headers()` is
+  // async in Next.js 15.
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   return (
     <html lang="es">
       <head>
@@ -140,6 +145,7 @@ export default function RootLayout({
         {/* JSON-LD Structured Data for SEO */}
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -171,6 +177,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -195,6 +202,7 @@ export default function RootLayout({
         {/* SoftwareApplication Schema - App-like experience */}
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -228,6 +236,7 @@ export default function RootLayout({
         {/* FAQPage Schema - Rich Snippets */}
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -280,6 +289,7 @@ export default function RootLayout({
         {/* BreadcrumbList Schema */}
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -310,6 +320,7 @@ export default function RootLayout({
         {/* Service Schema - Main offering */}
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",

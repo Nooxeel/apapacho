@@ -10,6 +10,11 @@ import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
+// NOTE (R0-05): This hook used to rely on a client-readable JWT. The token
+// now lives in an httpOnly cookie; authentication is implicit via
+// `credentials: 'include'` + the `X-Requested-With` header the backend
+// checks for CSRF. Full migration to the shared `api()` wrapper is R1-08.
+
 export type PaymentType = 'SUBSCRIPTION' | 'DONATION' | 'TIP' | 'CONTENT' | 'TOKENS';
 
 export interface CreateMPPaymentParams {
@@ -32,22 +37,20 @@ export interface MPPaymentResult {
 
 async function apiRequest<T>(
   endpoint: string,
-  options: { method?: string; body?: any; token?: string } = {}
+  options: { method?: string; body?: any } = {}
 ): Promise<T> {
-  const { method = 'GET', body, token } = options;
+  const { method = 'GET', body } = options;
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
   };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -61,13 +64,13 @@ async function apiRequest<T>(
 export function useMercadoPago() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { token } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
   /**
    * Create a payment and redirect to MercadoPago Checkout Pro
    */
   const createPayment = useCallback(async (params: CreateMPPaymentParams): Promise<MPPaymentResult> => {
-    if (!token) {
+    if (!isAuthenticated) {
       return { success: false, error: 'Debes iniciar sesión para realizar un pago' };
     }
 
@@ -84,7 +87,6 @@ export function useMercadoPago() {
       }>('/payments/mercadopago/create', {
         method: 'POST',
         body: params,
-        token,
       });
 
       if (response.success && response.initPoint) {
@@ -113,7 +115,7 @@ export function useMercadoPago() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [isAuthenticated]);
 
   /**
    * Create subscription payment via MercadoPago

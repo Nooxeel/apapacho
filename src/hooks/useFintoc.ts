@@ -10,6 +10,10 @@ import { useAuthStore } from '@/stores/authStore'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
+// NOTE (R0-05): The JWT now lives in an httpOnly cookie; auth travels via
+// `credentials: 'include'` + `X-Requested-With`. Full migration to the
+// shared `api()` wrapper is tracked in R1-08.
+
 export type PaymentType = 'SUBSCRIPTION' | 'DONATION' | 'TIP' | 'CONTENT' | 'TOKENS'
 
 export interface CreateFintocPaymentParams {
@@ -32,23 +36,20 @@ export interface FintocPaymentResult {
 
 async function apiRequest<T>(
   endpoint: string,
-  options: { method?: string; body?: any; token?: string } = {}
+  options: { method?: string; body?: any } = {}
 ): Promise<T> {
-  const { method = 'GET', body, token } = options
+  const { method = 'GET', body } = options
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
   }
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include',
   })
 
   if (!response.ok) {
@@ -62,14 +63,14 @@ async function apiRequest<T>(
 export function useFintoc() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { token } = useAuthStore()
+  const { isAuthenticated } = useAuthStore()
 
   /**
    * Create a Fintoc checkout session and redirect to payment
    */
   const createPayment = useCallback(
     async (params: CreateFintocPaymentParams): Promise<FintocPaymentResult> => {
-      if (!token) {
+      if (!isAuthenticated) {
         return { success: false, error: 'Debes iniciar sesión para realizar un pago' }
       }
 
@@ -87,7 +88,6 @@ export function useFintoc() {
         }>('/payments/fintoc/create', {
           method: 'POST',
           body: params,
-          token,
         })
 
         if (response.success && response.redirectUrl) {
@@ -112,7 +112,7 @@ export function useFintoc() {
         setLoading(false)
       }
     },
-    [token]
+    [isAuthenticated]
   )
 
   const payForSubscription = useCallback(

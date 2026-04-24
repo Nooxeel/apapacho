@@ -1,44 +1,47 @@
 import { io, Socket } from 'socket.io-client'
 
-// Remove /api from the URL for Socket.IO connection
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001')
-  .replace('/api', '')
+/**
+ * Socket.IO client — R0-05
+ *
+ * Auth model (post-R0-05):
+ *  - The access token lives only in httpOnly cookies. We pass
+ *    `withCredentials: true` so Socket.IO's HTTP handshake forwards the
+ *    cookie.
+ *  - We intentionally no longer read `localStorage.getItem('apapacho-token')`
+ *    (the previous key didn't even match the Zustand persist key — C3) and
+ *    we do not pass `auth.token` anymore.
+ *
+ * BACKEND NOTE (tracked as a follow-up): the backend WebSocket middleware
+ * (`backend/src/index.ts:264-298`) today only reads
+ * `socket.handshake.auth.token` / `Authorization` header. Until that
+ * middleware is updated to accept the JWT from the cookie jar, sockets will
+ * fail to authenticate. That change is out of scope for this frontend
+ * grouping (auth overhaul).
+ */
 
-// Solo loggear en desarrollo
+// Remove /api from the URL for Socket.IO connection
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace('/api', '')
+
+// Development-only logger to keep production consoles quiet.
 const isDev = process.env.NODE_ENV === 'development'
 const log = (...args: any[]) => isDev && console.log(...args)
 
 class SocketService {
   private socket: Socket | null = null
   private listeners: Map<string, Set<Function>> = new Map()
-  private connectionCount = 0 // Track number of components using the socket
-  private currentUserId: string | null = null // Track current user
-  private authToken: string | null = null // Auth token for WebSocket
+  // Reference counting so multiple components can share one socket.
+  private connectionCount = 0
+  private currentUserId: string | null = null
 
-  connect(userId: string, token?: string) {
+  connect(userId: string) {
     this.connectionCount++
     this.currentUserId = userId
-    
-    // Prefer passed token, fallback to stored token only if necessary
-    if (token) {
-      this.authToken = token
-    } else if (!this.authToken) {
-      // Only access localStorage as last resort fallback
-      this.authToken = typeof window !== 'undefined' ? localStorage.getItem('apapacho-token') : null
-    }
-    
+
     log(`[Socket] Connection count: ${this.connectionCount}, userId: ${userId}`)
-    
-    if (!this.authToken) {
-      log('[Socket] No auth token available, skipping connection')
-      return
-    }
-    
+
     if (this.socket?.connected) {
       log('[Socket] Already connected, re-joining user room')
-      // Re-join user room in case of reconnection or multiple connects
       this.socket.emit('join:user', userId)
-      log('[Socket] Emitted join:user for:', userId)
       return
     }
 
@@ -48,21 +51,19 @@ class SocketService {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
-      auth: {
-        token: this.authToken
-      }
+      // Cookie-based auth: the httpOnly session cookie is forwarded with the
+      // handshake request by the browser.
+      withCredentials: true,
     })
 
     this.socket.on('connect', () => {
-      log('✅ WebSocket connected:', this.socket?.id)
-      // Join user-specific room
+      log('WebSocket connected:', this.socket?.id)
       log('[Socket] Emitting join:user for:', this.currentUserId)
       this.socket?.emit('join:user', this.currentUserId)
     })
 
     this.socket.on('reconnect', (attemptNumber) => {
-      log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`)
-      // Re-join user room after reconnection
+      log(`WebSocket reconnected after ${attemptNumber} attempts`)
       if (this.currentUserId) {
         log('[Socket] Re-joining user room after reconnect:', this.currentUserId)
         this.socket?.emit('join:user', this.currentUserId)
@@ -70,39 +71,37 @@ class SocketService {
     })
 
     this.socket.on('disconnect', () => {
-      log('❌ WebSocket disconnected')
+      log('WebSocket disconnected')
     })
 
     this.socket.on('connect_error', (error) => {
-      // Solo loggear error en desarrollo, en producción puede ser normal
-      if (isDev) console.error('❌ WebSocket connection error:', error.message)
-      
-      // If authentication error, clear token and disconnect
+      if (isDev) console.error('WebSocket connection error:', error.message)
+
+      // On auth failure just tear down — there is nothing a token refresh
+      // can do client-side now that the token lives in a cookie we cannot
+      // read.
       if (error.message === 'Authentication required' || error.message === 'Invalid or expired token') {
         log('[Socket] Authentication failed, disconnecting')
-        this.authToken = null
         this.disconnect()
       }
     })
 
-    // Handle server-side errors
     this.socket.on('error', (error: { message: string }) => {
       log('[Socket] Server error:', error.message)
     })
 
-    // Setup event listeners with logging
     this.socket.on('message:new', (message) => {
-      log('[Socket] 📨 Received message:new event:', message)
+      log('[Socket] Received message:new event:', message)
       this.emit('message:new', message)
     })
 
     this.socket.on('unread:update', (data) => {
-      log('[Socket] 🔔 Received unread:update event:', data)
+      log('[Socket] Received unread:update event:', data)
       this.emit('unread:update', data)
     })
 
     this.socket.on('stats:update', (data) => {
-      log('[Socket] 📊 Received stats:update event:', data)
+      log('[Socket] Received stats:update event:', data)
       this.emit('stats:update', data)
     })
   }
@@ -110,8 +109,7 @@ class SocketService {
   disconnect() {
     this.connectionCount--
     log(`[Socket] Disconnect called, connection count: ${this.connectionCount}`)
-    
-    // Only actually disconnect if no components are using it
+
     if (this.connectionCount <= 0 && this.socket) {
       log('[Socket] Actually disconnecting')
       this.socket.disconnect()
@@ -144,7 +142,7 @@ class SocketService {
   private emit(event: string, data: any) {
     const callbacks = this.listeners.get(event)
     if (callbacks) {
-      callbacks.forEach(callback => callback(data))
+      callbacks.forEach((callback) => callback(data))
     }
   }
 

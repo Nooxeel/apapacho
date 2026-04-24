@@ -9,6 +9,13 @@ import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
+// NOTE (R0-05): This hook used to depend on the Zustand `token` field for
+// both the auth header and the "is the user logged in?" gate. Since the JWT
+// is now an httpOnly cookie, authentication travels automatically with
+// `credentials: 'include'` and we rely on `isAuthenticated` (derived from
+// the persisted user) to short-circuit the UI. A full migration to the
+// shared `api()` wrapper is tracked in R1-08.
+
 export type PaymentType = 'SUBSCRIPTION' | 'DONATION' | 'TIP' | 'CONTENT' | 'TOKENS';
 
 export interface CreatePaymentParams {
@@ -31,43 +38,42 @@ export interface PaymentResult {
 
 async function apiRequest<T>(
   endpoint: string,
-  options: { method?: string; body?: any; token?: string } = {}
+  options: { method?: string; body?: any } = {}
 ): Promise<T> {
-  const { method = 'GET', body, token } = options;
-  
+  const { method = 'GET', body } = options;
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    // Required by backend's cookie-auth CSRF guard for non-GET requests.
+    'X-Requested-With': 'XMLHttpRequest',
   };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
+
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include',
   });
-  
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Error desconocido' }));
     throw new Error(error.error || 'Error en la solicitud');
   }
-  
+
   return response.json();
 }
 
 export function useWebpay() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { token } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
   /**
    * Create a payment and redirect to Webpay
    * This will redirect the user away from the site to complete payment
    */
   const createPayment = useCallback(async (params: CreatePaymentParams): Promise<PaymentResult> => {
-    if (!token) {
+    if (!isAuthenticated) {
       return { success: false, error: 'Debes iniciar sesión para realizar un pago' };
     }
 
@@ -85,7 +91,6 @@ export function useWebpay() {
       }>('/payments/webpay/create', {
         method: 'POST',
         body: params,
-        token,
       });
 
       if (response.success && response.url && response.token) {
@@ -146,7 +151,7 @@ export function useWebpay() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [isAuthenticated]);
 
   /**
    * Create subscription payment
@@ -219,7 +224,7 @@ export function useWebpay() {
    * Get user's payment history
    */
   const getMyTransactions = useCallback(async (limit = 20, offset = 0) => {
-    if (!token) return { transactions: [], total: 0 };
+    if (!isAuthenticated) return { transactions: [], total: 0 };
 
     try {
       const response = await apiRequest<{
@@ -234,14 +239,12 @@ export function useWebpay() {
           completedAt?: string;
         }>;
         total: number;
-      }>(`/payments/webpay/my-transactions?limit=${limit}&offset=${offset}`, {
-        token,
-      });
+      }>(`/payments/webpay/my-transactions?limit=${limit}&offset=${offset}`);
       return response;
     } catch (err) {
       return { transactions: [], total: 0 };
     }
-  }, [token]);
+  }, [isAuthenticated]);
 
   return {
     loading,

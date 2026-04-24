@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { headers } from 'next/headers'
 import Link from 'next/link';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -24,13 +25,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ArticlePage() {
+export default async function ArticlePage() {
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0d0d1a] to-[#1a1a2e]">
       <Navbar />
 
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",

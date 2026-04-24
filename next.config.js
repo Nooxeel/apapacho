@@ -78,27 +78,9 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              // Note: 'unsafe-inline' needed for Next.js hydration, 'unsafe-eval' only in dev
-              process.env.NODE_ENV === 'development' 
-                ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.youtube.com https://www.googletagmanager.com https://accounts.google.com"
-                : "script-src 'self' 'unsafe-inline' https://www.youtube.com https://www.googletagmanager.com https://accounts.google.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
-              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://images.unsplash.com https://ui-avatars.com https://res.cloudinary.com https://*.placeholder.com http://localhost:3001 https://*.railway.app https://*.up.railway.app https://*.googleusercontent.com",
-              "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://www.youtube.com http://localhost:3001 https://*.railway.app https://*.up.railway.app ws://localhost:3001 wss://*.railway.app wss://*.up.railway.app https://accounts.google.com",
-              "frame-src 'self' https://www.youtube.com https://*.transbank.cl https://accounts.google.com",
-              "media-src 'self' https://res.cloudinary.com http://localhost:3001 https://*.railway.app blob:",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self' https://*.transbank.cl https://webpay3gint.transbank.cl https://webpay3g.transbank.cl",
-              "frame-ancestors 'none'",
-              "upgrade-insecure-requests",
-            ].join('; '),
-          },
+          // NOTE: Content-Security-Policy is now set per-request in
+          // src/middleware.ts so we can mint a fresh nonce and drop
+          // 'unsafe-inline' from script-src (see R0-16).
         ],
       },
       // Cache static assets aggressively
