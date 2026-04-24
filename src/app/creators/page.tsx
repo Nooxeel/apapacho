@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Card, Badge } from '@/components/ui';
 import { BadgeCheck, Heart, Search } from 'lucide-react';
+import { sanitizeBio, sanitizeText } from '@/lib/sanitize';
 
 interface Creator {
   id: string;
@@ -147,7 +148,7 @@ export default function CreatorsPage() {
                     <div className="p-4 pt-12">
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold text-white truncate group-hover:gradient-text transition-all">
-                          {creator.user?.displayName || 'Sin nombre'}
+                          {creator.user?.displayName ? sanitizeText(creator.user.displayName) : 'Sin nombre'}
                         </h3>
                         {creator.isVerified && (
                           <BadgeCheck 
@@ -161,7 +162,7 @@ export default function CreatorsPage() {
                       
                       {creator.bio && (
                         <p className="text-white/40 text-xs line-clamp-2">
-                          {creator.bio}
+                          {sanitizeBio(creator.bio)}
                         </p>
                       )}
                     </div>

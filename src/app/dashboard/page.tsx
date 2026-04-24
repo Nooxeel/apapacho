@@ -10,6 +10,8 @@ import { uploadApi, ApiError, subscriptionsApi, gamificationApi, type UserLevelR
 import { API_URL } from '@/lib/config';
 import { StreakDisplay, LevelDisplay, LevelBadge, AvatarWithProgress } from '@/components/gamification';
 import { Navbar } from '@/components/layout';
+import { KycBanner } from '@/components/ui/KycBanner';
+import { sanitizeText } from '@/lib/sanitize';
 import {
   User,
   Heart,
@@ -401,7 +403,7 @@ export default function DashboardPage() {
             {/* Info */}
             <div className="text-center md:text-left flex-1">
               <div className="flex items-center gap-3 justify-center md:justify-start">
-                <h1 className="text-2xl font-bold">{user.displayName}</h1>
+                <h1 className="text-2xl font-bold">{sanitizeText(user.displayName)}</h1>
                 <LevelBadge />
               </div>
               <p className="text-white/70">@{user.username}</p>
@@ -468,6 +470,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* KYC banner — shown whenever a creator is not APPROVED */}
+      {user.isCreator && <KycBanner />}
 
       {/* Creator Action Cards - Only for creators */}
       {user.isCreator && (
@@ -914,9 +919,9 @@ export default function DashboardPage() {
                         href={`/${comment.creator.user.username}`}
                         className="text-white/80 hover:text-white font-medium inline-flex items-center gap-2 mb-2"
                       >
-                        Comentario en el perfil de <span className="gradient-text">{comment.creator.user.displayName}</span>
+                        Comentario en el perfil de <span className="gradient-text">{sanitizeText(comment.creator.user.displayName)}</span>
                       </Link>
-                      <p className="text-white mb-3">{comment.content}</p>
+                      <p className="text-white mb-3">{sanitizeText(comment.content)}</p>
                       <div className="flex items-center gap-4 text-xs text-white/40">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />

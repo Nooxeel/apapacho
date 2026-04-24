@@ -11,6 +11,8 @@ export * from './payments'
 export * from './broadcasts'
 export * from './content'
 export * from './gamification'
+export * from './kyc'
+export * from './admin-kyc'
 
 // Default export: the api function
 export { default } from './client'

@@ -11,6 +11,7 @@ import { API_URL } from '@/lib/config'
 import { User as UserIcon, ImagePlus, Save, ArrowLeft, Tag, Palette, Type } from 'lucide-react'
 import { InterestSelector } from '@/components/interests'
 import FontSelector from '@/components/ui/FontSelector'
+import { sanitizeText } from '@/lib/sanitize'
 import type { Interest } from '@/types'
 import Image from 'next/image'
 
@@ -518,7 +519,7 @@ export default function ProfileEditPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-white mb-0.5 truncate">{profile.displayName || 'Tu Nombre'}</h3>
+                        <h3 className="font-bold text-white mb-0.5 truncate">{profile.displayName ? sanitizeText(profile.displayName) : 'Tu Nombre'}</h3>
                         <p className="text-sm text-white/60 truncate">@{profile.username}</p>
                       </div>
                     </div>

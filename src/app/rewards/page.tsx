@@ -17,6 +17,7 @@ import {
   AvatarWithProgress 
 } from '@/components/gamification';
 import { Navbar } from '@/components/layout';
+import { sanitizeText } from '@/lib/sanitize';
 import {
   Trophy,
   Target,
@@ -111,7 +112,7 @@ export default function RewardsPage() {
             {/* User Info & Level */}
             <div className="flex-1 text-center lg:text-left">
               <div className="flex items-center gap-3 justify-center lg:justify-start mb-2">
-                <h1 className="text-3xl font-bold">{user.displayName}</h1>
+                <h1 className="text-3xl font-bold">{sanitizeText(user.displayName)}</h1>
                 <LevelBadge />
               </div>
               <p className="text-white/60 mb-4">@{user.username}</p>

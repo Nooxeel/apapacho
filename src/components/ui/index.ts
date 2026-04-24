@@ -4,3 +4,4 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 export { Avatar } from './Avatar'
 export { Badge } from './Badge'
 export { ContentProtection, ProtectedMedia, useProtection } from './ContentProtection'
+export { KycBanner } from './KycBanner'

@@ -7,7 +7,7 @@ import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
 import { postApi, missionsApi } from '@/lib/api'
 import { useBadgeNotification } from '@/components/gamification'
-import { sanitizePostDescription, sanitizeComment } from '@/lib/sanitize'
+import { sanitizeText } from '@/lib/sanitize'
 import type { PostVisibility, PostComment } from '@/types'
 import { useRouter } from 'next/navigation'
 import { usePayment } from '@/hooks/usePayment'
@@ -463,7 +463,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                     <div>
                       {post.title && (
                         <h3 className="font-semibold text-white text-lg">
-                          {post.title}
+                          {sanitizeText(post.title)}
                         </h3>
                       )}
                       <p className="text-sm text-white/50 mt-1">
@@ -480,7 +480,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                   </div>
                   {post.description && (
                     <p className="text-white/70 text-sm mt-3 leading-relaxed">
-                      {sanitizePostDescription(post.description)}
+                      {sanitizeText(post.description)}
                     </p>
                   )}
                 </div>
@@ -764,14 +764,14 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                                 <div className="bg-white/10 rounded-2xl px-4 py-2">
                                   <div className="flex items-center gap-2 mb-1">
                                     <span className="font-semibold text-white text-sm">
-                                      {comment.user.displayName}
+                                      {sanitizeText(comment.user.displayName)}
                                     </span>
                                     <span className="text-xs text-white/40">
                                       @{comment.user.username}
                                     </span>
                                   </div>
                                   <p className="text-white text-sm whitespace-pre-wrap break-words">
-                                    {sanitizeComment(comment.content)}
+                                    {sanitizeText(comment.content)}
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-3 mt-1 px-2">

@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { creatorApi, subscriptionsApi, promocodesApi, missionsApi } from '@/lib/api'
 import { getFontStyle } from '@/lib/fonts'
 import { replaceCountryCodesWithFlags } from '@/lib/utils'
+import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
 import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
 import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
 import { Navbar } from '@/components/layout'
@@ -594,7 +595,7 @@ export default function CreatorPublicProfile() {
 
               {/* Title with verification */}
               <div className="mt-4 flex items-center gap-2">
-                <h1 className="text-2xl font-bold">{replaceCountryCodesWithFlags(profile.extendedInfoTitle || creator.username)}</h1>
+                <h1 className="text-2xl font-bold">{replaceCountryCodesWithFlags(sanitizeText(profile.extendedInfoTitle || creator.username))}</h1>
                 {profile.isVerified && (
                   <BadgeCheck
                     className="w-6 h-6"
@@ -608,7 +609,7 @@ export default function CreatorPublicProfile() {
               {profile.extendedInfo && (
                 <div className="mt-4 text-center text-gray-300 max-w-2xl whitespace-pre-line">
                   <p className="text-lg leading-relaxed">
-                    {replaceCountryCodesWithFlags(profile.extendedInfo)}
+                    {replaceCountryCodesWithFlags(sanitizeBio(profile.extendedInfo))}
                   </p>
                 </div>
               )}
@@ -756,9 +757,9 @@ export default function CreatorPublicProfile() {
             {/* About Me */}
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white/5 rounded-xl p-5 backdrop-blur-sm border border-white/10">
-                <h3 className="font-semibold text-lg mb-3">{profile.bioTitle || 'Acerca de mí'}</h3>
+                <h3 className="font-semibold text-lg mb-3">{sanitizeText(profile.bioTitle || 'Acerca de mí')}</h3>
                 <p className="text-gray-300 text-sm whitespace-pre-line">
-                  {profile.bio || 'Este creador aún no ha agregado una descripción.'}
+                  {profile.bio ? sanitizeBio(profile.bio) : 'Este creador aún no ha agregado una descripción.'}
                 </p>
 
                 {/* Social Links */}
@@ -867,7 +868,7 @@ export default function CreatorPublicProfile() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6">
-              <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {creator.displayName}</h2>
+              <h2 className="text-xl font-bold text-white mb-2">Suscribirse a {sanitizeText(creator.displayName)}</h2>
               <p className="text-white/60 text-sm mb-4">Elige un plan para acceder a contenido exclusivo</p>
 
               {/* Payment gateway selector */}
@@ -1061,7 +1062,7 @@ export default function CreatorPublicProfile() {
 
               {/* Message */}
               <div className="space-y-2 text-white/80">
-                <p>Ahora eres suscriptor de <span className="font-semibold text-white">{creator.displayName}</span></p>
+                <p>Ahora eres suscriptor de <span className="font-semibold text-white">{sanitizeText(creator.displayName)}</span></p>
                 <div className="bg-white/5 rounded-lg p-3 space-y-1 text-sm">
                   <p><span className="text-white/50">Plan:</span> <span className="font-medium">{successMessage.tierName}</span></p>
                   <p><span className="text-white/50">Válido hasta:</span> <span className="font-medium">{successMessage.endDate}</span></p>
@@ -1101,7 +1102,7 @@ export default function CreatorPublicProfile() {
               <div className="bg-white/5 rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <span className="text-white/50 text-sm">Creador</span>
-                  <span className="font-semibold text-white">{creator.displayName}</span>
+                  <span className="font-semibold text-white">{sanitizeText(creator.displayName)}</span>
                 </div>
                 <div className="flex justify-between items-start">
                   <span className="text-white/50 text-sm">Plan</span>

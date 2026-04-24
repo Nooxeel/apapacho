@@ -296,19 +296,6 @@ export function ProfileCustomizer() {
                 </label>
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
-                CSS Personalizado
-              </label>
-              <textarea
-                placeholder="/* Escribe tu CSS aquí */"
-                className="w-full h-32 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-mono placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 resize-none"
-              />
-              <p className="text-xs text-white/40 mt-1">
-                ⚠️ Funcionalidad avanzada. Úsala con cuidado.
-              </p>
-            </div>
           </div>
         )}
 

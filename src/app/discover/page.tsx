@@ -10,6 +10,7 @@ import { Button } from '@/components/ui'
 import { InterestBadges } from '@/components/interests'
 import { discoverApi, interestsApi } from '@/lib/api'
 import type { Interest } from '@/types'
+import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
 import Image from 'next/image'
 
 interface Creator {
@@ -266,7 +267,7 @@ export default function DiscoverPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="text-lg font-bold text-white truncate">
-                          {creator.displayName}
+                          {sanitizeText(creator.displayName)}
                         </h3>
                         {creator.isVerified && (
                           <BadgeCheck className="w-5 h-5 text-fuchsia-400 flex-shrink-0" />
@@ -288,7 +289,7 @@ export default function DiscoverPage() {
                   {/* Bio */}
                   {creator.bio && (
                     <p className="text-white/70 text-sm line-clamp-2 mb-4">
-                      {creator.bio}
+                      {sanitizeBio(creator.bio)}
                     </p>
                   )}
 

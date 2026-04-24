@@ -8,6 +8,7 @@ export interface User {
   bio?: string
   fontFamily?: string
   isCreator: boolean
+  role?: 'USER' | 'CREATOR' | 'SUPER_ADMIN'
   createdAt: Date
   updatedAt: Date
 }
@@ -31,7 +32,6 @@ export interface CreatorProfile {
   fontFamily: string
   musicTracks: YouTubeTrack[]
   socialLinks: SocialLink[]
-  customCSS?: string
   theme: ProfileTheme
   visibilitySettings?: {
     tabs?: {

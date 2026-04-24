@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { User as UserIcon, Check, Users } from 'lucide-react'
 import { Card } from '@/components/ui'
 import type { Interest } from '@/types'
+import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
 
 export interface CreatorCardData {
   id: string
@@ -95,7 +96,7 @@ export function CreatorCard({ creator, userInterests = [], priority = false }: C
         {/* Name & Username */}
         <div className="mb-3 text-center">
           <h3 className="mb-1 truncate text-lg font-bold text-white group-hover:text-fuchsia-400 transition-colors">
-            {creator.user.displayName}
+            {sanitizeText(creator.user.displayName)}
           </h3>
           <p className="truncate text-sm text-white/60">@{creator.user.username}</p>
         </div>
@@ -103,7 +104,7 @@ export function CreatorCard({ creator, userInterests = [], priority = false }: C
         {/* Bio */}
         {creator.bio && (
           <p className="mb-4 line-clamp-2 text-center text-sm text-white/70">
-            {creator.bio}
+            {sanitizeBio(creator.bio)}
           </p>
         )}
 

@@ -2,6 +2,7 @@
 
 import { SocialLink } from '@/types'
 import { ExternalLink } from 'lucide-react'
+import { sanitizeText, sanitizeUrl } from '@/lib/sanitize'
 
 interface SocialLinksDisplayProps {
   links: SocialLink[]
@@ -20,19 +21,24 @@ export default function SocialLinksDisplay({
     return null
   }
 
-  // Helper para generar el href correcto
+  // Helper para generar el href correcto.
+  // Para URLs http(s) arbitrarias se pasa por sanitizeUrl() que bloquea
+  // esquemas peligrosos (javascript:, data:, vbscript:).
   const getLinkHref = (link: SocialLink) => {
     const platform = link.platform.toLowerCase()
-    
+
     if (platform === 'email') {
       // Si ya tiene mailto:, usarlo directamente; si no, agregarlo
-      return link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`
+      // Sanitizamos el email como texto (no puede haber HTML) para evitar
+      // inyecciones en el mailto: header.
+      const clean = sanitizeText(link.url)
+      return clean.startsWith('mailto:') ? clean : `mailto:${clean}`
     }
-    
+
     if (platform === 'whatsapp' || platform === 'telefono' || platform === 'teléfono' || platform === 'phone') {
       // Extraer solo números del link.url
       const phoneNumber = link.url.replace(/\D/g, '')
-      
+
       if (platform === 'whatsapp') {
         // Para WhatsApp, usar el formato wa.me
         return `https://wa.me/${phoneNumber}`
@@ -41,8 +47,8 @@ export default function SocialLinksDisplay({
         return `tel:+${phoneNumber}`
       }
     }
-    
-    return link.url
+
+    return sanitizeUrl(link.url)
   }
 
   // Helper para mostrar el texto del link
@@ -78,11 +84,11 @@ export default function SocialLinksDisplay({
             target={shouldOpenInNewTab(link) ? '_blank' : '_self'}
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors group"
-            title={link.label || link.platform}
+            title={sanitizeText(link.label || link.platform)}
           >
             <span className="text-xl">{link.icon || '🔗'}</span>
             <span className="text-sm text-white/90 group-hover:text-white font-medium">
-              {link.label || link.platform}
+              {sanitizeText(link.label || link.platform)}
             </span>
             <ExternalLink className="w-3 h-3 text-white/50 group-hover:text-white/70" />
           </a>
@@ -107,7 +113,7 @@ export default function SocialLinksDisplay({
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-white font-medium group-hover:text-fuchsia-300 transition-colors truncate">
-                {link.label || link.platform}
+                {sanitizeText(link.label || link.platform)}
               </div>
               <div className="text-xs text-white/50 truncate">
                 {getLinkDisplayText(link)}
@@ -137,7 +143,7 @@ export default function SocialLinksDisplay({
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-white font-semibold group-hover:text-fuchsia-300 transition-colors truncate">
-                {link.label || link.platform}
+                {sanitizeText(link.label || link.platform)}
               </div>
             </div>
           </div>

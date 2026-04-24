@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { messageApi } from '@/lib/api'
 import { socketService } from '@/lib/socket'
 import { AvatarWithProgressCompact } from '@/components/gamification'
+import { sanitizeText } from '@/lib/sanitize'
 import Image from 'next/image'
 
 // Inline icons to avoid loading full lucide-react bundle
@@ -266,7 +267,7 @@ export function Navbar() {
                           </div>
                         )}
                       </AvatarWithProgressCompact>
-                      <span className="text-white font-medium">{user.displayName}</span>
+                      <span className="text-white font-medium">{sanitizeText(user.displayName)}</span>
                     </button>
                   
                   {showUserMenu && (

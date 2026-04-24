@@ -10,6 +10,7 @@ import { Edit2, Trash2, Eye, Heart, MessageCircle, Image as ImageIcon, Video, Pl
 import Link from 'next/link';
 import { API_URL } from '@/lib/config';
 import { VisibilitySelector } from '@/components/profile/VisibilitySelector';
+import { sanitizeText } from '@/lib/sanitize';
 import type { PostVisibility } from '@/types';
 import Image from 'next/image';
 
@@ -294,10 +295,10 @@ export default function CreatorPostsPage() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-white mb-1">
-                          {post.title || 'Sin título'}
+                          {post.title ? sanitizeText(post.title) : 'Sin título'}
                         </h3>
                         <p className="text-white/60 text-sm mb-3 line-clamp-2">
-                          {post.description || 'Sin descripción'}
+                          {post.description ? sanitizeText(post.description) : 'Sin descripción'}
                         </p>
 
                         {/* Visibility Badge */}

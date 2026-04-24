@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { API_URL } from '@/lib/config';
-import { sanitizeComment } from '@/lib/sanitize';
+import { sanitizeText } from '@/lib/sanitize';
 import { missionsApi } from '@/lib/api';
 import { LevelBadge, useBadgeNotification } from '@/components/gamification';
 import Image from 'next/image';
@@ -236,11 +236,11 @@ function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: Comme
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-medium text-sm">{comment.user.displayName}</span>
+                      <span className="font-medium text-sm">{sanitizeText(comment.user.displayName)}</span>
                       <LevelBadge userId={comment.userId} className="text-xs" />
                       <span className="text-xs text-white/40">@{comment.user.username}</span>
                     </div>
-                    <p className="text-sm text-white/80">{sanitizeComment(comment.content)}</p>
+                    <p className="text-sm text-white/80">{sanitizeText(comment.content)}</p>
                     <span className="text-xs text-white/40">{formatDate(comment.createdAt)}</span>
                   </div>
                 </div>
@@ -334,12 +334,12 @@ function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: Comme
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="font-medium">{comment.user.displayName}</span>
+                  <span className="font-medium">{sanitizeText(comment.user.displayName)}</span>
                   <LevelBadge userId={comment.userId} className="text-xs" />
                   <span className="text-sm text-white/40">@{comment.user.username}</span>
                   <span className="text-xs text-white/30">• {formatDate(comment.createdAt)}</span>
                 </div>
-                <p className="text-white/80">{sanitizeComment(comment.content)}</p>
+                <p className="text-white/80">{sanitizeText(comment.content)}</p>
               </div>
               {/* Botón de eliminar (visible para el autor o el dueño del perfil) */}
               {(user?.id === comment.userId || isOwner) && (

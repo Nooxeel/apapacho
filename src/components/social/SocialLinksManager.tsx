@@ -7,6 +7,7 @@ import { SocialLink, SocialPlatform } from '@/types'
 import { Plus, Trash2, GripVertical, Eye, EyeOff, ExternalLink, Save, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { sanitizeText, sanitizeUrl } from '@/lib/sanitize'
 
 interface SocialLinksManagerProps {
   token: string
@@ -356,7 +357,7 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-white font-medium">
-                        {link.label || link.platform}
+                        {sanitizeText(link.label || link.platform)}
                       </span>
                       {!link.isVisible && (
                         <span className="text-xs px-2 py-0.5 bg-white/10 rounded text-white/50">
@@ -365,13 +366,13 @@ export default function SocialLinksManager({ token, onLinksChange }: SocialLinks
                       )}
                     </div>
                     <a
-                      href={link.url}
+                      href={sanitizeUrl(link.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-white/50 hover:text-fuchsia-400 flex items-center gap-1 truncate"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {link.url}
+                      {sanitizeText(link.url)}
                       <ExternalLink className="w-3 h-3 flex-shrink-0" />
                     </a>
                   </div>

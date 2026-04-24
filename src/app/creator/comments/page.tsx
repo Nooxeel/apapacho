@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button, Card } from '@/components/ui';
 import { MessageCircle, Check, X, Trash2, Clock, CheckCircle } from 'lucide-react';
 import { API_URL } from '@/lib/config';
+import { sanitizeText } from '@/lib/sanitize';
 import Image from 'next/image';
 
 interface Comment {
@@ -189,7 +190,7 @@ export default function CreatorCommentsPage() {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-semibold text-white">{comment.user.displayName}</span>
+            <span className="font-semibold text-white">{sanitizeText(comment.user.displayName)}</span>
             <span className="text-white/40 text-sm">@{comment.user.username}</span>
             {isPending && (
               <span className="ml-auto flex items-center gap-1 text-xs text-yellow-400">
@@ -204,7 +205,7 @@ export default function CreatorCommentsPage() {
               </span>
             )}
           </div>
-          <p className="text-white/80 text-sm mb-2">{comment.content}</p>
+          <p className="text-white/80 text-sm mb-2">{sanitizeText(comment.content)}</p>
           <span className="text-white/40 text-xs">{formatDate(comment.createdAt)}</span>
         </div>
 
