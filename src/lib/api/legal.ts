@@ -371,6 +371,8 @@ export interface AdminDmcaQueueRow {
   takenDownAt: string | null
   rejectedAt: string | null
   rejectionReason: string | null
+  ipAddress: string | null
+  processedBy: string | null
   hoursOverdue: number
   isOverdue: boolean
 }

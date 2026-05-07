@@ -75,6 +75,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               KYC
             </Link>
+            <Link
+              href="/admin/legal"
+              className="text-sm text-white/70 hover:text-white"
+            >
+              Legal
+            </Link>
           </div>
         </div>
       </nav>
