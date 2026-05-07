@@ -160,7 +160,11 @@ export function RecommendedSection({ token, userInterests }: RecommendedSectionP
         >
           {recommendedCreators.map(creator => (
             <div key={creator.id} className="min-w-[280px] flex-shrink-0">
-              <CreatorCard creator={creator} userInterests={userInterests} />
+              <CreatorCard
+                creator={creator}
+                userInterests={userInterests}
+                showRecommendationInfo
+              />
             </div>
           ))}
         </div>

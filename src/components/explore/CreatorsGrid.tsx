@@ -13,6 +13,12 @@ interface CreatorsGridProps {
   emptyMessage?: string
   /** Whether this is the first batch (enables priority loading for first items) */
   isFirstBatch?: boolean
+  /**
+   * When true, each card renders the algorithmic-transparency popover
+   * (Ley 21.719 — Group 3.6). Defaults to true because this grid lives in
+   * discovery routes; set to false from non-recommendation contexts.
+   */
+  showRecommendationInfo?: boolean
 }
 
 export function CreatorsGrid({
@@ -22,7 +28,8 @@ export function CreatorsGrid({
   onLoadMore,
   userInterests = [],
   emptyMessage = 'No se encontraron creadores',
-  isFirstBatch = false
+  isFirstBatch = false,
+  showRecommendationInfo = true,
 }: CreatorsGridProps) {
   // Loading state (first load)
   if (isLoading && creators.length === 0) {
@@ -82,6 +89,7 @@ export function CreatorsGrid({
             creator={creator}
             userInterests={userInterests}
             priority={isFirstBatch && index < 4}
+            showRecommendationInfo={showRecommendationInfo}
           />
         ))}
       </div>

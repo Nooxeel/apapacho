@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { User as UserIcon, Check, Users } from 'lucide-react'
 import { Card } from '@/components/ui'
+import { RecommendationExplanation } from '@/components/legal/RecommendationExplanation'
 import type { Interest } from '@/types'
 import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
 
@@ -32,9 +33,21 @@ interface CreatorCardProps {
   userInterests?: string[] // IDs de intereses del usuario autenticado
   /** When true, images load with priority for LCP optimization */
   priority?: boolean
+  /**
+   * When true, render the "ℹ" button that opens the algorithmic-transparency
+   * popover (Ley 21.719). Only enable on cards shown via discovery /
+   * recommendations — not on direct profile visits or subscription lists,
+   * because there is no recommendation event to explain there.
+   */
+  showRecommendationInfo?: boolean
 }
 
-export function CreatorCard({ creator, userInterests = [], priority = false }: CreatorCardProps) {
+export function CreatorCard({
+  creator,
+  userInterests = [],
+  priority = false,
+  showRecommendationInfo = false,
+}: CreatorCardProps) {
   const subscriberCount = creator._count?.subscribers || 0
   const displayedInterests = creator.interests.slice(0, 5)
   const remainingCount = creator.interests.length - 5
@@ -63,6 +76,17 @@ export function CreatorCard({ creator, userInterests = [], priority = false }: C
             />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-fuchsia-600/30 via-purple-600/30 to-pink-600/30" />
+          )}
+
+          {/* Algorithmic transparency popover (Ley 21.719) */}
+          {showRecommendationInfo && (
+            <div className="absolute right-2 top-2 z-10">
+              <RecommendationExplanation
+                itemId={creator.id}
+                itemType="creator"
+                ariaLabel={`Por qué te mostramos a ${creator.user.displayName}`}
+              />
+            </div>
           )}
         </div>
 

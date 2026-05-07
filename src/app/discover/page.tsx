@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { Navbar } from '@/components/layout'
 import { Button } from '@/components/ui'
 import { InterestBadges } from '@/components/interests'
+import { RecommendationExplanation } from '@/components/legal/RecommendationExplanation'
 import { discoverApi, interestsApi } from '@/lib/api'
 import type { Interest } from '@/types'
 import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
@@ -250,8 +251,19 @@ export default function DiscoverPage() {
                 <Link
                   key={creator.id}
                   href={`/${creator.username}`}
-                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all group"
+                  className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all group"
                 >
+                  {/* Algorithmic transparency popover (Ley 21.719) */}
+                  {token && (
+                    <div className="absolute right-3 top-3 z-10">
+                      <RecommendationExplanation
+                        itemId={creator.id}
+                        itemType="creator"
+                        ariaLabel={`Por qué te mostramos a ${creator.displayName}`}
+                      />
+                    </div>
+                  )}
+
                   {/* Avatar & Name */}
                   <div className="flex items-start gap-4 mb-4">
                     <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
