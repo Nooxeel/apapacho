@@ -13,6 +13,8 @@ export * from './content'
 export * from './gamification'
 export * from './kyc'
 export * from './admin-kyc'
+export * from './consents'
+export * from './legal'
 
 // Default export: the api function
 export { default } from './client'

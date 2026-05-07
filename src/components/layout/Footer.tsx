@@ -87,18 +87,23 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/terms" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
-                  Términos de Servicio
+                <Link href="/terminos" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Términos y Condiciones
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                <Link href="/privacidad" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Política de Privacidad
                 </Link>
               </li>
               <li>
                 <Link href="/cookies" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
-                  Cookies
+                  Política de Cookies
+                </Link>
+              </li>
+              <li>
+                <Link href="/derechos" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Ejercer mis derechos
                 </Link>
               </li>
               <li>

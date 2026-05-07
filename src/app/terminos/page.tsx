@@ -6,8 +6,8 @@ export default function TerminosPage() {
   return (
     <div className="min-h-screen bg-[#0f0f14] py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <Link 
-          href="/login" 
+        <Link
+          href="/login"
           className="inline-flex items-center text-fuchsia-400 hover:text-fuchsia-300 mb-8"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,219 +17,235 @@ export default function TerminosPage() {
         </Link>
 
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
-          <h1 className="text-3xl font-bold text-white mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Términos y Condiciones de Uso
           </h1>
-          
+          <p className="text-sm text-gray-400 mb-8">
+            Versión 1.0 · Vigente desde el 6 de mayo de 2026
+          </p>
+
           <div className="prose prose-invert max-w-none space-y-6 text-gray-300">
-            <p className="text-sm text-gray-400">
-              Última actualización: 26 de diciembre de 2025
-            </p>
 
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">1. GENERALIDADES</h2>
               <p>
-                El presente documento regula los términos y condiciones generales aplicables al acceso y uso que el Usuario 
-                realizará del Sitio Web: www.appapacho.cl (en adelante "Appapacho", "www.appapacho.cl", o "el sitio web" 
-                indistintamente), así como a cualquier tipo de información, contenido, imagen, video, audio y otro material 
-                comunicado o presente en el sitio web, así como todo servicio ofrecido por Appapacho.
+                Los presentes Términos y Condiciones de Uso (en adelante, los &quot;Términos&quot;) regulan la relación
+                comercial entre <strong>Apapacho SpA</strong> (en adelante, &quot;Apapacho&quot;, &quot;nosotros&quot;
+                o &quot;la Plataforma&quot;), sociedad chilena con razón social [Apapacho SpA — RUT por completar] y
+                domicilio en [A completar], y toda persona natural mayor de edad que acceda, navegue, se registre o
+                contrate cualquiera de los servicios disponibles en el sitio web <span className="text-fuchsia-400">www.appapacho.cl</span>
+                {' '}y sus aplicaciones asociadas (en adelante, el &quot;Usuario&quot;, indistintamente para Usuarios
+                consumidores y Creadores de contenido).
               </p>
               <p className="mt-4">
-                Appapacho es un sitio web que facilita a los profesionales, aficionados, artistas o creadores de contenido, 
-                un lugar donde fundar su propia comunidad de seguidores, subir imágenes, videos y archivos, y generar ingresos 
-                por medio de la venta de contenido digital y de suscripciones a su perfil.
+                Apapacho es una plataforma chilena de creadores de contenido para personas adultas, que facilita a
+                Creadores publicar y monetizar su contenido digital, y a Usuarios suscriptores acceder a dicho contenido
+                mediante suscripciones, propinas o pagos individuales. La presente normativa regula exclusivamente la
+                relación comercial entre las partes; el tratamiento de datos personales se rige por nuestra
+                {' '}<Link href="/privacidad" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
+                  Política de Privacidad
+                </Link>, parte integrante de estos Términos.
               </p>
               <p className="mt-4">
-                El acceso y uso del sitio web y del contenido relacionado o anexo, se regirá íntegramente por las leyes de 
-                la República de Chile. De particular importancia resultan la aplicación de la Ley No. 19.628 de Protección 
-                de Datos Personales y la Ley No. 19.496 sobre Derechos del Consumidor.
+                El acceso o uso de cualquier funcionalidad de la Plataforma implica la aceptación íntegra y sin reservas
+                de los presentes Términos. Si el Usuario no está de acuerdo con alguna parte, debe abstenerse de utilizar
+                la Plataforma.
               </p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">2. REGISTRO DE USUARIO</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">2. CAPACIDAD LEGAL Y EDAD MÍNIMA</h2>
               <p>
-                Será requisito necesario para el uso del sitio web la aceptación de los presentes Términos y Condiciones 
-                al momento del registro por parte del Usuario. Adicionalmente, el Usuario deberá designar una clave o 
-                contraseña de acceso.
+                Apapacho está dirigido <strong>exclusivamente a personas mayores de 18 años</strong>. Al registrarse, el
+                Usuario declara <strong>bajo juramento</strong> tener cumplidos los 18 años de edad y poseer la capacidad
+                legal necesaria para celebrar contratos vinculantes conforme a la legislación chilena.
               </p>
               <p className="mt-4">
-                Se entenderán conocidos y aceptados estos Términos y Condiciones por el sólo hecho de registrarse el Usuario, 
-                acto en el cual se incluirá una manifestación expresa del Usuario sobre el conocimiento de las presentes 
-                condiciones de uso.
-              </p>
-              <p className="mt-4">
-                Una vez registrado, el Usuario tendrá a su disposición un nombre de usuario y una contraseña o clave secreta, 
-                por medio de los cuales podrá ingresar al Sitio Web y tener acceso a sus contenidos, así como un acceso 
-                personalizado, confidencial y seguro.
-              </p>
-              <p className="mt-4">
-                El Usuario asume totalmente su responsabilidad por el mantenimiento de la confidencialidad de su contraseña 
-                o clave secreta registrada en el Sitio Web. Dicha contraseña o clave secreta es de uso personal, por lo que 
-                su entrega voluntaria a terceros por parte del Usuario no conlleva responsabilidad alguna por parte de Appapacho.
+                La declaración falsa sobre la edad constituye una infracción grave que faculta a Apapacho a cancelar la
+                cuenta de inmediato, retener fondos hasta esclarecer la situación y comunicar los hechos a las autoridades
+                competentes cuando corresponda. El proceso de KYC (Know Your Customer) obligatorio para Creadores incluye
+                verificación documental de edad mediante cédula de identidad chilena vigente.
               </p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">3. RESPONSABILIDAD DE LOS USUARIOS</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">3. REGISTRO Y CUENTA DE USUARIO</h2>
               <p>
-                Appapacho entrega al Usuario un servicio caracterizado por la diversidad del contenido proporcionado. 
-                El Usuario asume su responsabilidad al ingresar al Sitio Web, para realizar un correcto uso de este y 
-                sus contenidos. Así, esta responsabilidad se extenderá a:
+                El registro requiere proporcionar un correo electrónico válido, una contraseña segura y un nombre de
+                usuario único. Los Usuarios pueden utilizar <strong>pseudónimos</strong> u otros nombres distintos a su
+                identidad civil para construir su comunidad en la Plataforma; sin embargo, los datos verídicos de
+                identidad serán recolectados y verificados internamente cuando la ley o el proceso de KYC así lo exijan.
               </p>
+              <p className="mt-4">
+                Cada persona natural sólo puede mantener <strong>una (1) cuenta activa</strong>. La creación de cuentas
+                múltiples por una misma persona, salvo autorización expresa de Apapacho, constituye causal de suspensión.
+                El Usuario es responsable de mantener la confidencialidad de su contraseña y de toda actividad realizada
+                desde su cuenta. Cualquier uso indebido detectado debe ser notificado de inmediato a
+                {' '}<a href="mailto:contacto@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                  contacto@appapacho.cl
+                </a>.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">4. SUSCRIPCIONES, PAGOS Y RETIROS</h2>
+
+              <h3 className="text-lg font-medium text-white mt-6 mb-3">4.1 Pagos por Usuarios</h3>
+              <p>
+                Los pagos se procesan a través de pasarelas autorizadas: <strong>Webpay/Transbank</strong> y
+                {' '}<strong>Fintoc</strong> (Chile) y <strong>MercadoPago</strong> (Chile/Argentina). Las suscripciones
+                pueden ser de renovación automática mensual; el Usuario puede cancelarlas en cualquier momento desde su
+                panel sin que ello implique reembolso de períodos ya pagados, salvo que la ley lo exija.
+              </p>
+
+              <h3 className="text-lg font-medium text-white mt-6 mb-3">4.2 Comisión de la Plataforma</h3>
+              <p>
+                Apapacho retiene una comisión sobre cada transacción neta percibida por el Creador. El porcentaje vigente
+                se publica en la sección Pricing de la Plataforma y se notificará con al menos <strong>30 días de
+                antelación</strong> ante cualquier modificación.
+              </p>
+
+              <h3 className="text-lg font-medium text-white mt-6 mb-3">4.3 Retiros de Creadores</h3>
+              <p>
+                El Creador podrá solicitar retiros de los fondos disponibles en su saldo siempre que cumpla con: (i) KYC
+                aprobado, (ii) saldo mínimo establecido en su panel y (iii) método de pago bancario verificado. Los
+                retiros se procesan dentro del ciclo de pagos publicado (típicamente quincenal). Apapacho declara cumplir
+                con las obligaciones tributarias propias derivadas de la prestación de su servicio; cada Creador es
+                responsable de declarar y pagar los tributos que correspondan a las utilidades obtenidas.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">5. CONDUCTA ESPERADA DEL USUARIO</h2>
+              <p>El Usuario suscriptor se obliga a:</p>
               <ul className="list-disc list-inside mt-4 space-y-2">
-                <li>
-                  Usar la información, los contenidos y/o servicios y datos ofrecidos por Appapacho, sin que sea contrario 
-                  a estos Términos y condiciones, así como al Ordenamiento Jurídico Chileno, la Moral y el Orden Público.
-                </li>
-                <li>
-                  La veracidad y licitud de los datos e información aportados por el usuario en los formularios de registro 
-                  presentes en el Sitio Web.
-                </li>
-                <li>
-                  Notificar de forma inmediata a Appapacho acerca de cualquier hecho relacionado con el uso indebido de 
-                  información registrada, tales como robo, hurto, extravío, acceso no autorizado a identificadores y/o contraseñas.
-                </li>
+                <li>Utilizar la Plataforma de buena fe, conforme al Ordenamiento Jurídico Chileno, la moral y el orden público.</li>
+                <li>Tratar al contenido publicado por los Creadores como material para uso personal, sin extraerlo, redistribuirlo o reproducirlo fuera de la Plataforma.</li>
+                <li>No utilizar el contenido con fines comerciales sin un acuerdo expreso y por escrito con el Creador titular.</li>
+                <li>Abstenerse de cualquier conducta de hostigamiento, difamación, discriminación o explotación hacia los Creadores u otros usuarios.</li>
+                <li>No intentar identificar la identidad civil de un Creador que utilice pseudónimo, ni divulgar información personal de terceros.</li>
+                <li>Reportar contenido ilícito o conductas indebidas mediante las herramientas habilitadas o al correo <a href="mailto:contacto@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">contacto@appapacho.cl</a>.</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">4. CAPACIDAD LEGAL</h2>
-              <p>
-                El Usuario declara ser mayor de edad, por tanto, tener capacidad legal necesaria y suficiente para vincularse 
-                por los presentes Términos y condiciones. Por lo tanto, Appapacho no se dirige a menores de edad, declinando 
-                cualquier responsabilidad por el incumplimiento de este requisito.
-              </p>
-              <p className="mt-4">
-                En Appapacho los Creadores pueden ofrecer contenido no apto para menores de edad, por lo que usted, como usuario, 
-                declara y garantiza tener 18 años o la mayoría de edad correspondiente a su país de origen para registrarse 
-                y usar el sitio web como Creador y formar parte de un contrato vinculante con Appapacho.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">5. FUNCIONAMIENTO DEL SITIO</h2>
-              <p>
-                Appapacho es una red social de pago, un sitio web de venta de contenido digital y debe ser utilizada únicamente 
-                para este fin. Para convertirse en usuario, debe registrarse proporcionando una dirección de correo válida, 
-                un nombre de usuario y una contraseña. Es una condición de uso del sitio web que toda la información suministrada 
-                sea correcta, verídica, actual y completa.
-              </p>
-              <p className="mt-4">
-                La suscripción da acceso al "Contenido Exclusivo" subido anteriormente por el creador o la creadora al sitio web, 
-                y a todo el contenido que suba en el futuro hasta la fecha de caducidad de la suscripción. Esto no obliga al 
-                creador a subir más contenido.
-              </p>
-              <p className="mt-4">
-                El creador acepta dar acceso a todo el "Contenido Exclusivo" nuevo o recientemente publicado a todos los usuarios 
-                que mantengan suscripciones activas a su perfil de creador al momento de la publicación del nuevo contenido.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">6. PAGOS Y RETIROS</h2>
-              <p>
-                El creador podrá solicitar el retiro de sus ganancias cuando desee, directamente desde su menú de usuario. 
-                Los pagos se realizarán mediante transferencia bancaria u otros medios de pago disponibles en la plataforma.
-              </p>
-              <p className="mt-4">
-                Appapacho declara cumplir con todas las obligaciones tributarias que se devenguen por la prestación de los 
-                servicios incluidos en el sitio web. No es responsabilidad ni obligación de Appapacho el pago de los impuestos 
-                con cargo a las utilidades que los y las creadoras puedan obtener por sus ventas a través del sitio web.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">7. USOS PROHIBIDOS</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">6. CONDUCTA ESPERADA DEL CREADOR</h2>
+              <p>El Creador se obliga, además de las reglas aplicables a todo Usuario, a:</p>
               <ul className="list-disc list-inside mt-4 space-y-2">
-                <li>El uso de fotos de contenido sexual explícito como imágenes de perfil y/o imagen de portada.</li>
-                <li>La publicación de números de teléfono o de contacto directo en publicaciones o biografía.</li>
-                <li>La incitación o invitación a adquirir contenido fuera del sitio web.</li>
-                <li>La publicación de comentarios o mensajes de hostigamiento, difamatorios, discriminatorios de cualquier tipo.</li>
-                <li>La realización de publicaciones ajenas a la finalidad y función principal de Appapacho.</li>
-                <li>La extracción de contenido de cualquier forma desde el sitio web.</li>
-                <li>Hacer mal uso de la herramienta de reportes de usuarios o publicaciones.</li>
-                <li>La publicación y/o venta de contenido de terceras personas sin su consentimiento.</li>
-                <li>Publicar contenido ilegal, incluyendo pero no limitado a: pornografía infantil, contenido que infrinja derechos de autor.</li>
+                <li>Completar y mantener vigente el proceso <strong>KYC</strong> (verificación de identidad y edad mediante cédula chilena y selfie).</li>
+                <li>Publicar únicamente contenido <strong>lícito</strong>, sobre el que ostente la titularidad de los derechos de autor o cuente con autorización expresa para su explotación.</li>
+                <li><strong>Prohibición absoluta</strong> de publicar material de abuso sexual infantil (CSAM) o cualquier contenido que represente, sexualice o involucre a personas menores de 18 años. Cualquier hallazgo en este sentido será reportado de inmediato a las autoridades chilenas competentes y derivará en la cancelación irrevocable de la cuenta.</li>
+                <li>No publicar contenido que exhiba a terceros sin consentimiento expreso, escrito y verificable de cada persona representada.</li>
+                <li>No incitar a contratar fuera de la Plataforma con fines de evadir comisiones o controles de seguridad.</li>
+                <li>Mantener actualizada la información tributaria y bancaria asociada a sus retiros.</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">8. DERECHOS DEL USUARIO</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">7. LIMITACIÓN DE RESPONSABILIDAD</h2>
               <p>
-                El Usuario gozará de todos los derechos que le reconoce la legislación sobre protección al consumidor vigente 
-                en Chile, adicionalmente a los derechos que le otorgan estos Términos y Condiciones. El Usuario dispondrá en 
-                todo momento de los derechos de información, rectificación y cancelación de los datos personales conforme a 
-                lo dispuesto por la Ley No. 19.628 sobre Protección de Datos Personales.
+                Apapacho actúa como intermediario tecnológico que provee la infraestructura para que los Creadores
+                publiquen su contenido y los Usuarios accedan al mismo. Apapacho no es autor del contenido publicado por
+                los Creadores ni responde por las opiniones, declaraciones o materiales que éstos suban a la Plataforma.
               </p>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">9. LIMITACIÓN DE RESPONSABILIDAD</h2>
-              <p>
-                Appapacho no responderá por:
+              <p className="mt-4">
+                Sin perjuicio de lo anterior, y en cumplimiento del principio de <strong>accountability</strong>
+                consagrado en la Ley N° 21.719, Apapacho asume responsabilidad directa por:
               </p>
               <ul className="list-disc list-inside mt-4 space-y-2">
-                <li>Uso indebido que Usuarios realicen del contenido almacenado.</li>
-                <li>Daños y perjuicios causados a Usuarios derivados del funcionamiento de las herramientas de búsqueda.</li>
-                <li>Contenido de los Sitios Web a las que los Usuarios puedan acceder sin autorización.</li>
-                <li>Pérdida, mal uso o uso no autorizado de contraseñas.</li>
+                <li>La debida diligencia en la moderación de contenido manifiestamente ilícito una vez notificado.</li>
+                <li>La seguridad de la información personal tratada (cifrado en reposo, controles de acceso, registros de auditoría).</li>
+                <li>El cumplimiento de los SLA comprometidos para solicitudes ARCO-P (15 días hábiles) y DMCA (7 días hábiles).</li>
+                <li>La notificación oportuna de brechas de seguridad (dentro de las 72 horas desde su conocimiento) a la autoridad y a los usuarios afectados.</li>
               </ul>
+              <p className="mt-4">
+                Apapacho <strong>no</strong> incluye cláusulas de exoneración absolutas ni renuncias a derechos
+                irrenunciables del consumidor reconocidos por la Ley N° 19.496.
+              </p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">10. PROTECCIÓN DE DATOS PERSONALES</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">8. SUSPENSIÓN Y TERMINACIÓN DE CUENTA</h2>
               <p>
-                En conformidad con lo establecido en la Ley No. 19.628 sobre la Protección de Datos Personales, los datos 
-                que se suministren al Sitio Web, pasan a formar parte de una base de datos perteneciente a Appapacho y serán 
-                destinados exclusivamente para los fines que motivaron su entrega. Estos datos nunca serán comunicados o 
-                compartidos con otras empresas sin expresa autorización de su titular.
+                Apapacho podrá suspender o cancelar una cuenta cuando concurra alguna de las siguientes causales:
+              </p>
+              <ul className="list-disc list-inside mt-4 space-y-2">
+                <li>Incumplimiento grave o reiterado de los presentes Términos.</li>
+                <li>Uso fraudulento de medios de pago, contracargos abusivos o lavado de activos.</li>
+                <li>Publicación de contenido ilícito (CSAM, contenido sin consentimiento de terceros, infracciones de propiedad intelectual reiteradas).</li>
+                <li>Falsedad en la edad o en la documentación KYC.</li>
+                <li>Solicitud expresa de la autoridad judicial o administrativa.</li>
+              </ul>
+              <p className="mt-4">
+                <strong>Derecho de apelación:</strong> el Usuario afectado podrá apelar la suspensión enviando
+                antecedentes a <a href="mailto:legal@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                  legal@appapacho.cl
+                </a> dentro de los 30 días siguientes a la notificación. Apapacho responderá de manera fundada en un plazo
+                máximo de 15 días hábiles. Los fondos legítimamente devengados al momento de la cancelación serán
+                liquidados conforme al ciclo de pagos, salvo retención judicial o administrativa.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">9. MODIFICACIONES A LOS TÉRMINOS</h2>
+              <p>
+                Apapacho podrá modificar los presentes Términos en cualquier momento. Toda modificación será notificada
+                con al menos <strong>30 días de antelación</strong> a su entrada en vigor mediante: (i) correo
+                electrónico al Usuario y (ii) banner visible en la Plataforma. Si el cambio implica la incorporación de
+                nuevas finalidades de tratamiento de datos, se solicitará un nuevo consentimiento expreso conforme a la
+                Política de Privacidad.
               </p>
               <p className="mt-4">
-                Appapacho garantiza a todos sus Usuarios el libre ejercicio de los derechos contemplados en la Ley No. 19.628 
-                sobre la Protección de Datos Personales en lo relativo a la información, modificación, cancelación y bloqueo 
-                de sus datos personales.
+                El uso continuado de la Plataforma con posterioridad a la entrada en vigor de los nuevos Términos
+                constituye aceptación de los mismos. El Usuario que no esté de acuerdo podrá cancelar su cuenta sin
+                penalización.
               </p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">11. PROPIEDAD INTELECTUAL</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">10. LEY APLICABLE Y JURISDICCIÓN</h2>
               <p>
-                Los derechos presentes en el Sitio Web, incluyendo la Propiedad Intelectual respecto al mismo Sitio Web, 
-                páginas y otro tipo de contenido (textos, material gráfico o audiovisual, logos, íconos, material descargable, 
-                códigos fuente) son de propiedad de Appapacho.
+                Los presentes Términos se rigen íntegramente por las leyes de la <strong>República de Chile</strong>,
+                incluyendo de manera particular la Ley N° 19.496 sobre Derechos del Consumidor, la Ley N° 19.628 y la
+                Ley N° 21.719 sobre Protección de Datos Personales, la Ley N° 17.336 sobre Propiedad Intelectual y demás
+                normativa aplicable.
               </p>
               <p className="mt-4">
-                El contenido subido por los creadores es de su propiedad y ellos son responsables de tener los derechos 
-                necesarios para su publicación.
+                Las partes fijan su domicilio en la ciudad de Santiago de Chile y se someten a la jurisdicción de sus
+                tribunales ordinarios de justicia para todo conflicto derivado de la interpretación o ejecución de los
+                presentes Términos.
               </p>
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">12. LEY APLICABLE</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">11. CONTACTO</h2>
               <p>
-                Estos Términos y Condiciones se rigen por las leyes de la República de Chile. El Usuario fija su domicilio 
-                en Chile y se somete a la jurisdicción de sus tribunales de justicia.
+                Para consultas comerciales, soporte general o reclamos relacionados con el uso de la Plataforma:
               </p>
-              <p className="mt-4">
-                Es de completa responsabilidad del usuario leer estos términos antes de hacer uso del sitio web. El usuario 
-                acepta en completa conformidad los acuerdos pactados en estos términos al momento de registrarse en Appapacho 
-                y hacer uso de este.
+              <ul className="list-none mt-4 space-y-2">
+                <li><strong>Soporte general:</strong> <a href="mailto:contacto@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">contacto@appapacho.cl</a></li>
+                <li><strong>Asuntos legales / cumplimiento:</strong> <a href="mailto:legal@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">legal@appapacho.cl</a></li>
+                <li><strong>Privacidad y datos personales:</strong> <a href="mailto:privacidad@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">privacidad@appapacho.cl</a></li>
+                <li><strong>Notificaciones DMCA / propiedad intelectual:</strong> <a href="mailto:dmca@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">dmca@appapacho.cl</a></li>
+              </ul>
+              <p className="mt-4 text-sm text-gray-400">
+                El tratamiento de tus datos personales se rige por nuestra
+                {' '}<Link href="/privacidad" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
+                  Política de Privacidad
+                </Link>, parte integrante de estos Términos.
               </p>
             </section>
 
-            <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">13. CONTACTO</h2>
-              <p>
-                Para cualquier tipo de comunicación, consulta o reclamo relacionado con el uso o funcionamiento del Sitio Web, 
-                puede contactarnos a través del correo electrónico: <span className="text-fuchsia-400">contacto@appapacho.cl</span>
+            <section className="mt-12 pt-8 border-t border-white/10">
+              <p className="text-sm text-gray-400">
+                Versión 1.0 · Vigente desde el 6 de mayo de 2026 · Apapacho SpA
               </p>
             </section>
           </div>
 
           <div className="mt-12 pt-8 border-t border-white/10">
-            <Link 
-              href="/login" 
+            <Link
+              href="/login"
               className="inline-flex items-center justify-center w-full px-6 py-3 bg-fuchsia-500 hover:bg-fuchsia-600 text-white font-medium rounded-xl transition-colors"
             >
               Volver al Registro
