@@ -8,8 +8,10 @@ import { GoogleAuthProvider } from '@/components/providers/GoogleAuthProvider'
 import { BadgeNotificationProvider } from '@/components/gamification'
 import { ContentProtection } from '@/components/ui/ContentProtection'
 import { GoogleAnalytics } from '@/components/analytics'
-// Cookie consent disabled for now - not required in Chile
-// import CookieConsent from '@/components/ui/CookieConsent'
+// Cookie consent (Ley 21.719 — Group 3.3): mandatory in Chile under the new
+// data protection law (vigent 2026). Mounted ABOVE AgeVerificationProvider
+// so consent is captured BEFORE any non-essential processing fires.
+import CookieConsent from '@/components/ui/CookieConsent'
 
 // Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font - only load weights actually used
@@ -371,6 +373,14 @@ export default async function RootLayout({
         <ContentProtection />
         <GoogleAuthProvider>
           <FontProvider>
+            {/*
+              Mount order matters (Ley 21.719): the cookie banner appears
+              BEFORE AgeVerificationProvider's modal so the user can decide
+              about non-essential processing before any age gate. Both can
+              coexist visually because the banner is fixed-bottom and the
+              age modal is a centered overlay.
+            */}
+            <CookieConsent />
             <AgeVerificationProvider>
               <BadgeNotificationProvider>
                 {children}
@@ -378,7 +388,6 @@ export default async function RootLayout({
             </AgeVerificationProvider>
           </FontProvider>
         </GoogleAuthProvider>
-        {/* Cookie consent disabled for now - not required in Chile */}
       </body>
     </html>
   )

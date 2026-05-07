@@ -37,8 +37,27 @@ function LoginContent() {
     username: '',
     displayName: '',
     isCreator: true,
-    acceptTerms: false
   })
+
+  // Ley 21.719 — granular per-purpose consent (replaces the old single
+  // `acceptTerms` checkbox at submit time). `service` is mandatory; the rest
+  // are opt-ins. We persist them separately to UserConsent on the backend.
+  const [consents, setConsents] = useState({
+    service: false,
+    marketing: false,
+    profiling: false,
+    internationalTransfer: false,
+  })
+
+  const buildConsentsPayload = () =>
+    consents.service
+      ? ({
+          service: true as const,
+          marketing: consents.marketing,
+          profiling: consents.profiling,
+          internationalTransfer: consents.internationalTransfer,
+        })
+      : undefined
 
   // Load remembered email on mount (password is NOT stored for security)
   useEffect(() => {
@@ -78,9 +97,10 @@ function LoginContent() {
     setError(null)
     setFieldErrors({})
 
-    // Validar términos en registro
-    if (!isLogin && !formData.acceptTerms) {
-      setError('Debes aceptar los términos y condiciones para continuar')
+    // Validar consent obligatorio (Ley 21.719): solo `service` es requerido,
+    // el resto son opt-ins.
+    if (!isLogin && !consents.service) {
+      setError('Debes aceptar los Términos y la Política de Privacidad para continuar')
       setIsLoading(false)
       return
     }
@@ -121,13 +141,15 @@ function LoginContent() {
           hasReferralCode: !!referralCode
         })
         
+        const consentsPayload = buildConsentsPayload()
         const result = await authApi.register({
           email: formData.email,
           password: formData.password,
           username: formData.username,
           displayName: formData.displayName,
           isCreator: formData.isCreator,
-          ...(referralCode ? { referralCode } : {})
+          ...(referralCode ? { referralCode } : {}),
+          ...(consentsPayload ? { consents: consentsPayload } : {}),
         }) as any
         
         console.log('[REGISTER] Registration successful:', result)
@@ -220,10 +242,19 @@ function LoginContent() {
     setError(null)
 
     try {
+      // Only send consents when registering. The backend will only consume
+      // them on first signup (existing users keep their stored consents).
+      const consentsPayload = !isLogin ? buildConsentsPayload() : undefined
+      if (!isLogin && !consentsPayload) {
+        setError('Debes aceptar los Términos y la Política de Privacidad para registrarte con Google')
+        setIsGoogleLoading(false)
+        return
+      }
       const result = await authApi.googleLogin({
         credential: response.credential,
         isCreator: !isLogin ? formData.isCreator : undefined,
-        referralCode: referralCode || undefined
+        referralCode: referralCode || undefined,
+        ...(consentsPayload ? { consents: consentsPayload } : {}),
       }) as any
 
       // Use Zustand store (cookies are set by backend)
@@ -373,43 +404,110 @@ function LoginContent() {
                   <span className="text-white/80 text-sm">Quiero ser creador de contenido</span>
                 </label>
 
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.acceptTerms}
-                    onChange={(e) => setFormData(prev => ({ ...prev, acceptTerms: e.target.checked }))}
-                    className="w-4 h-4 mt-0.5 rounded border-gray-600 bg-gray-700 text-fuchsia-500 focus:ring-fuchsia-500"
-                    required
-                  />
-                  <span className="text-white/80 text-sm">
-                    He leído y acepto los{' '}
-                    <Link 
-                      href="/terminos" 
-                      target="_blank"
-                      className="text-fuchsia-400 hover:text-fuchsia-300 underline"
-                    >
-                      Términos y Condiciones
-                    </Link>
-                    {' '}y la{' '}
-                    <Link 
-                      href="/privacidad" 
+                {/*
+                  Ley 21.719 — granular consent (Group 3.3).
+                  - `service` is the only mandatory checkbox: bundles T&C +
+                    Privacy Policy + age confirmation (>= 18).
+                  - The other three are independent opt-ins. Unchecked rows
+                    are still recorded server-side as `granted: false` so
+                    we can prove the user was offered the choice.
+                */}
+                <div className="space-y-3 pt-1">
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={consents.service}
+                      onChange={(e) => setConsents(prev => ({ ...prev, service: e.target.checked }))}
+                      className="w-4 h-4 mt-0.5 rounded border-gray-600 bg-gray-700 text-fuchsia-500 focus:ring-fuchsia-500 flex-shrink-0"
+                      required
+                      aria-describedby="consent-service-help"
+                    />
+                    <span id="consent-service-help" className="text-white/80 text-sm">
+                      He leído y acepto los{' '}
+                      <Link
+                        href="/terminos"
+                        target="_blank"
+                        className="text-fuchsia-400 hover:text-fuchsia-300 underline"
+                      >
+                        Términos y Condiciones
+                      </Link>
+                      {' '}y la{' '}
+                      <Link
+                        href="/privacidad"
+                        target="_blank"
+                        className="text-fuchsia-400 hover:text-fuchsia-300 underline"
+                      >
+                        Política de Privacidad
+                      </Link>
+                      . Confirmo ser mayor de 18 años.{' '}
+                      <span className="text-red-400" aria-hidden="true">*</span>
+                    </span>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={consents.marketing}
+                      onChange={(e) => setConsents(prev => ({ ...prev, marketing: e.target.checked }))}
+                      className="w-4 h-4 mt-0.5 rounded border-gray-600 bg-gray-700 text-fuchsia-500 focus:ring-fuchsia-500 flex-shrink-0"
+                    />
+                    <span className="text-white/80 text-sm">
+                      Acepto recibir comunicaciones de marketing y novedades de Appapacho por email.{' '}
+                      <span className="text-white/40">(opcional)</span>
+                    </span>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={consents.profiling}
+                      onChange={(e) => setConsents(prev => ({ ...prev, profiling: e.target.checked }))}
+                      className="w-4 h-4 mt-0.5 rounded border-gray-600 bg-gray-700 text-fuchsia-500 focus:ring-fuchsia-500 flex-shrink-0"
+                    />
+                    <span className="text-white/80 text-sm">
+                      Autorizo el uso de mis datos para personalización de contenido y recomendaciones.{' '}
+                      <span className="text-white/40">(opcional)</span>
+                    </span>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={consents.internationalTransfer}
+                      onChange={(e) => setConsents(prev => ({ ...prev, internationalTransfer: e.target.checked }))}
+                      className="w-4 h-4 mt-0.5 rounded border-gray-600 bg-gray-700 text-fuchsia-500 focus:ring-fuchsia-500 flex-shrink-0"
+                    />
+                    <span className="text-white/80 text-sm">
+                      Acepto la transferencia de mis datos a procesadores fuera de Chile (EE.UU.) bajo cláusulas contractuales tipo.{' '}
+                      <span className="text-white/40">(opcional)</span>
+                    </span>
+                  </label>
+                </div>
+
+                {/* CAPA-BASICA - GRUPO 3.2 */}
+                <div className="flex items-start gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white/60 leading-relaxed">
+                  <span aria-hidden="true" className="mt-0.5">ℹ️</span>
+                  <span>
+                    <strong className="text-white/80">Resumen:</strong> tratamos tus datos para brindarte el servicio.
+                    Detalle completo, finalidades específicas y opciones de control en nuestra{' '}
+                    <Link
+                      href="/privacidad"
                       target="_blank"
                       className="text-fuchsia-400 hover:text-fuchsia-300 underline"
                     >
                       Política de Privacidad
-                    </Link>
-                    , y confirmo que soy mayor de 18 años
+                    </Link>.
                   </span>
-                </label>
+                </div>
               </>
             )}
 
-            <Button 
-              type="submit" 
-              variant="primary" 
+            <Button
+              type="submit"
+              variant="primary"
               className="w-full"
               isLoading={isLoading}
-              disabled={!isLogin && !formData.acceptTerms}
+              disabled={!isLogin && !consents.service}
             >
               {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
             </Button>

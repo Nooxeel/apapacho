@@ -151,8 +151,8 @@ export default function SettingsPage() {
       id: 'privacy' as const,
       icon: Shield,
       label: 'Privacidad',
-      description: 'Controla tu privacidad',
-      href: '/privacidad',
+      description: 'Consentimientos, derechos y exportación de datos',
+      href: '/settings/privacy',
     },
     {
       id: 'account' as const,
