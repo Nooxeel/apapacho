@@ -1,45 +1,31 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
- * Next.js Edge middleware — R0-04 + R0-16
+ * Next.js Edge middleware — R0-16 (CSP nonce).
  *
- * Responsibilities:
- *  1. Server-side route protection: reject unauthenticated requests to
- *     protected paths before the page is ever rendered (fixes C1 — content
- *     was previously flashed to the client while useAuthStore ran).
- *  2. Per-request CSP nonce: mints a fresh nonce on every request so that
- *     inline scripts (JSON-LD in layout.tsx, Next.js bootstrap) can be
- *     whitelisted without `'unsafe-inline'` in script-src (fixes H7).
+ * R0-04 (server-side route protection) is intentionally DISABLED while
+ * frontend (appapacho.cl) and backend (apapacho-backend-production.up.railway.app)
+ * live on different eTLD+1s. The auth cookie `apapacho_token` is scoped to the
+ * backend's host, so the frontend's edge middleware cannot read it and any
+ * cookie-based redirect here ends up in a login loop.
  *
- * The nonce is exposed to RSCs via the `x-nonce` request header (read with
- * `headers().get('x-nonce')` in server components) and echoed back on the
- * response for easier debugging.
+ * Defense-in-depth meanwhile:
+ *  - Client-side guards in each protected page (Zustand `useAuthStore`)
+ *    redirect to /login when there is no `user` rehydrated from /auth/me.
+ *  - The backend rejects every API call without a valid cookie, so no data
+ *    leaks through the page render — only the static shell may flash.
+ *
+ * Re-enable cookie protection here (uncomment the block below) once the
+ * backend is reachable at `api.appapacho.cl` and cookies use
+ * `Domain=.appapacho.cl` so they are first-party to the frontend too.
+ *
+ * The CSP nonce path stays active and is the main reason this middleware
+ * exists in production today.
  */
-
-// Routes that require a valid session cookie. Patterns are evaluated against
-// the pathname only. Keep this list aligned with the client-side guards that
-// remain in each page as a defense-in-depth measure.
-const PROTECTED_MATCHERS: readonly RegExp[] = [
-  /^\/creator(\/.*)?$/,
-  /^\/admin(\/.*)?$/,
-  /^\/dashboard(\/.*)?$/,
-  /^\/settings(\/.*)?$/,
-  /^\/messages(\/.*)?$/,
-  /^\/transactions(\/.*)?$/,
-  /^\/profile\/edit(\/.*)?$/,
-  /^\/payments(\/.*)?$/,
-]
-
-// Must match backend/src/lib/cookies.ts -> JWT_COOKIE_NAME
-const AUTH_COOKIE_NAME = 'apapacho_token'
 
 function generateNonce(): string {
   // crypto.randomUUID is available in the Edge runtime.
   return crypto.randomUUID().replace(/-/g, '')
-}
-
-function isProtectedPath(pathname: string): boolean {
-  return PROTECTED_MATCHERS.some((re) => re.test(pathname))
 }
 
 function buildCsp(nonce: string): string {
@@ -88,7 +74,6 @@ function buildCsp(nonce: string): string {
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
   const nonce = generateNonce()
 
   // Propagate the nonce to downstream RSCs via request headers so that
@@ -96,14 +81,9 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-nonce', nonce)
 
-  if (isProtectedPath(pathname)) {
-    const token = request.cookies.get(AUTH_COOKIE_NAME)
-    if (!token) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('next', pathname + request.nextUrl.search)
-      return NextResponse.redirect(loginUrl)
-    }
-  }
+  // Cookie-based protection intentionally disabled — see file-level comment.
+  // Client-side guards remain authoritative until backend lives on the same
+  // eTLD+1 as the frontend (e.g. api.appapacho.cl).
 
   const response = NextResponse.next({ request: { headers: requestHeaders } })
   response.headers.set('Content-Security-Policy', buildCsp(nonce))
