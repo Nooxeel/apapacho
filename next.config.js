@@ -4,17 +4,17 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  
+
   // Target modern browsers only - no legacy polyfills needed
   // Saves ~12KB by not including Array.at, Object.hasOwn, etc. polyfills
   // All these methods are native in Chrome 92+, Firefox 90+, Safari 15+
-  
+
   // Experimental optimizations for better performance
   experimental: {
     optimizeCss: true, // Optimize CSS for faster loads
     optimizePackageImports: ['lucide-react', 'date-fns', 'lodash'], // Tree-shake large packages
   },
-  
+
   // Reduce bundle size by excluding unused modules
   modularizeImports: {
     'lucide-react': {
@@ -24,10 +24,10 @@ const nextConfig = {
       transform: 'date-fns/{{member}}',
     },
   },
-  
+
   // Enable gzip compression
   compress: true,
-  
+
   images: {
     unoptimized: false, // Enable image optimization (Vercel free tier includes 1000 optimizations/month)
     remotePatterns: [
@@ -117,4 +117,30 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+// Sentry wrapper (Ley 21.719 — Ola 4, P1.3 observabilidad).
+// Solo agrega source-map upload + tunnel proxy. Si SENTRY_AUTH_TOKEN no está
+// presente en build (Vercel preview deploys de PRs sin secret), Sentry omite
+// el upload silenciosamente (silent:true) y el wrapper sigue funcionando.
+const { withSentryConfig } = require('@sentry/nextjs')
+
+module.exports = withSentryConfig(nextConfig, {
+  // Organización y proyecto leídos del entorno (no hardcodeamos para que cada
+  // ambiente — local, Vercel preview, Vercel prod — apunte a su proyecto).
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Silenciar logs del wrapper en prod (Vercel build logs limpios).
+  silent: process.env.NODE_ENV === 'production',
+
+  // Tree-shake los `Sentry.logger.*` para reducir bundle size en cliente.
+  disableLogger: true,
+
+  // Tunnel route: enrutamos los eventos por nuestro propio dominio para
+  // evitar adblockers (uBlock/Brave shields filtran *.sentry.io por default).
+  tunnelRoute: '/monitoring',
+
+  // No subir source maps al cliente (privacidad de código + reducir tamaño).
+  // Sentry recibe las maps solo durante el build para resolver stacks.
+  hideSourceMaps: true,
+})
