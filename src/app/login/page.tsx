@@ -4,10 +4,10 @@ import { useState, useEffect, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
-import { authApi, missionsApi } from '@/lib/api'
+import { authApi, missionsApi, mfaApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, ShieldCheck } from 'lucide-react'
 
 // Key for storing remembered credentials
 const REMEMBER_KEY = 'apapacho-remember-credentials'
@@ -38,6 +38,14 @@ function LoginContent() {
     displayName: '',
     isCreator: true,
   })
+
+  // MFA challenge state (Ley 21.719 — Ola 4 P1.1). When the backend
+  // signals requiresMfa we replace the password form with a TOTP/recovery
+  // code input and exchange via /api/auth/mfa/verify.
+  const [mfaChallengeToken, setMfaChallengeToken] = useState<string | null>(null)
+  const [mfaCode, setMfaCode] = useState('')
+  const [mfaSubmitting, setMfaSubmitting] = useState(false)
+  const mfaCodeRef = useRef<HTMLInputElement>(null)
 
   // Ley 21.719 — granular per-purpose consent (replaces the old single
   // `acceptTerms` checkbox at submit time). `service` is mandatory; the rest
@@ -111,7 +119,7 @@ function LoginContent() {
           email: formData.email,
           password: formData.password
         }) as any
-        
+
         // Handle remember me - only save email for convenience (NOT password)
         if (rememberMe) {
           localStorage.setItem(REMEMBER_KEY, JSON.stringify({
@@ -120,13 +128,24 @@ function LoginContent() {
         } else {
           localStorage.removeItem(REMEMBER_KEY)
         }
-        
+
+        // MFA gate (Ley 21.719 — Ola 4 P1.1). When the backend returns
+        // requiresMfa we DON'T have cookies/tokens yet — switch the UI to
+        // the challenge step. Email/password are not stored anywhere.
+        if (result?.requiresMfa && result?.challengeToken) {
+          setMfaChallengeToken(result.challengeToken)
+          setMfaCode('')
+          // Focus the MFA input after the form re-renders.
+          setTimeout(() => mfaCodeRef.current?.focus(), 50)
+          return
+        }
+
         // Only use Zustand store (cookies are set by backend)
         login(result.user, result.token)
-        
+
         // Track login mission progress
         missionsApi.trackProgress(result.token, 'login').catch(() => {})
-        
+
         if (result.user.isCreator) {
           router.push('/creator/edit')
         } else {
@@ -231,6 +250,52 @@ function LoginContent() {
     }
   }
 
+  // Submit the MFA challenge (TOTP or recovery code) after a password login
+  // that returned requiresMfa = true. The backend exchanges it for cookies.
+  const handleMfaVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    if (!mfaChallengeToken) return
+    const trimmed = mfaCode.trim()
+    if (!/^\d{6}$/.test(trimmed) && !/^[0-9A-Fa-f]{8}$/.test(trimmed)) {
+      setError('Ingresa un código TOTP de 6 dígitos o un código de respaldo de 8 caracteres.')
+      return
+    }
+    setMfaSubmitting(true)
+    try {
+      const result = (await mfaApi.verifyOnLogin(mfaChallengeToken, trimmed)) as any
+      login(result.user, result.token, result.expiresIn)
+      missionsApi.trackProgress(result.token, 'login').catch(() => {})
+      if (result.user.isCreator) {
+        router.push('/creator/edit')
+      } else {
+        router.push('/dashboard')
+      }
+    } catch (err: any) {
+      console.error('MFA verify error:', err)
+      const msg = err?.message || 'Código incorrecto. Inténtalo nuevamente.'
+      setError(msg)
+      // If the challenge token expired or attempts exhausted, return to the
+      // password form so the user can try from scratch.
+      if (
+        msg.toLowerCase().includes('expirado') ||
+        msg.toLowerCase().includes('demasiados intentos') ||
+        err?.statusCode === 429
+      ) {
+        setMfaChallengeToken(null)
+        setMfaCode('')
+      }
+    } finally {
+      setMfaSubmitting(false)
+    }
+  }
+
+  const handleCancelMfa = () => {
+    setMfaChallengeToken(null)
+    setMfaCode('')
+    setError(null)
+  }
+
   // Handle Google OAuth login
   const handleGoogleSuccess = async (response: CredentialResponse) => {
     if (!response.credential) {
@@ -292,16 +357,20 @@ function LoginContent() {
           </div>
 
           <h1 className="text-2xl font-bold text-white text-center mb-2">
-            {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
+            {mfaChallengeToken
+              ? 'Verificación en dos pasos'
+              : isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
           </h1>
           <p className="text-gray-400 text-center mb-6">
-            {isLogin 
-              ? 'Ingresa a tu cuenta de Appapacho' 
-              : 'Únete a la comunidad de creadores'}
+            {mfaChallengeToken
+              ? 'Ingresa el código de tu app de autenticación o un código de respaldo.'
+              : isLogin
+                ? 'Ingresa a tu cuenta de Appapacho'
+                : 'Únete a la comunidad de creadores'}
           </p>
 
           {/* Referral code indicator */}
-          {referralCode && !isLogin && (
+          {referralCode && !isLogin && !mfaChallengeToken && (
             <div className="bg-fuchsia-500/20 border border-fuchsia-500/50 rounded-lg p-3 text-fuchsia-300 text-sm mb-4 text-center">
               🎁 Código de referido aplicado: <strong>{referralCode}</strong>
             </div>
@@ -313,6 +382,44 @@ function LoginContent() {
             </div>
           )}
 
+          {mfaChallengeToken ? (
+            <form onSubmit={handleMfaVerify} className="space-y-4">
+              <div className="flex items-center justify-center gap-2 text-emerald-300">
+                <ShieldCheck className="w-5 h-5" />
+                <span className="text-sm">Cuenta protegida con MFA</span>
+              </div>
+
+              <Input
+                ref={mfaCodeRef}
+                label="Código"
+                inputMode="text"
+                autoComplete="one-time-code"
+                placeholder="123456 ó DEADBEEF"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\s/g, ''))}
+                maxLength={8}
+                required
+                helperText="6 dígitos de tu app o 8 caracteres de un código de respaldo"
+              />
+
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full"
+                isLoading={mfaSubmitting}
+              >
+                Verificar y entrar
+              </Button>
+
+              <button
+                type="button"
+                onClick={handleCancelMfa}
+                className="w-full text-sm text-gray-400 hover:text-white"
+              >
+                Volver al inicio de sesión
+              </button>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               ref={emailRef}
@@ -512,8 +619,11 @@ function LoginContent() {
               {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
             </Button>
           </form>
+          )}
 
-          {/* Divider */}
+          {/* Divider + Google + Toggle — hidden during MFA challenge */}
+          {!mfaChallengeToken && (
+          <>
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/10" />
@@ -554,11 +664,13 @@ function LoginContent() {
               }}
               className="text-fuchsia-400 hover:text-fuchsia-300 text-sm"
             >
-              {isLogin 
-                ? '¿No tienes cuenta? Regístrate' 
+              {isLogin
+                ? '¿No tienes cuenta? Regístrate'
                 : '¿Ya tienes cuenta? Inicia sesión'}
             </button>
           </div>
+          </>
+          )}
         </div>
       </Card>
     </div>

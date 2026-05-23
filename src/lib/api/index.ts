@@ -16,6 +16,7 @@ export * from './admin-kyc'
 export * from './consents'
 export * from './legal'
 export * from './recommendations'
+export * from './mfa'
 
 // Default export: the api function
 export { default } from './client'

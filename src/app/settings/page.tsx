@@ -20,7 +20,7 @@ import { useAuthStore } from '@/stores/authStore'
 import SavedCardsList from '@/components/cards/SavedCardsList'
 import api from '@/lib/api'
 
-type SettingsSection = 'cards' | 'profile' | 'notifications' | 'privacy' | 'account' | null
+type SettingsSection = 'cards' | 'profile' | 'notifications' | 'privacy' | 'security' | 'account' | null
 
 interface DeletionCheck {
   canDelete: boolean
@@ -153,6 +153,13 @@ export default function SettingsPage() {
       label: 'Privacidad',
       description: 'Consentimientos, derechos y exportación de datos',
       href: '/settings/privacy',
+    },
+    {
+      id: 'security' as const,
+      icon: Shield,
+      label: 'Seguridad',
+      description: 'Autenticación de dos factores (MFA)',
+      href: '/settings/security',
     },
     {
       id: 'account' as const,

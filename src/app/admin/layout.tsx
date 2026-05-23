@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ShieldAlert } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { authApi } from '@/lib/api'
 
@@ -20,6 +21,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { token, isAuthenticated, hasHydrated, logout } = useAuthStore()
   const [checking, setChecking] = useState(true)
   const [authorized, setAuthorized] = useState(false)
+  // Ley 21.719 — Ola 4 P1.1: surface MFA enforcement client-side so the
+  // admin sees a clear CTA when /api/admin/* returns 403 MFA_REQUIRED.
+  // Backend is the source of truth — this is UX, not enforcement.
+  const [mfaRequired, setMfaRequired] = useState(false)
 
   useEffect(() => {
     if (!hasHydrated) return
@@ -30,12 +35,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     let cancelled = false
     async function verify() {
       try {
-        const me = (await authApi.getMe(token!)) as { role?: string }
+        const me = (await authApi.getMe(token!)) as {
+          role?: string
+          mfaEnabled?: boolean
+        }
         if (cancelled) return
         if (me.role !== 'SUPER_ADMIN') {
           router.replace('/')
           return
         }
+        setMfaRequired(me.mfaEnabled !== true)
         setAuthorized(true)
       } catch {
         if (!cancelled) {
@@ -84,6 +93,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
       </nav>
+
+      {mfaRequired && (
+        <div className="border-b border-red-500/30 bg-red-500/10">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-start gap-3 flex-1">
+              <ShieldAlert className="h-5 w-5 flex-shrink-0 text-red-400 mt-0.5" />
+              <div>
+                <p className="font-semibold text-red-200">
+                  Debes activar MFA para acceder al panel admin
+                </p>
+                <p className="text-sm text-red-200/80">
+                  El panel administrativo procesa documentos sensibles (KYC,
+                  ARCO-P, DMCA). Sin MFA, las acciones serán rechazadas con 403.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/settings/security/mfa/setup"
+              className="self-stretch sm:self-auto inline-flex items-center justify-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+            >
+              Activar MFA ahora
+            </Link>
+          </div>
+        </div>
+      )}
+
       {children}
     </div>
   )
