@@ -8,7 +8,8 @@ import { creatorApi, subscriptionsApi, promocodesApi, missionsApi } from '@/lib/
 import { getFontStyle } from '@/lib/fonts'
 import { replaceCountryCodesWithFlags } from '@/lib/utils'
 import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
-import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/profile'
+import { MusicPlayer, Comments, FavoriteButton, PostsFeed, VerifiedBadge } from '@/components/profile'
+import type { KycStatus } from '@/lib/api'
 import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
 import { Navbar } from '@/components/layout'
 import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
@@ -59,6 +60,12 @@ interface CreatorProfile {
     textColor: string
     fontFamily: string
     isVerified: boolean
+    /**
+     * KYC review status. Optional because the public creator endpoint does
+     * not yet expose this field — when absent we fall back to `isVerified`
+     * to drive the trust badge.
+     */
+    kycStatus?: KycStatus
     visibilitySettings?: {
       tabs: {
         likes: boolean
@@ -122,6 +129,20 @@ function formatNumber(num: number): string {
     return (num / 1000).toFixed(1) + 'k'
   }
   return num.toString()
+}
+
+/**
+ * Bridge between the public creator endpoint (which exposes `isVerified` but
+ * not yet `kycStatus`) and the new `VerifiedBadge` API. When the backend
+ * starts including `kycStatus`, we honour it directly; otherwise we fall back
+ * to the admin-curated `isVerified` boolean.
+ */
+function resolveCreatorKycStatus(
+  kycStatus: KycStatus | undefined,
+  isVerified: boolean
+): KycStatus {
+  if (kycStatus) return kycStatus
+  return isVerified ? 'APPROVED' : 'PENDING'
 }
 
 export default function CreatorPublicProfile() {
@@ -597,13 +618,11 @@ export default function CreatorPublicProfile() {
               {/* Title with verification */}
               <div className="mt-4 flex items-center gap-2">
                 <h1 className="text-2xl font-bold">{replaceCountryCodesWithFlags(sanitizeText(profile.extendedInfoTitle || creator.username))}</h1>
-                {profile.isVerified && (
-                  <BadgeCheck
-                    className="w-6 h-6"
-                    style={{ color: profile.accentColor }}
-                    fill={profile.accentColor}
-                  />
-                )}
+                <VerifiedBadge
+                  kycStatus={resolveCreatorKycStatus(profile.kycStatus, profile.isVerified)}
+                  size="lg"
+                  accentColor={profile.accentColor}
+                />
               </div>
 
               {/* Extended Info - Main content */}
@@ -842,6 +861,7 @@ export default function CreatorPublicProfile() {
                   isSubscriber={isSubscriber}
                   isOwner={isOwner}
                   showPostTipping={profile.visibilitySettings?.tabs?.postTipping !== false}
+                  creatorKycStatus={resolveCreatorKycStatus(profile.kycStatus, profile.isVerified)}
                 />
               )}
             </div>

@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { User as UserIcon, Check, Users } from 'lucide-react'
+import { User as UserIcon, Users } from 'lucide-react'
 import { Card } from '@/components/ui'
+import { VerifiedBadge } from '@/components/profile'
 import { RecommendationExplanation } from '@/components/legal/RecommendationExplanation'
 import type { Interest } from '@/types'
+import type { KycStatus } from '@/lib/api'
 import { sanitizeBio, sanitizeText } from '@/lib/sanitize'
 
 export interface CreatorCardData {
@@ -18,6 +20,11 @@ export interface CreatorCardData {
   bannerImage?: string
   bio?: string
   isVerified: boolean
+  /**
+   * KYC review status. Optional — public listings may not yet include it; in
+   * that case we fall back to `isVerified` to drive the trust badge.
+   */
+  kycStatus?: KycStatus
   interests: Array<{
     interest: Interest
   }>
@@ -109,12 +116,13 @@ export function CreatorCard({
             )}
           </div>
 
-          {/* Verified Badge */}
-          {creator.isVerified && (
-            <div className="absolute bottom-0 right-[calc(50%-2.5rem-0.5rem)] rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-500 p-1">
-              <Check className="h-3 w-3 text-white" />
-            </div>
-          )}
+          {/* Verified Badge — discrete, KYC-driven */}
+          <div className="absolute bottom-0 right-[calc(50%-2.5rem-0.5rem)]">
+            <VerifiedBadge
+              kycStatus={resolveCardKycStatus(creator.kycStatus, creator.isVerified)}
+              size="sm"
+            />
+          </div>
         </div>
 
         {/* Name & Username */}
@@ -184,4 +192,17 @@ export function CreatorCard({
       </Card>
     </Link>
   )
+}
+
+/**
+ * Bridge between the listing endpoints (which return `isVerified` but not yet
+ * `kycStatus`) and the `VerifiedBadge` API. Honours `kycStatus` when present,
+ * otherwise derives approval from the admin-curated `isVerified` flag.
+ */
+function resolveCardKycStatus(
+  kycStatus: KycStatus | undefined,
+  isVerified: boolean
+): KycStatus {
+  if (kycStatus) return kycStatus
+  return isVerified ? 'APPROVED' : 'PENDING'
 }

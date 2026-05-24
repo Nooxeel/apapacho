@@ -4,9 +4,11 @@ import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2, Loader2, MoreHorizontal } from 'lucide-react'
 import { Button, ProtectedMedia } from '@/components/ui'
 import { ReportButton } from '@/components/social/ReportButton'
+import { VerifiedBadge } from './VerifiedBadge'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
 import { postApi, missionsApi } from '@/lib/api'
+import type { KycStatus } from '@/lib/api'
 import { useBadgeNotification } from '@/components/gamification'
 import { sanitizeText } from '@/lib/sanitize'
 import type { PostVisibility, PostComment } from '@/types'
@@ -48,9 +50,15 @@ interface PostsFeedProps {
   isSubscriber?: boolean
   isOwner?: boolean
   showPostTipping?: boolean
+  /**
+   * KYC status of the profile owner. When `'APPROVED'` we render a small
+   * "Verificado" badge next to each post's header. Optional — defaults to no
+   * badge when omitted or when the backend doesn't expose the field.
+   */
+  creatorKycStatus?: KycStatus
 }
 
-export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false, showPostTipping = true }: PostsFeedProps) {
+export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false, showPostTipping = true, creatorKycStatus }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
   const { gateway, webpay, mercadoPago, fintoc } = usePayment()
@@ -463,8 +471,13 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                   <div className="flex items-center justify-between">
                     <div>
                       {post.title && (
-                        <h3 className="font-semibold text-white text-lg">
-                          {sanitizeText(post.title)}
+                        <h3 className="font-semibold text-white text-lg flex items-center gap-1.5">
+                          <span>{sanitizeText(post.title)}</span>
+                          <VerifiedBadge
+                            kycStatus={creatorKycStatus}
+                            size="sm"
+                            accentColor={accentColor}
+                          />
                         </h3>
                       )}
                       <p className="text-sm text-white/50 mt-1">
