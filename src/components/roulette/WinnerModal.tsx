@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import type { Prize } from './constants'
 import { RARITY_CONFIG } from './constants'
 import { Gift, Ticket, X } from 'lucide-react'
@@ -25,13 +26,28 @@ export function WinnerModal({ prize, specialPrize, onClose }: WinnerModalProps) 
   const isEpic = prize.rarity === 'epic'
   const isRetry = prize.type === 'RETRY'
 
+  // Listen for Escape so keyboard users can dismiss. The roulette modal is
+  // animation-heavy and renders its own backdrop via absolute-positioned div,
+  // so we keep this lightweight rather than migrating to the shared <Dialog>
+  // (the bounce/shake animations are intrinsic to the visual reward).
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="roulette-winner-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Modal */}
       <div
@@ -47,10 +63,12 @@ export function WinnerModal({ prize, specialPrize, onClose }: WinnerModalProps) 
       >
         {/* Close button */}
         <button
+          type="button"
           onClick={onClose}
+          aria-label="Cerrar"
           className="absolute top-3 right-3 text-white/40 hover:text-white transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5" aria-hidden="true" />
         </button>
 
         <div className="text-center">
@@ -58,7 +76,10 @@ export function WinnerModal({ prize, specialPrize, onClose }: WinnerModalProps) 
           <div className="text-7xl mb-4">{prize.icon}</div>
 
           {/* Title */}
-          <h3 className="text-2xl font-bold text-white mb-1">
+          <h3
+            id="roulette-winner-title"
+            className="text-2xl font-bold text-white mb-1"
+          >
             {isRetry ? 'Próxima vez...' :
              isLegendary ? 'LEGENDARIO!' :
              isEpic ? 'ÉPICO!' :

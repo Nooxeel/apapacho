@@ -14,6 +14,7 @@ import {
   type KycSubmissionDetail,
 } from '@/lib/api'
 import { Button } from '@/components/ui/Button'
+import { Dialog } from '@/components/ui/Dialog'
 
 const STANDARD_REASONS = [
   'Foto borrosa o ilegible',
@@ -581,6 +582,8 @@ function Field({
   )
 }
 
+// Thin wrapper around the shared Dialog primitive — kept as a local
+// component to preserve the call-sites in this page without re-rewriting them.
 function Modal({
   title,
   onClose,
@@ -591,26 +594,8 @@ function Modal({
   children: React.ReactNode
 }) {
   return (
-    <div
-      className="fixed inset-0 bg-black/80 z-40 flex items-start justify-center p-4 overflow-y-auto"
-      onClick={onClose}
-    >
-      <div
-        className="bg-neutral-900 border border-white/10 rounded-2xl w-full max-w-lg p-6 mt-16"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-white/60 hover:text-white"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <Dialog open onClose={onClose} title={title} size="lg">
+      {children}
+    </Dialog>
   )
 }

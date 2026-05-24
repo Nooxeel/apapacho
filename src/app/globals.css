@@ -171,18 +171,75 @@ body {
   will-change: opacity, transform;
 }
 
-/* Reduce motion for accessibility */
+/* ============================================================
+ * Accessibility — Reduced motion (WCAG 2.3.3 Animation from Interactions)
+ *
+ * Disable ALL animations & transitions across the app when the user has
+ * `prefers-reduced-motion: reduce` set at OS level. Keeping animation
+ * durations near-zero (0.01ms) instead of `0` ensures any logic that
+ * relies on `animationend`/`transitionend` events still fires, so we
+ * don't break components like Toaster that listen for them.
+ * ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  .animate-bounce-in,
-  .animate-pulse-slow,
-  .animate-bounce,
-  .animate-pulse {
-    animation: none;
-  }
-  
-  * {
-    transition-duration: 0.01ms !important;
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+ * Skip-to-content link — WCAG 2.4.1 (Bypass Blocks).
+ *
+ * The link is visually hidden until focused; pressing Tab as the very
+ * first interaction reveals it in the top-left corner.
+ * ============================================================ */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: #d946ef;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-to-content:focus,
+.skip-to-content:focus-visible {
+  left: 0.5rem;
+  top: 0.5rem;
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* ============================================================
+ * Dialog animations
+ *
+ * Wrapped under @media (prefers-reduced-motion: no-preference) so they
+ * only run for users who haven't opted out. The universal rule above
+ * also caps any animation at ~0ms for the reduced-motion case, giving
+ * us double safety.
+ * ============================================================ */
+@keyframes dialog-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes dialog-zoom-in {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dialog-backdrop {
+    animation: dialog-fade-in 150ms ease-out;
+  }
+  .dialog-panel {
+    animation: dialog-zoom-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 

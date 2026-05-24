@@ -36,6 +36,7 @@ import {
   type ConsentPurpose,
   type ConsentStatusResponse,
 } from '@/lib/api/consents'
+import { Dialog } from '@/components/ui/Dialog'
 
 const DEFER_FLAG_KEY = 'apapacho.reconsent.deferredOnce'
 
@@ -172,110 +173,106 @@ export function ConsentRefreshModal() {
     .map((p) => PURPOSE_LABELS[p] ?? p)
     .filter(Boolean)
 
+  // Blocking modal: backdrop and Escape MUST NOT dismiss — the user has to
+  // either accept or use the deferral button (when allowed).
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="reconsent-title"
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+    <Dialog
+      open
+      onClose={() => { /* no-op: this dialog is intentionally blocking */ }}
+      title="Hemos actualizado nuestros términos"
+      size="lg"
+      closeOnOverlay={false}
+      closeOnEscape={false}
+      showCloseButton={false}
     >
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#13131a] shadow-2xl">
-        <div className="p-6 sm:p-8">
-          <h2
-            id="reconsent-title"
-            className="text-xl sm:text-2xl font-semibold text-white mb-2"
-          >
-            Hemos actualizado nuestros términos
-          </h2>
-          <p className="text-sm text-gray-300 leading-relaxed">
-            Para seguir usando Apapacho, necesitamos que revises y aceptes la
-            versión más reciente de nuestros documentos legales. Conforme a la
-            Ley 21.719, te pedimos un nuevo consentimiento cuando hacemos
-            cambios sustanciales.
+      <p className="text-sm text-gray-300 leading-relaxed">
+        Para seguir usando Apapacho, necesitamos que revises y aceptes la
+        versión más reciente de nuestros documentos legales. Conforme a la
+        Ley 21.719, te pedimos un nuevo consentimiento cuando hacemos
+        cambios sustanciales.
+      </p>
+
+      {pendingLabels.length > 0 && (
+        <div className="mt-4 rounded-lg bg-white/5 p-3 text-sm text-gray-300">
+          <p className="font-medium text-white mb-1">
+            Finalidades pendientes de actualización:
           </p>
-
-          {pendingLabels.length > 0 && (
-            <div className="mt-4 rounded-lg bg-white/5 p-3 text-sm text-gray-300">
-              <p className="font-medium text-white mb-1">
-                Finalidades pendientes de actualización:
-              </p>
-              <ul className="list-disc list-inside space-y-0.5 text-gray-400">
-                {pendingLabels.map((label) => (
-                  <li key={label}>{label}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-            <Link
-              href="/terminos"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fuchsia-400 hover:text-fuchsia-300 underline"
-            >
-              Términos y Condiciones
-            </Link>
-            <Link
-              href="/privacidad"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fuchsia-400 hover:text-fuchsia-300 underline"
-            >
-              Política de Privacidad
-            </Link>
-            <Link
-              href="/cookies"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fuchsia-400 hover:text-fuchsia-300 underline"
-            >
-              Política de Cookies
-            </Link>
-          </div>
-
-          {error && (
-            <div
-              role="alert"
-              className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200"
-            >
-              {error}
-            </div>
-          )}
-
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              onClick={handleAccept}
-              disabled={submitting}
-              className="flex-1 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 px-5 py-3 text-sm font-semibold text-white hover:from-fuchsia-400 hover:to-purple-400 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
-            >
-              {submitting ? 'Guardando…' : 'Acepto las nuevas versiones'}
-            </button>
-            <button
-              type="button"
-              onClick={handleDefer}
-              disabled={alreadyDeferred || submitting}
-              title={
-                alreadyDeferred
-                  ? 'Ya pospusiste esta revisión una vez en esta sesión'
-                  : undefined
-              }
-              className="rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-gray-200 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
-            >
-              Revisar después
-            </button>
-          </div>
-
-          <p className="mt-4 text-xs text-gray-500">
-            Si pospones esta revisión, te la volveremos a pedir la próxima vez
-            que inicies sesión. Tras la primera postergación dentro de esta
-            sesión, el botón se desactiva para evitar accesos prolongados sin
-            consentimiento actualizado.
-          </p>
+          <ul className="list-disc list-inside space-y-0.5 text-gray-400">
+            {pendingLabels.map((label) => (
+              <li key={label}>{label}</li>
+            ))}
+          </ul>
         </div>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        <Link
+          href="/terminos"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-fuchsia-400 hover:text-fuchsia-300 underline"
+        >
+          Términos y Condiciones
+        </Link>
+        <Link
+          href="/privacidad"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-fuchsia-400 hover:text-fuchsia-300 underline"
+        >
+          Política de Privacidad
+        </Link>
+        <Link
+          href="/cookies"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-fuchsia-400 hover:text-fuchsia-300 underline"
+        >
+          Política de Cookies
+        </Link>
       </div>
-    </div>
+
+      {error && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200"
+        >
+          {error}
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          onClick={handleAccept}
+          disabled={submitting}
+          className="flex-1 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 px-5 py-3 text-sm font-semibold text-white hover:from-fuchsia-400 hover:to-purple-400 disabled:cursor-not-allowed disabled:opacity-60 transition-colors"
+        >
+          {submitting ? 'Guardando…' : 'Acepto las nuevas versiones'}
+        </button>
+        <button
+          type="button"
+          onClick={handleDefer}
+          disabled={alreadyDeferred || submitting}
+          title={
+            alreadyDeferred
+              ? 'Ya pospusiste esta revisión una vez en esta sesión'
+              : undefined
+          }
+          className="rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-gray-200 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+        >
+          Revisar después
+        </button>
+      </div>
+
+      <p className="mt-4 text-xs text-gray-500">
+        Si pospones esta revisión, te la volveremos a pedir la próxima vez
+        que inicies sesión. Tras la primera postergación dentro de esta
+        sesión, el botón se desactiva para evitar accesos prolongados sin
+        consentimiento actualizado.
+      </p>
+    </Dialog>
   )
 }
 

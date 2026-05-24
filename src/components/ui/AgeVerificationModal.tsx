@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import { useAuthStore } from '@/stores'
 import { ageVerificationApi } from '@/lib/api'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 interface AgeVerificationModalProps {
   onVerified?: () => void
@@ -13,6 +14,13 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
   const { token, hasHydrated } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [isVerified, setIsVerified] = useState<boolean | null>(null)
+  const titleId = useId()
+  const descId = useId()
+  const containerRef = useRef<HTMLDivElement>(null)
+  // Trap focus while the gate is visible. As a banner the gate doesn't cover
+  // the page but it MUST be acknowledged before continuing — keeping focus
+  // inside avoids users tabbing into hidden background content.
+  useFocusTrap(containerRef, isVerified === false)
 
   // Check verification status on mount
   useEffect(() => {
@@ -98,12 +106,22 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] p-2 sm:p-4 animate-in slide-in-from-bottom duration-500">
+    <div
+      ref={containerRef}
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={descId}
+      className="fixed bottom-0 left-0 right-0 z-[100] p-2 sm:p-4"
+    >
       <div className="max-w-4xl mx-auto bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
             {/* Warning Icon - hidden on mobile to save space */}
-            <div className="hidden sm:flex w-12 h-12 bg-fuchsia-500/20 rounded-full items-center justify-center flex-shrink-0">
+            <div
+              className="hidden sm:flex w-12 h-12 bg-fuchsia-500/20 rounded-full items-center justify-center flex-shrink-0"
+              aria-hidden="true"
+            >
               <svg className="w-6 h-6 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
@@ -111,11 +129,11 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
 
             {/* Content */}
             <div className="flex-1">
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-1">
-                🔞 Contenido para Adultos
+              <h3 id={titleId} className="text-base sm:text-lg font-semibold text-white mb-1">
+                <span aria-hidden="true">🔞 </span>Contenido para Adultos
               </h3>
-              <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-                Esta plataforma contiene contenido explícito para adultos mayores de 18 años. 
+              <p id={descId} className="text-gray-400 text-xs sm:text-sm leading-relaxed">
+                Esta plataforma contiene contenido explícito para adultos mayores de 18 años.
                 Al continuar, confirmas que tienes al menos <span className="text-fuchsia-400 font-bold">18 años</span>.{' '}
                 <a href="/terminos" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
                   Términos

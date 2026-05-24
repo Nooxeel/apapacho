@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { blockApi } from '@/lib/api'
 import { Shield, ShieldOff, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/useToast'
+import { Dialog } from '@/components/ui/Dialog'
 
 interface BlockUserButtonProps {
   userId: string
@@ -218,91 +219,98 @@ function BlockReasonModal({
   isLoading: boolean
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div 
-        className="bg-[#1a1a24] border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-500/20 rounded-lg">
+    <Dialog
+      open
+      onClose={onCancel}
+      title={
+        <span className="flex items-center gap-3">
+          <span className="p-2 bg-red-500/20 rounded-lg inline-flex" aria-hidden="true">
             <Shield className="w-6 h-6 text-red-400" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-white">Bloquear usuario</h3>
-            <p className="text-sm text-white/60">@{username}</p>
-          </div>
-        </div>
+          </span>
+          <span>
+            Bloquear usuario
+            <span className="block text-sm text-white/60 font-normal">@{username}</span>
+          </span>
+        </span>
+      }
+      size="md"
+      closeOnOverlay={!isLoading}
+      closeOnEscape={!isLoading}
+      showCloseButton={!isLoading}
+    >
+      <p className="text-white/70 mb-4">
+        <strong>{displayName}</strong> no podrá:
+      </p>
 
-        <p className="text-white/70 mb-4">
-          <strong>{displayName}</strong> no podrá:
+      <ul className="text-sm text-white/60 space-y-2 mb-6 pl-4">
+        <li className="flex items-center gap-2">
+          <span className="w-1 h-1 bg-white/40 rounded-full" aria-hidden="true"></span>
+          Ver tu perfil ni contenido
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="w-1 h-1 bg-white/40 rounded-full" aria-hidden="true"></span>
+          Enviarte mensajes
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="w-1 h-1 bg-white/40 rounded-full" aria-hidden="true"></span>
+          Suscribirse a tu contenido
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="w-1 h-1 bg-white/40 rounded-full" aria-hidden="true"></span>
+          Comentar en tu perfil
+        </li>
+      </ul>
+
+      <div className="mb-6">
+        <label htmlFor="block-reason" className="block text-sm font-medium text-white/80 mb-2">
+          Razón del bloqueo (opcional)
+        </label>
+        <textarea
+          id="block-reason"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Ej: Comportamiento inapropiado, spam, acoso..."
+          rows={3}
+          aria-describedby="block-reason-help"
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3
+                   focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500
+                   placeholder:text-white/40 resize-none text-white"
+        />
+        <p id="block-reason-help" className="text-xs text-white/40 mt-1">
+          Solo tú podrás ver esta razón
         </p>
-        
-        <ul className="text-sm text-white/60 space-y-2 mb-6 pl-4">
-          <li className="flex items-center gap-2">
-            <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-            Ver tu perfil ni contenido
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-            Enviarte mensajes
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-            Suscribirse a tu contenido
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="w-1 h-1 bg-white/40 rounded-full"></span>
-            Comentar en tu perfil
-          </li>
-        </ul>
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-white/80 mb-2">
-            Razón del bloqueo (opcional)
-          </label>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Ej: Comportamiento inapropiado, spam, acoso..."
-            rows={3}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3
-                     focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500
-                     placeholder:text-white/40 resize-none"
-          />
-          <p className="text-xs text-white/40 mt-1">
-            Solo tú podrás ver esta razón
-          </p>
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            disabled={isLoading}
-            className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium
-                     transition-colors disabled:opacity-50"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 rounded-xl font-medium
-                     transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Bloqueando...
-              </>
-            ) : (
-              <>
-                <Shield className="w-4 h-4" />
-                Bloquear
-              </>
-            )}
-          </button>
-        </div>
       </div>
-    </div>
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium
+                   transition-colors disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={isLoading}
+          className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 rounded-xl font-medium
+                   transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              Bloqueando...
+            </>
+          ) : (
+            <>
+              <Shield className="w-4 h-4" aria-hidden="true" />
+              Bloquear
+            </>
+          )}
+        </button>
+      </div>
+    </Dialog>
   )
 }

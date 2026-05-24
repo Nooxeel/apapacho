@@ -143,7 +143,16 @@ export default async function RootLayout({
         
         {/* Viewport optimization */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" content="#0d0d1a" />
+        {/* Theme color is also exported via app/manifest.ts so installed PWAs
+            pick up the brand pink (#d946ef). The dark value here matches the
+            page chrome for browsers that show a tinted address bar. */}
+        <meta name="theme-color" content="#0d0d1a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#d946ef" media="(prefers-color-scheme: light)" />
+        {/* iOS Safari "Add to Home Screen" niceties — PWA support */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Apapacho" />
+        <meta name="mobile-web-app-capable" content="yes" />
         
         {/* Age verification & adult content indicators */}
         <meta name="rating" content="adult" />
@@ -157,6 +166,13 @@ export default async function RootLayout({
         <meta name="content-language" content="es-CL" />
       </head>
       <body className={`${inter.variable} ${poppins.variable} font-sans`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        {/* Skip-to-content link — WCAG 2.4.1 (Bypass Blocks).
+            Visually hidden until focused; first Tab keystroke surfaces it.
+            Pages render their primary <main id="main-content"> so this target
+            always resolves. */}
+        <a href="#main-content" className="skip-to-content">
+          Saltar al contenido principal
+        </a>
         {/* JSON-LD Structured Data for SEO */}
         <script
           type="application/ld+json"

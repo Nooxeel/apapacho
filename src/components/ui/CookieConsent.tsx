@@ -20,11 +20,12 @@
  * with `canUseAnalytics` / `canUsePreferences` plus a new `canUseMarketing`.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useId } from 'react'
 import Link from 'next/link'
 import { X, Cookie, Shield, BarChart3, Settings, Megaphone } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { consentsApi } from '@/lib/api/consents'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 const CONSENT_KEY = 'apapacho-cookie-consent'
 const CONSENT_VERSION = 2 // bump if categories change semantically
@@ -96,6 +97,12 @@ export default function CookieConsent() {
   const { token, hasHydrated } = useAuthStore()
   // Guard so we only attempt to sync once per token transition.
   const lastSyncedToken = useRef<string | null>(null)
+  // Focus trap so users tabbing through the banner cycle inside it (the banner
+  // is a privacy notice that must be acknowledged — letting Tab leak into the
+  // page chrome behind it confused screen-reader users in QA).
+  const bannerRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+  useFocusTrap(bannerRef, isVisible)
 
   // First mount — show the banner immediately if no stored consent exists.
   // (Note: we deliberately do NOT wait for age verification — Ley 21.719
@@ -156,16 +163,25 @@ export default function CookieConsent() {
   if (!isVisible) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[60] p-4 animate-in slide-in-from-bottom duration-500">
+    <div
+      ref={bannerRef}
+      role="region"
+      aria-label="Consentimiento de cookies"
+      aria-labelledby={titleId}
+      className="fixed bottom-0 left-0 right-0 z-[60] p-4"
+    >
       <div className="max-w-4xl mx-auto bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+            <div
+              className="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center flex-shrink-0"
+              aria-hidden="true"
+            >
               <Cookie className="w-6 h-6 text-pink-500" />
             </div>
 
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Usamos cookies</h3>
+              <h3 id={titleId} className="text-lg font-semibold text-white mb-2">Usamos cookies</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Usamos cookies esenciales para el funcionamiento del sitio y, con tu consentimiento,
                 otras cookies para analítica, preferencias y marketing. Puedes aceptarlas todas,
@@ -302,7 +318,7 @@ function CategoryRow({ icon: Icon, iconClass, title, description, control }: Cat
   return (
     <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg gap-3">
       <div className="flex items-start gap-3 min-w-0">
-        <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconClass}`} />
+        <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconClass}`} aria-hidden="true" />
         <div className="min-w-0">
           <p className="text-white font-medium text-sm">{title}</p>
           <p className="text-xs text-gray-400">{description}</p>

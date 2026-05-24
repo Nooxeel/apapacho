@@ -22,9 +22,9 @@ import {
   Smartphone,
   Tablet,
   AlertTriangle,
-  X,
 } from 'lucide-react'
 import { sessionsApi, type ActiveSession } from '@/lib/api/sessions'
+import { Dialog } from '@/components/ui/Dialog'
 
 type DeviceIcon = 'mobile' | 'tablet' | 'desktop'
 
@@ -246,72 +246,50 @@ export default function ActiveSessions() {
         </div>
       )}
 
-      {confirmAllOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="confirm-all-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !busyAll) setConfirmAllOpen(false)
-          }}
-        >
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#111] p-6 shadow-2xl">
-            <div className="flex items-start gap-3">
-              <AlertTriangle
-                className="h-6 w-6 flex-shrink-0 text-yellow-400"
-                aria-hidden="true"
-              />
-              <div className="flex-1">
-                <h3
-                  id="confirm-all-title"
-                  className="text-lg font-semibold text-white"
-                >
-                  ¿Cerrar todas las otras sesiones?
-                </h3>
-                <p className="mt-2 text-sm text-gray-300">
-                  Esto cerrará la sesión en {otherSessionsCount} dispositivo
-                  {otherSessionsCount === 1 ? '' : 's'} además de este. Tu
-                  sesión actual quedará activa.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => !busyAll && setConfirmAllOpen(false)}
-                aria-label="Cerrar diálogo"
-                className="rounded-lg p-1 text-gray-400 hover:bg-white/10 hover:text-white"
-              >
-                <X className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
-            <div className="mt-5 flex flex-wrap justify-end gap-2">
-              <button
-                type="button"
-                disabled={busyAll}
-                onClick={() => setConfirmAllOpen(false)}
-                className="rounded-lg border border-white/15 px-4 py-2 text-sm text-gray-200 hover:bg-white/10 disabled:opacity-40"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                disabled={busyAll}
-                onClick={handleTerminateAllOthers}
-                className="rounded-lg bg-red-500/90 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500 disabled:opacity-60"
-              >
-                {busyAll ? (
-                  <span className="flex items-center gap-1">
-                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
-                    Cerrando…
-                  </span>
-                ) : (
-                  'Sí, cerrar las otras sesiones'
-                )}
-              </button>
-            </div>
-          </div>
+      <Dialog
+        open={confirmAllOpen}
+        onClose={() => { if (!busyAll) setConfirmAllOpen(false) }}
+        title={
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+            ¿Cerrar todas las otras sesiones?
+          </span>
+        }
+        size="md"
+        closeOnOverlay={!busyAll}
+        closeOnEscape={!busyAll}
+        showCloseButton={!busyAll}
+      >
+        <p className="text-sm text-gray-300">
+          Esto cerrará la sesión en {otherSessionsCount} dispositivo
+          {otherSessionsCount === 1 ? '' : 's'} además de este. Tu sesión actual quedará activa.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            disabled={busyAll}
+            onClick={() => setConfirmAllOpen(false)}
+            className="rounded-lg border border-white/15 px-4 py-2 text-sm text-gray-200 hover:bg-white/10 disabled:opacity-40"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            disabled={busyAll}
+            onClick={handleTerminateAllOthers}
+            className="rounded-lg bg-red-500/90 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-500 disabled:opacity-60"
+          >
+            {busyAll ? (
+              <span className="flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                Cerrando…
+              </span>
+            ) : (
+              'Sí, cerrar las otras sesiones'
+            )}
+          </button>
         </div>
-      )}
+      </Dialog>
     </div>
   )
 }

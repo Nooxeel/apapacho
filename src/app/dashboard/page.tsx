@@ -11,6 +11,7 @@ import { API_URL } from '@/lib/config';
 import { StreakDisplay, LevelDisplay, LevelBadge, AvatarWithProgress } from '@/components/gamification';
 import { Navbar } from '@/components/layout';
 import { KycBanner } from '@/components/ui/KycBanner';
+import { Dialog } from '@/components/ui/Dialog';
 import { sanitizeText } from '@/lib/sanitize';
 import { useToast } from '@/hooks/useToast';
 import {
@@ -368,6 +369,9 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#0f0f14] text-white">
       {/* Navbar */}
       <Navbar />
+
+      {/* Skip-to-content target — anchor referenced from /layout.tsx */}
+      <main id="main-content" tabIndex={-1} className="focus:outline-none">
       
       {/* Header */}
       <div className="bg-gradient-to-r from-fuchsia-600 to-purple-600 py-16 pt-20">
@@ -986,134 +990,127 @@ export default function DashboardPage() {
           </div>
         ) : null}
       </div>
+      </main>
 
       {/* Manage Subscription Modal */}
-      {showManageModal && selectedSubscription && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-          onClick={() => setShowManageModal(false)}
-        >
-          <div 
-            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6 border-b border-white/10">
-              <h2 className="text-xl font-bold text-white">Gestionar Suscripción</h2>
-            </div>
-
-            <div className="p-6 space-y-4">
-              {/* Subscription Info */}
-              <div className="bg-white/5 rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <span className="text-white/50 text-sm">Creador</span>
-                  <span className="font-semibold text-white">{selectedSubscription.creator.displayName}</span>
-                </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-white/50 text-sm">Plan</span>
-                  <span className="font-semibold text-white">{selectedSubscription.tier.name}</span>
-                </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-white/50 text-sm">Precio</span>
-                  <span className="font-semibold text-fuchsia-400">
-                    ${selectedSubscription.tier.price.toFixed(2)}/{selectedSubscription.tier.currency}
-                  </span>
-                </div>
-                <div className="flex justify-between items-start">
-                  <span className="text-white/50 text-sm">Fecha de inicio</span>
-                  <span className="text-white">{new Date(selectedSubscription.startDate).toLocaleDateString('es-CL')}</span>
-                </div>
-                {selectedSubscription.endDate && (
-                  <div className="flex justify-between items-start">
-                    <span className="text-white/50 text-sm">Válido hasta</span>
-                    <span className="text-white">{new Date(selectedSubscription.endDate).toLocaleDateString('es-CL')}</span>
-                  </div>
-                )}
-                <div className="flex justify-between items-start">
-                  <span className="text-white/50 text-sm">Estado</span>
-                  <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
-                    {selectedSubscription.status === 'active' ? 'Activa' : selectedSubscription.status}
-                  </span>
-                </div>
+      <Dialog
+        open={showManageModal && !!selectedSubscription}
+        onClose={() => setShowManageModal(false)}
+        title="Gestionar Suscripción"
+        size="md"
+      >
+        {selectedSubscription && (
+          <div className="space-y-4">
+            {/* Subscription Info */}
+            <div className="bg-white/5 rounded-lg p-4 space-y-3">
+              <div className="flex justify-between items-start">
+                <span className="text-white/50 text-sm">Creador</span>
+                <span className="font-semibold text-white">{selectedSubscription.creator.displayName}</span>
               </div>
-
-              {/* Cancel Button */}
-              <button
-                onClick={() => {
-                  setShowManageModal(false);
-                  setShowCancelConfirm(true);
-                }}
-                className="w-full py-3 rounded-lg font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
-              >
-                Cancelar Suscripción
-              </button>
-
-              <button
-                onClick={() => setShowManageModal(false)}
-                className="w-full py-2 text-white/50 hover:text-white transition-colors text-sm"
-              >
-                Cerrar
-              </button>
+              <div className="flex justify-between items-start">
+                <span className="text-white/50 text-sm">Plan</span>
+                <span className="font-semibold text-white">{selectedSubscription.tier.name}</span>
+              </div>
+              <div className="flex justify-between items-start">
+                <span className="text-white/50 text-sm">Precio</span>
+                <span className="font-semibold text-fuchsia-400">
+                  ${selectedSubscription.tier.price.toFixed(2)}/{selectedSubscription.tier.currency}
+                </span>
+              </div>
+              <div className="flex justify-between items-start">
+                <span className="text-white/50 text-sm">Fecha de inicio</span>
+                <span className="text-white">{new Date(selectedSubscription.startDate).toLocaleDateString('es-CL')}</span>
+              </div>
+              {selectedSubscription.endDate && (
+                <div className="flex justify-between items-start">
+                  <span className="text-white/50 text-sm">Válido hasta</span>
+                  <span className="text-white">{new Date(selectedSubscription.endDate).toLocaleDateString('es-CL')}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-start">
+                <span className="text-white/50 text-sm">Estado</span>
+                <span className="px-2 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">
+                  {selectedSubscription.status === 'active' ? 'Activa' : selectedSubscription.status}
+                </span>
+              </div>
             </div>
+
+            {/* Cancel Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowManageModal(false);
+                setShowCancelConfirm(true);
+              }}
+              className="w-full py-3 rounded-lg font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20"
+            >
+              Cancelar Suscripción
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowManageModal(false)}
+              className="w-full py-2 text-white/50 hover:text-white transition-colors text-sm"
+            >
+              Cerrar
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
       {/* Cancel Confirmation Modal */}
-      {showCancelConfirm && selectedSubscription && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-          onClick={() => !cancelling && setShowCancelConfirm(false)}
-        >
-          <div 
-            className="bg-[#1a1a24] rounded-2xl border border-white/10 max-w-md w-full p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center space-y-4">
-              {/* Warning Icon */}
-              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
-                <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
+      <Dialog
+        open={showCancelConfirm && !!selectedSubscription}
+        onClose={() => { if (!cancelling) setShowCancelConfirm(false); }}
+        title="¿Cancelar suscripción?"
+        size="md"
+        closeOnOverlay={!cancelling}
+        closeOnEscape={!cancelling}
+        showCloseButton={!cancelling}
+      >
+        {selectedSubscription && (
+          <div className="text-center space-y-4">
+            {/* Warning Icon */}
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto" aria-hidden="true">
+              <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
 
-              {/* Title */}
-              <h2 className="text-xl font-bold text-white">
-                ¿Cancelar suscripción?
-              </h2>
+            {/* Message */}
+            <div className="space-y-2 text-white/70 text-sm">
+              <p>Estás a punto de cancelar tu suscripción a <span className="font-semibold text-white">{selectedSubscription.creator.displayName}</span></p>
+              {selectedSubscription.endDate && (
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-yellow-200">
+                  <p className="font-medium">Importante:</p>
+                  <p className="mt-1">Mantendrás acceso al contenido exclusivo hasta el <span className="font-semibold">{new Date(selectedSubscription.endDate).toLocaleDateString('es-CL')}</span></p>
+                </div>
+              )}
+              <p className="text-white/50 text-xs mt-3">Podrás volver a suscribirte en cualquier momento</p>
+            </div>
 
-              {/* Message */}
-              <div className="space-y-2 text-white/70 text-sm">
-                <p>Estás a punto de cancelar tu suscripción a <span className="font-semibold text-white">{selectedSubscription.creator.displayName}</span></p>
-                {selectedSubscription.endDate && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-yellow-200">
-                    <p className="font-medium">ℹ️ Importante:</p>
-                    <p className="mt-1">Mantendrás acceso al contenido exclusivo hasta el <span className="font-semibold">{new Date(selectedSubscription.endDate).toLocaleDateString('es-CL')}</span></p>
-                  </div>
-                )}
-                <p className="text-white/50 text-xs mt-3">Podrás volver a suscribirte en cualquier momento</p>
-              </div>
-
-              {/* Buttons */}
-              <div className="space-y-2">
-                <button
-                  onClick={handleCancelSubscription}
-                  disabled={cancelling}
-                  className="w-full py-3 rounded-lg font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {cancelling ? 'Cancelando...' : 'Sí, cancelar suscripción'}
-                </button>
-                <button
-                  onClick={() => setShowCancelConfirm(false)}
-                  disabled={cancelling}
-                  className="w-full py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 bg-fuchsia-500/20 text-fuchsia-400 hover:bg-fuchsia-500/30"
-                >
-                  No, mantener suscripción
-                </button>
-              </div>
+            {/* Buttons */}
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleCancelSubscription}
+                disabled={cancelling}
+                className="w-full py-3 rounded-lg font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {cancelling ? 'Cancelando...' : 'Sí, cancelar suscripción'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCancelConfirm(false)}
+                disabled={cancelling}
+                className="w-full py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 bg-fuchsia-500/20 text-fuchsia-400 hover:bg-fuchsia-500/30"
+              >
+                No, mantener suscripción
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Dialog>
     </div>
   );
 }
