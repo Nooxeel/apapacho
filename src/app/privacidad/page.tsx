@@ -24,6 +24,25 @@ export default function PrivacidadPage() {
             Versión 1.0 · Vigente desde el 6 de mayo de 2026
           </p>
 
+          {/* Banner: Apapacho SpA constitution pending placeholders */}
+          <div
+            role="alert"
+            aria-label="Aviso sobre campos pendientes del Responsable"
+            className="mb-8 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100"
+          >
+            <p className="font-semibold mb-1">Aviso importante</p>
+            <p>
+              Los datos del Responsable marcados como{' '}
+              <strong>[PENDIENTE COMPLETAR]</strong> serán publicados antes del
+              lanzamiento público de la Plataforma. Esta política es vinculante
+              una vez completados todos los campos del Responsable. Hasta entonces,
+              cualquier consulta puede dirigirse a{' '}
+              <a href="mailto:privacidad@appapacho.cl" className="underline">
+                privacidad@appapacho.cl
+              </a>.
+            </p>
+          </div>
+
           <div className="prose prose-invert max-w-none space-y-6 text-gray-300">
 
             <section>
@@ -48,12 +67,47 @@ export default function PrivacidadPage() {
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">2. IDENTIDAD DEL RESPONSABLE DEL TRATAMIENTO</h2>
               <ul className="list-none space-y-2">
-                <li><strong>Razón social:</strong> Apapacho SpA</li>
-                <li><strong>RUT:</strong> [por completar]</li>
-                <li><strong>Domicilio:</strong> [por completar — Chile]</li>
-                <li><strong>Sitio web:</strong> www.appapacho.cl</li>
-                <li><strong>Email de contacto legal:</strong> <a href="mailto:legal@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">legal@appapacho.cl</a></li>
+                <li>
+                  <strong>Razón social:</strong>{' '}
+                  <span className="text-amber-300">[PENDIENTE COMPLETAR — al constituir Apapacho SpA en SII]</span>
+                </li>
+                <li>
+                  <strong>RUT:</strong>{' '}
+                  <span className="text-amber-300">[PENDIENTE COMPLETAR]</span>
+                </li>
+                <li>
+                  <strong>Domicilio legal:</strong>{' '}
+                  <span className="text-amber-300">[PENDIENTE COMPLETAR]</span>
+                </li>
+                <li><strong>Representante legal:</strong> Jorge Moya</li>
+                <li>
+                  <strong>Sitio web:</strong>{' '}
+                  <a href="https://appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                    https://appapacho.cl
+                  </a>
+                </li>
+                <li>
+                  <strong>Email general:</strong>{' '}
+                  <a href="mailto:contacto@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                    contacto@appapacho.cl
+                  </a>
+                </li>
+                <li>
+                  <strong>Email DPO / privacidad:</strong>{' '}
+                  <a href="mailto:privacidad@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                    privacidad@appapacho.cl
+                  </a>
+                </li>
+                <li>
+                  <strong>Delegado de Protección de Datos (DPO):</strong>{' '}
+                  <span className="text-amber-300">[PENDIENTE COMPLETAR — contratar abogado externo]</span>
+                </li>
               </ul>
+              <p className="mt-4 text-sm text-gray-400">
+                Los datos marcados como <strong>[PENDIENTE COMPLETAR]</strong> serán completados
+                antes del lanzamiento público. Esta política es vinculante una vez completados
+                todos los campos del Responsable.
+              </p>
             </section>
 
             <section>
@@ -68,9 +122,10 @@ export default function PrivacidadPage() {
                 <li><strong>Responsabilidad:</strong> atender consultas y solicitudes ARCO-P, supervisar el cumplimiento normativo y servir de punto de contacto con la autoridad de control.</li>
               </ul>
               <p className="mt-4 text-sm text-gray-400">
-                Nota: la designación de un Delegado de Protección de Datos es una práctica recomendada por la
-                Ley N° 21.719. Apapacho mantiene este canal operativo de manera voluntaria como parte de su programa de
-                cumplimiento; la designación nominativa del DPD externo será publicada una vez formalizada.
+                Nota: la designación nominativa del DPD externo se publicará en el campo del Responsable
+                arriba una vez formalizado el contrato con el abogado externo. Hasta entonces, el canal
+                <code className="text-fuchsia-300 bg-white/5 px-1 mx-1 rounded">privacidad@appapacho.cl</code>
+                opera bajo supervisión directa del representante legal.
               </p>
             </section>
 
@@ -179,11 +234,12 @@ export default function PrivacidadPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">7. DESTINATARIOS Y TRANSFERENCIAS INTERNACIONALES</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">7. DESTINATARIOS DE TUS DATOS</h2>
               <p>
-                No vendemos datos personales. Compartimos datos exclusivamente con los siguientes prestadores de
-                servicios (encargados de tratamiento), bajo cláusulas contractuales que garantizan un nivel de
-                protección adecuado:
+                Para operar la Plataforma usamos los siguientes procesadores. Todos ellos están obligados
+                contractualmente a tratar tus datos conforme a estándares <strong>equivalentes o superiores</strong>{' '}
+                a los exigidos por la Ley 21.719 chilena, ya sea mediante DPAs (Data Processing Agreements)
+                firmados directamente o mediante cláusulas contractuales tipo equivalentes.
               </p>
               <div className="overflow-x-auto mt-4 -mx-2 sm:mx-0">
                 <table className="min-w-full text-sm border border-white/10 rounded-lg">
@@ -191,53 +247,77 @@ export default function PrivacidadPage() {
                     <tr>
                       <th className="px-3 py-2 text-left text-white font-semibold border-b border-white/10">Procesador</th>
                       <th className="px-3 py-2 text-left text-white font-semibold border-b border-white/10">País</th>
-                      <th className="px-3 py-2 text-left text-white font-semibold border-b border-white/10">Rol / finalidad</th>
+                      <th className="px-3 py-2 text-left text-white font-semibold border-b border-white/10">Datos que procesa</th>
+                      <th className="px-3 py-2 text-left text-white font-semibold border-b border-white/10">Propósito</th>
+                      <th className="px-3 py-2 text-left text-white font-semibold border-b border-white/10">Salvaguardas</th>
                     </tr>
                   </thead>
                   <tbody className="text-gray-300">
                     <tr className="border-b border-white/10">
-                      <td className="px-3 py-2">Cloudinary</td>
-                      <td className="px-3 py-2">USA</td>
-                      <td className="px-3 py-2">Almacenamiento y entrega de fotografías y videos</td>
+                      <td className="px-3 py-2">Cloudinary, Inc.</td>
+                      <td className="px-3 py-2">Estados Unidos</td>
+                      <td className="px-3 py-2">Imágenes, videos, documentos KYC (cifrados)</td>
+                      <td className="px-3 py-2">Almacenamiento y entrega de contenido</td>
+                      <td className="px-3 py-2">DPA + cifrado en reposo + signed URLs TTL limitado</td>
                     </tr>
                     <tr className="border-b border-white/10">
-                      <td className="px-3 py-2">Resend</td>
-                      <td className="px-3 py-2">USA</td>
-                      <td className="px-3 py-2">Envío de correos electrónicos transaccionales</td>
+                      <td className="px-3 py-2">Resend, Inc.</td>
+                      <td className="px-3 py-2">Estados Unidos</td>
+                      <td className="px-3 py-2">Email + nombre del destinatario</td>
+                      <td className="px-3 py-2">Envío de emails transaccionales y marketing (con consent)</td>
+                      <td className="px-3 py-2">DPA + cláusulas contractuales tipo</td>
                     </tr>
                     <tr className="border-b border-white/10">
-                      <td className="px-3 py-2">Railway</td>
-                      <td className="px-3 py-2">USA</td>
-                      <td className="px-3 py-2">Hosting del backend (cómputo y base de datos)</td>
+                      <td className="px-3 py-2">Railway Corp.</td>
+                      <td className="px-3 py-2">Estados Unidos</td>
+                      <td className="px-3 py-2">Toda la base de datos</td>
+                      <td className="px-3 py-2">Hosting backend y Postgres gestionado</td>
+                      <td className="px-3 py-2">DPA + cifrado en tránsito y reposo</td>
                     </tr>
                     <tr className="border-b border-white/10">
-                      <td className="px-3 py-2">Vercel</td>
-                      <td className="px-3 py-2">USA</td>
-                      <td className="px-3 py-2">Hosting del frontend (sitio web)</td>
+                      <td className="px-3 py-2">Vercel Inc.</td>
+                      <td className="px-3 py-2">Estados Unidos</td>
+                      <td className="px-3 py-2">Logs de request, edge cache</td>
+                      <td className="px-3 py-2">Hosting frontend</td>
+                      <td className="px-3 py-2">DPA + cláusulas tipo</td>
                     </tr>
                     <tr className="border-b border-white/10">
-                      <td className="px-3 py-2">Webpay / Transbank</td>
+                      <td className="px-3 py-2">Transbank S.A.</td>
                       <td className="px-3 py-2">Chile</td>
-                      <td className="px-3 py-2">Procesamiento de pagos con tarjeta</td>
+                      <td className="px-3 py-2">Datos de tarjeta (tokenizados)</td>
+                      <td className="px-3 py-2">Procesamiento de pagos Webpay</td>
+                      <td className="px-3 py-2">Convenio comercial + regulación local</td>
                     </tr>
                     <tr className="border-b border-white/10">
                       <td className="px-3 py-2">MercadoPago</td>
-                      <td className="px-3 py-2">Argentina / Chile</td>
-                      <td className="px-3 py-2">Procesamiento de pagos alternativos</td>
+                      <td className="px-3 py-2">Argentina (regional)</td>
+                      <td className="px-3 py-2">Datos de transacción</td>
+                      <td className="px-3 py-2">Procesamiento de pagos</td>
+                      <td className="px-3 py-2">DPA + cláusulas tipo</td>
+                    </tr>
+                    <tr className="border-b border-white/10">
+                      <td className="px-3 py-2">Google LLC (OAuth)</td>
+                      <td className="px-3 py-2">Estados Unidos</td>
+                      <td className="px-3 py-2">Email + nombre al iniciar sesión social</td>
+                      <td className="px-3 py-2">Autenticación opcional</td>
+                      <td className="px-3 py-2">Términos de Google vinculantes</td>
                     </tr>
                     <tr>
-                      <td className="px-3 py-2">Fintoc</td>
-                      <td className="px-3 py-2">Chile</td>
-                      <td className="px-3 py-2">Pagos vía open banking (transferencia bancaria)</td>
+                      <td className="px-3 py-2">Sentry, Inc.</td>
+                      <td className="px-3 py-2">Estados Unidos</td>
+                      <td className="px-3 py-2">Logs de error sin PII (redactados)</td>
+                      <td className="px-3 py-2">Monitoreo de errores en producción</td>
+                      <td className="px-3 py-2">DPA + redaction obligatoria</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <p className="mt-4">
-                Las transferencias hacia Estados Unidos se efectúan al amparo de <strong>Cláusulas Contractuales Tipo
-                (SCC)</strong> equivalentes a las europeas, suscritas con cada procesador. Estas cláusulas obligan al
-                destinatario a aplicar un nivel de protección equivalente al exigido por la legislación chilena, y
-                facultan al titular de los datos a hacer valer sus derechos directamente frente al procesador.
+              <p className="mt-4 text-sm text-gray-400">
+                No vendemos datos personales. Las transferencias hacia Estados Unidos o Argentina se efectúan al
+                amparo de <strong>Cláusulas Contractuales Tipo (SCC)</strong> equivalentes a las europeas, suscritas
+                con cada procesador. Estas cláusulas obligan al destinatario a aplicar un nivel de protección
+                equivalente al exigido por la legislación chilena, y facultan al titular de los datos a hacer valer
+                sus derechos directamente frente al procesador.
               </p>
             </section>
 
@@ -346,18 +426,36 @@ export default function PrivacidadPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mt-8 mb-4">13. MENORES DE EDAD</h2>
+              <h2 className="text-xl font-semibold text-white mt-8 mb-4">13. PROTECCIÓN DE MENORES DE EDAD</h2>
               <p>
-                Apapacho <strong>no permite</strong> el registro ni el uso de la Plataforma a personas menores de 18
-                años. No recolectamos intencionalmente datos de menores. Si detectamos una cuenta perteneciente a un
-                menor de edad, procederemos a su <strong>eliminación inmediata</strong> y a la supresión de los datos
-                asociados, sin perjuicio de las retenciones legales mínimas y de las acciones que correspondan ante las
-                autoridades.
+                La plataforma de Apapacho está <strong>estrictamente prohibida</strong> para menores de 18 años.
+                Implementamos múltiples barreras técnicas para prevenir su acceso:
               </p>
+              <ul className="list-disc list-inside mt-4 space-y-2">
+                <li>Verificación de mayoría de edad obligatoria al ingresar al sitio (age gate).</li>
+                <li>Confirmación de fecha de nacimiento al registrarse.</li>
+                <li>Verificación de identidad con cédula chilena para Creadores de contenido (KYC con selfie biométrica).</li>
+                <li>Monitoreo continuo de patrones que sugieran cuentas de menores.</li>
+              </ul>
               <p className="mt-4">
-                El proceso de KYC obligatorio para Creadores incluye verificación documental de edad mediante cédula
-                chilena, lo que constituye una salvaguarda adicional contra el acceso de menores a la actividad de
-                creación.
+                Si descubres que un menor de 18 años está usando la plataforma, contáctanos inmediatamente a{' '}
+                <a href="mailto:privacidad@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                  privacidad@appapacho.cl
+                </a>
+                . Procederemos a:
+              </p>
+              <ol className="list-decimal list-inside mt-2 space-y-2">
+                <li>Suspender la cuenta dentro de las <strong>24 horas</strong>.</li>
+                <li>Eliminar toda la información personal del menor de manera expedita.</li>
+                <li>
+                  Si el menor produjo o consumió contenido sensible: reportar a las autoridades correspondientes
+                  (<strong>PDI Cyber Chile</strong>, <strong>NCMEC CyberTipline</strong>) según la
+                  Ley 21.515 y normativas internacionales.
+                </li>
+              </ol>
+              <p className="mt-4">
+                Si crees que tu hijo o tutelado ha accedido a la plataforma sin tu autorización, puedes ejercer su
+                derecho de eliminación contactándonos con documentación que acredite la tutela.
               </p>
             </section>
 
@@ -381,15 +479,29 @@ export default function PrivacidadPage() {
             <section>
               <h2 className="text-xl font-semibold text-white mt-8 mb-4">15. CAMBIOS A ESTA POLÍTICA</h2>
               <p>
-                Esta Política puede ser actualizada para reflejar cambios normativos, técnicos u operacionales. Toda
-                modificación será comunicada con al menos <strong>30 días de antelación</strong> mediante correo
-                electrónico al Usuario y banner visible en la Plataforma.
+                Esta política puede actualizarse para reflejar cambios legales, técnicos o de servicio. Cuando hagamos
+                cambios sustanciales:
               </p>
+              <ul className="list-disc list-inside mt-4 space-y-2">
+                <li>Te notificaremos por email al menos <strong>15 días</strong> antes de la entrada en vigor.</li>
+                <li>
+                  Verás un <strong>aviso destacado</strong> al iniciar sesión que te permitirá revisar los cambios
+                  y reaceptar.
+                </li>
+                <li>Las versiones anteriores quedan archivadas y disponibles bajo solicitud.</li>
+              </ul>
               <p className="mt-4">
                 Si la modificación implica una <strong>nueva finalidad</strong> de tratamiento o un cambio en la base de
                 licitud, solicitaremos un <strong>nuevo consentimiento expreso</strong>. La continuidad en el uso de la
                 Plataforma luego de la entrada en vigor implica aceptación de los cambios que no requieran nuevo
                 consentimiento.
+              </p>
+              <p className="mt-4 text-sm text-gray-400">
+                Versión actual: <strong>1.0</strong> · Vigente desde el <strong>6 de mayo de 2026</strong>.
+                Para consultar versiones anteriores escribe a{' '}
+                <a href="mailto:privacidad@appapacho.cl" className="text-fuchsia-400 hover:text-fuchsia-300">
+                  privacidad@appapacho.cl
+                </a>.
               </p>
             </section>
 

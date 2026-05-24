@@ -12,6 +12,10 @@ import { GoogleAnalytics } from '@/components/analytics'
 // data protection law (vigent 2026). Mounted ABOVE AgeVerificationProvider
 // so consent is captured BEFORE any non-essential processing fires.
 import CookieConsent from '@/components/ui/CookieConsent'
+// Re-consent modal (Ley 21.719 — Ola 5A): forces authenticated users to
+// re-accept legal docs when a ConsentVersion bump renders their previous
+// acceptance stale. Self-contained — only renders when needed.
+import ConsentRefreshModal from '@/components/legal/ConsentRefreshModal'
 
 // Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font - only load weights actually used
@@ -381,6 +385,7 @@ export default async function RootLayout({
               age modal is a centered overlay.
             */}
             <CookieConsent />
+            <ConsentRefreshModal />
             <AgeVerificationProvider>
               <BadgeNotificationProvider>
                 {children}

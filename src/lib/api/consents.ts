@@ -45,6 +45,35 @@ export interface MyConsentsResponse {
   history: ConsentHistoryEntry[]
 }
 
+// ---------------------------------------------------------------------------
+// Re-consent (Ola 5A) — surfaced when a ConsentVersion changes after the user
+// last accepted. The frontend polls `/users/me/consent-status` once after
+// login and pops a blocking modal if any purpose returns `needsReconsent: true`.
+// ---------------------------------------------------------------------------
+
+export type ConsentDocType = 'TERMS' | 'PRIVACY' | 'COOKIES'
+
+export interface ConsentStatusEntry {
+  purpose: ConsentPurpose
+  docType: ConsentDocType
+  currentAcceptedVersionId: string | null
+  currentAcceptedVersion: string | null
+  latestVersionId: string | null
+  latestVersion: string | null
+  needsReconsent: boolean
+}
+
+export interface ConsentStatusResponse {
+  entries: ConsentStatusEntry[]
+  needsReconsent: boolean
+  pendingPurposes: ConsentPurpose[]
+}
+
+export interface AcceptLatestResponse {
+  ok: true
+  acceptedPurposes: ConsentPurpose[]
+}
+
 export const consentsApi = {
   /** Read current state per purpose + last 20 transitions. */
   getMyConsents: (token: string) =>
@@ -67,6 +96,23 @@ export const consentsApi = {
   /** Convenience: opt back in to profiling. */
   optInProfiling: (token: string) =>
     api<{ ok: true; profilingOptedOut: false }>('/users/me/profiling/opt-in', {
+      method: 'POST',
+      token,
+    }),
+
+  /**
+   * Compute which purposes need re-consent after a ConsentVersion bump.
+   * Returns `needsReconsent: false` when everything is in sync.
+   */
+  getConsentStatus: (token?: string) =>
+    api<ConsentStatusResponse>('/users/me/consent-status', { token }),
+
+  /**
+   * Re-accept all pending purposes at once with the latest versions.
+   * Preserves the user's previous granted/withdrawn decision per purpose.
+   */
+  acceptLatest: (token?: string) =>
+    api<AcceptLatestResponse>('/users/me/consents/accept-latest', {
       method: 'POST',
       token,
     }),
