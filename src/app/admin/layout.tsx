@@ -96,6 +96,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               Reportes
             </Link>
+            <Link
+              href="/admin/content-moderation"
+              className="text-sm text-white/70 hover:text-white"
+            >
+              Moderación
+            </Link>
           </div>
         </div>
       </nav>
