@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import {
   ARCOP_TYPE_LABELS,
+  ARCOP_RELATIONSHIP_LABELS,
   completeArcopRequest,
   getArcopDetail,
   rejectArcopRequest,
@@ -130,11 +131,16 @@ export default function AdminArcopDetailPage() {
       {!loading && !error && detail && (
         <>
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold">
                 Solicitud {ARCOP_TYPE_LABELS[detail.type]}
               </h1>
-              <p className="text-white/50 text-xs font-mono mt-1">{detail.id}</p>
+              {detail.isThirdPartyRequest && (
+                <span className="text-xs px-2 py-1 rounded-md bg-orange-500/20 text-orange-200 font-medium">
+                  Por tercero
+                </span>
+              )}
+              <p className="text-white/50 text-xs font-mono mt-1 w-full">{detail.id}</p>
             </div>
             <div className="flex items-center gap-2">
               <StatusBadge status={detail.status} />
@@ -146,19 +152,64 @@ export default function AdminArcopDetailPage() {
             </div>
           </div>
 
+          {detail.isThirdPartyRequest && (
+            <section className="mt-6 bg-orange-500/5 border border-orange-500/30 rounded-2xl p-5">
+              <h2 className="text-sm font-semibold uppercase text-orange-200/80 tracking-wider">
+                Solicitud por representante (Ley 21.719 art. 12)
+              </h2>
+              <dl className="mt-3 grid sm:grid-cols-2 gap-4 text-sm">
+                <Row label="Representante">{detail.thirdPartyName ?? '—'}</Row>
+                <Row label="Email del representante">{detail.thirdPartyEmail ?? '—'}</Row>
+                <Row label="RUT">{detail.thirdPartyIdNumber ?? '—'}</Row>
+                <Row label="Relación con el titular">
+                  {detail.thirdPartyRelationship
+                    ? ARCOP_RELATIONSHIP_LABELS[detail.thirdPartyRelationship]
+                    : '—'}
+                </Row>
+                <Row label="Titular (nombre)">{detail.targetName ?? '—'}</Row>
+                <Row label="Titular (email)">{detail.targetEmail ?? '—'}</Row>
+                <Row label="¿Tiene cuenta Apapacho?">
+                  {detail.user ? 'Sí — cuenta vinculada' : 'No — sin cuenta asociada'}
+                </Row>
+              </dl>
+              {detail.thirdPartyEvidenceSignedUrl && (
+                <div className="mt-4">
+                  <div className="text-xs uppercase text-orange-200/60 mb-1">
+                    Evidencia adjunta (URL firmada, 90d TTL)
+                  </div>
+                  <a
+                    href={detail.thirdPartyEvidenceSignedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 hover:bg-orange-500/30 text-orange-100 rounded-lg text-sm font-medium"
+                  >
+                    Ver documento ({detail.thirdPartyEvidenceFormat ?? 'archivo'})
+                  </a>
+                </div>
+              )}
+            </section>
+          )}
+
           <section className="mt-6 bg-white/5 border border-white/10 rounded-2xl p-5">
             <h2 className="text-sm font-semibold uppercase text-white/50 tracking-wider">
-              Datos del usuario
+              {detail.isThirdPartyRequest ? 'Cuenta del titular (si existe)' : 'Datos del usuario'}
             </h2>
-            <dl className="mt-3 grid sm:grid-cols-2 gap-4 text-sm">
-              <Row label="Nombre">{detail.user.displayName}</Row>
-              <Row label="Username">@{detail.user.username}</Row>
-              <Row label="Email">{detail.user.email}</Row>
-              <Row label="Cuenta creada">
-                {new Date(detail.user.createdAt).toLocaleDateString('es-CL')}
-              </Row>
-              <Row label="Es creador">{detail.user.isCreator ? 'Sí' : 'No'}</Row>
-            </dl>
+            {detail.user ? (
+              <dl className="mt-3 grid sm:grid-cols-2 gap-4 text-sm">
+                <Row label="Nombre">{detail.user.displayName}</Row>
+                <Row label="Username">@{detail.user.username}</Row>
+                <Row label="Email">{detail.user.email}</Row>
+                <Row label="Cuenta creada">
+                  {new Date(detail.user.createdAt).toLocaleDateString('es-CL')}
+                </Row>
+                <Row label="Es creador">{detail.user.isCreator ? 'Sí' : 'No'}</Row>
+              </dl>
+            ) : (
+              <p className="mt-3 text-sm text-white/60">
+                No se encontró una cuenta Apapacho asociada al email del titular. El operador debe
+                resolver manualmente la identidad y notificar al representante.
+              </p>
+            )}
           </section>
 
           <section className="mt-4 bg-white/5 border border-white/10 rounded-2xl p-5">

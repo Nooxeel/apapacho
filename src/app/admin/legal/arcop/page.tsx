@@ -127,14 +127,34 @@ function ArcopRow({ row }: { row: AdminArcopQueueRow }) {
     <tr className="border-b border-white/5 hover:bg-white/5">
       <td className="py-3 pr-4">
         <div>
-          <div className="font-medium">{row.user.displayName}</div>
-          <div className="text-xs text-white/50">@{row.user.username} · {row.user.email}</div>
+          {row.user ? (
+            <>
+              <div className="font-medium">{row.user.displayName}</div>
+              <div className="text-xs text-white/50">
+                @{row.user.username} · {row.user.email}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="font-medium text-orange-200">
+                {row.targetName ?? 'Titular sin cuenta'}
+              </div>
+              <div className="text-xs text-white/50">{row.targetEmail ?? '—'}</div>
+            </>
+          )}
         </div>
       </td>
       <td className="py-3 pr-4">
-        <span className="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-xs">
-          {ARCOP_TYPE_LABELS[row.type]}
-        </span>
+        <div className="flex flex-col gap-1">
+          <span className="px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-xs w-fit">
+            {ARCOP_TYPE_LABELS[row.type]}
+          </span>
+          {row.isThirdPartyRequest && (
+            <span className="px-2 py-0.5 rounded-md bg-orange-500/20 text-orange-200 text-[10px] w-fit font-medium">
+              Por tercero
+            </span>
+          )}
+        </div>
       </td>
       <td className="py-3 pr-4 text-white/70 text-xs">{requestedFmt}</td>
       <td className="py-3 pr-4 text-white/70 text-xs">{dueFmt}</td>

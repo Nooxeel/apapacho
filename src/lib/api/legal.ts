@@ -179,6 +179,136 @@ export async function listMyArcopRequests(
 }
 
 // ---------------------------------------------------------------------------
+// Profile pre-fill for /derechos form
+// ---------------------------------------------------------------------------
+
+export interface ArcopProfilePrefill {
+  id: string
+  email: string
+  username: string
+  displayName: string
+  isCreator: boolean
+  /** Year-only — backend strips month/day for data minimization. */
+  birthYear: number | null
+  ageVerified: boolean
+  accountCreatedAt: string
+}
+
+/**
+ * Fetch the narrow user payload used to pre-fill the ARCO-P form. Requires
+ * authentication; backend returns 404 if the user record disappeared.
+ */
+export async function getProfileForArcop(
+  token?: string,
+  signal?: AbortSignal
+): Promise<ArcopProfilePrefill> {
+  return api<ArcopProfilePrefill>('/users/me/profile-for-arcop', {
+    method: 'GET',
+    token,
+    signal,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Third-party ARCO-P (representative submits on behalf of data subject)
+// ---------------------------------------------------------------------------
+
+export type ArcopThirdPartyRelationship =
+  | 'legal_representative'
+  | 'parent'
+  | 'guardian'
+  | 'executor'
+  | 'other'
+
+export const ARCOP_RELATIONSHIP_LABELS: Record<ArcopThirdPartyRelationship, string> = {
+  legal_representative: 'Representante legal',
+  parent: 'Padre / Madre',
+  guardian: 'Tutor',
+  executor: 'Albacea / Ejecutor testamentario',
+  other: 'Otro',
+}
+
+export interface ArcopThirdPartyInput {
+  type: ArcopRightType
+  motive: string
+  targetEmail: string
+  targetName: string
+  thirdPartyName: string
+  thirdPartyEmail: string
+  thirdPartyIdNumber: string
+  thirdPartyRelationship: ArcopThirdPartyRelationship
+  evidenceFile: File
+  swornStatement: true
+}
+
+export interface ArcopThirdPartySubmitResponse {
+  requestId: string
+  type: ArcopRightType
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECTED'
+  dueBy: string
+}
+
+/**
+ * Submit an ARCO-P request as a representative (multipart/form-data, public
+ * endpoint, IP rate-limited). Validates the sworn statement client-side
+ * before sending.
+ */
+export async function submitThirdPartyArcopRequest(
+  input: ArcopThirdPartyInput,
+  signal?: AbortSignal
+): Promise<ArcopThirdPartySubmitResponse> {
+  if (input.swornStatement !== true) {
+    throw new Error('Debes aceptar la declaración jurada para enviar la solicitud.')
+  }
+
+  const formData = new FormData()
+  formData.append('type', input.type)
+  formData.append('motive', input.motive)
+  formData.append('targetEmail', input.targetEmail)
+  formData.append('targetName', input.targetName)
+  formData.append('thirdPartyName', input.thirdPartyName)
+  formData.append('thirdPartyEmail', input.thirdPartyEmail)
+  formData.append('thirdPartyIdNumber', input.thirdPartyIdNumber)
+  formData.append('thirdPartyRelationship', input.thirdPartyRelationship)
+  formData.append('swornStatement', 'true')
+  formData.append('evidenceFile', input.evidenceFile)
+
+  const apiUrl =
+    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL
+      ? process.env.NEXT_PUBLIC_API_URL
+      : 'http://localhost:3001/api'
+
+  const response = await fetch(`${apiUrl}/legal/arcop/third-party`, {
+    method: 'POST',
+    body: formData,
+    signal,
+    credentials: 'include',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  })
+
+  if (!response.ok) {
+    let errorMessage = 'Error al enviar la solicitud por tercero'
+    try {
+      const contentType = response.headers.get('content-type') ?? ''
+      if (contentType.includes('application/json')) {
+        const errorData = (await response.json()) as { error?: string; message?: string }
+        errorMessage = errorData.error ?? errorData.message ?? errorMessage
+      } else {
+        const text = await response.text()
+        if (text) errorMessage = text
+      }
+    } catch {
+      // fall through to default message
+    }
+    throw new Error(errorMessage)
+  }
+
+  return (await response.json()) as ArcopThirdPartySubmitResponse
+}
+
+// ---------------------------------------------------------------------------
 // DMCA (notificación de infracción de propiedad intelectual)
 // ---------------------------------------------------------------------------
 
@@ -265,7 +395,7 @@ export type AdminArcopStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECT
 
 export interface AdminArcopQueueRow {
   id: string
-  userId: string
+  userId: string | null
   type: ArcopRightType
   status: AdminArcopStatus
   motive: string | null
@@ -279,13 +409,25 @@ export interface AdminArcopQueueRow {
   attachmentExpiresAt: string | null
   hoursOverdue: number
   isOverdue: boolean
+  /**
+   * Third-party flag — when true the request was filed by a representative
+   * (legal representative, parent, guardian, executor) and the admin UI must
+   * surface the evidence URL + relationship before processing.
+   */
+  isThirdPartyRequest?: boolean
+  thirdPartyName?: string | null
+  thirdPartyEmail?: string | null
+  thirdPartyIdNumber?: string | null
+  thirdPartyRelationship?: ArcopThirdPartyRelationship | null
+  targetEmail?: string | null
+  targetName?: string | null
   user: {
     id: string
     username: string
     displayName: string
     email: string
     avatar: string | null
-  }
+  } | null
 }
 
 export interface AdminArcopQueueResponse {
@@ -300,10 +442,15 @@ export interface AdminArcopDetail extends AdminArcopQueueRow {
   ipAddress: string | null
   userAgent: string | null
   processedBy: string | null
-  user: AdminArcopQueueRow['user'] & {
-    createdAt: string
-    isCreator: boolean
-  }
+  /** Cloudinary signed URL for the third-party evidence file (90d TTL). */
+  thirdPartyEvidenceSignedUrl?: string | null
+  thirdPartyEvidenceFormat?: string | null
+  user:
+    | (NonNullable<AdminArcopQueueRow['user']> & {
+        createdAt: string
+        isCreator: boolean
+      })
+    | null
 }
 
 export async function getArcopQueue(
