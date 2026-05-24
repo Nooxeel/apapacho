@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { ArrowLeft, Shield } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import MfaSection from '@/components/security/MfaSection'
+import ActiveSessions from '@/components/security/ActiveSessions'
 
 export default function SecuritySettingsPage() {
   const router = useRouter()
@@ -55,6 +56,19 @@ export default function SecuritySettingsPage() {
             Autenticación de dos factores
           </h2>
           <MfaSection />
+        </section>
+
+        <section className="mt-10 space-y-4">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+              Sesiones activas
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Dispositivos donde tu cuenta está iniciada. Si ves una sesión que
+              no reconoces, ciérrala y cambia tu contraseña.
+            </p>
+          </div>
+          <ActiveSessions />
         </section>
 
         <section className="mt-8">
