@@ -8,6 +8,7 @@ import { Upload, X, Image as ImageIcon, Video, Loader2, AlertCircle } from 'luci
 import { API_URL } from '@/lib/config'
 import { VisibilitySelector } from './VisibilitySelector'
 import type { PostVisibility } from '@/types'
+import { useToast } from '@/hooks/useToast'
 
 interface MediaUploadProps {
   onSuccess?: (url: string) => void
@@ -17,6 +18,7 @@ interface MediaUploadProps {
 export function MediaUpload({ onSuccess, onCancel }: MediaUploadProps) {
   const router = useRouter()
   const { token, user } = useAuthStore()
+  const toast = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [title, setTitle] = useState('')
@@ -150,8 +152,9 @@ export function MediaUpload({ onSuccess, onCancel }: MediaUploadProps) {
       setUploadProgress(100)
 
       // Éxito
-      alert(`¡${fileType === 'video' ? 'Video' : 'Imagen'} subida exitosamente!`)
-      
+      toast.success(`¡${fileType === 'video' ? 'Video' : 'Imagen'} subida exitosamente!`)
+
+
       if (onSuccess) {
         onSuccess(mediaUrl)
       } else {

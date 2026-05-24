@@ -20,6 +20,7 @@ import {
 import { useAuthStore } from '@/stores/authStore'
 import { broadcastsApi, subscriptionsApi, BroadcastTarget, BroadcastStatus, Broadcast } from '@/lib/api'
 import { Navbar } from '@/components/layout/Navbar'
+import { useToast } from '@/hooks/useToast'
 
 const TARGET_OPTIONS: { value: BroadcastTarget; label: string; description: string; icon: any }[] = [
   { 
@@ -67,7 +68,8 @@ interface SubscriptionTier {
 export default function BroadcastsPage() {
   const router = useRouter()
   const { token, user, hasHydrated } = useAuthStore()
-  
+  const toast = useToast()
+
   // State
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([])
   const [loading, setLoading] = useState(true)
@@ -150,7 +152,7 @@ export default function BroadcastsPage() {
   const handleSend = async () => {
     if (!token || !content.trim()) return
     if (targetType === 'SPECIFIC_TIERS' && selectedTiers.length === 0) {
-      alert('Selecciona al menos un plan')
+      toast.warning('Selecciona al menos un plan')
       return
     }
 
@@ -172,10 +174,12 @@ export default function BroadcastsPage() {
       // Recargar lista
       fetchData()
 
-      alert(scheduledFor ? '✅ Mensaje programado correctamente' : '✅ Mensaje enviado correctamente')
+      toast.success(
+        scheduledFor ? 'Mensaje programado correctamente' : 'Mensaje enviado correctamente'
+      )
     } catch (error: any) {
       console.error('Error sending broadcast:', error)
-      alert(error.message || 'Error al enviar mensaje')
+      toast.error(error.message || 'Error al enviar mensaje')
     } finally {
       setSending(false)
     }
@@ -190,7 +194,7 @@ export default function BroadcastsPage() {
       await broadcastsApi.cancel(id, token)
       fetchData()
     } catch (error: any) {
-      alert(error.message || 'Error al cancelar')
+      toast.error(error.message || 'Error al cancelar')
     }
   }
 

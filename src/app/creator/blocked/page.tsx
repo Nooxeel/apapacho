@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Navbar } from '@/components/layout'
 import { useAuthStore } from '@/stores/authStore'
 import { blockApi, usersApi } from '@/lib/api'
+import { useToast } from '@/hooks/useToast'
 import { 
   Shield, 
   ShieldOff, 
@@ -42,6 +43,7 @@ interface BlockedUser {
 export default function BlockedUsersPage() {
   const router = useRouter()
   const { token, user, hasHydrated } = useAuthStore()
+  const toast = useToast()
   
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -111,7 +113,7 @@ export default function BlockedUsersPage() {
       setBlockedUsers(prev => prev.filter(b => b.user.id !== blockedUserId))
       setTotal(prev => prev - 1)
     } catch (err: any) {
-      alert(err.message || 'Error al desbloquear usuario')
+      toast.error(err.message || 'Error al desbloquear usuario')
     } finally {
       setUnblockingId(null)
     }
@@ -178,7 +180,7 @@ export default function BlockedUsersPage() {
       setSearchResults(prev => prev.filter(u => u.id !== userId))
       setBlockReason('')
     } catch (err: any) {
-      alert(err.message || 'Error al bloquear usuario')
+      toast.error(err.message || 'Error al bloquear usuario')
     } finally {
       setBlockingId(null)
     }

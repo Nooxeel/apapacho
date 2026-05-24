@@ -16,6 +16,8 @@ import CookieConsent from '@/components/ui/CookieConsent'
 // re-accept legal docs when a ConsentVersion bump renders their previous
 // acceptance stale. Self-contained — only renders when needed.
 import ConsentRefreshModal from '@/components/legal/ConsentRefreshModal'
+// Global accessible toast system — replaces native alert() across the app.
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 // Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font - only load weights actually used
@@ -383,14 +385,20 @@ export default async function RootLayout({
               about non-essential processing before any age gate. Both can
               coexist visually because the banner is fixed-bottom and the
               age modal is a centered overlay.
+
+              ToastProvider wraps the rest so any client component below can
+              dispatch toasts via the useToast() hook. The <Toaster /> renderer
+              lives inside the provider (fixed-positioned, outside scroll).
             */}
-            <CookieConsent />
-            <ConsentRefreshModal />
-            <AgeVerificationProvider>
-              <BadgeNotificationProvider>
-                {children}
-              </BadgeNotificationProvider>
-            </AgeVerificationProvider>
+            <ToastProvider>
+              <CookieConsent />
+              <ConsentRefreshModal />
+              <AgeVerificationProvider>
+                <BadgeNotificationProvider>
+                  {children}
+                </BadgeNotificationProvider>
+              </AgeVerificationProvider>
+            </ToastProvider>
           </FontProvider>
         </GoogleAuthProvider>
       </body>

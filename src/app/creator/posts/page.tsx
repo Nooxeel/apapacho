@@ -13,6 +13,7 @@ import { VisibilitySelector } from '@/components/profile/VisibilitySelector';
 import { sanitizeText } from '@/lib/sanitize';
 import type { PostVisibility } from '@/types';
 import Image from 'next/image';
+import { useToast } from '@/hooks/useToast';
 
 interface PostContent {
   type: 'text' | 'image' | 'video';
@@ -37,6 +38,7 @@ interface Post {
 export default function CreatorPostsPage() {
   const router = useRouter();
   const { token, hasHydrated, user } = useAuthStore();
+  const toast = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
@@ -109,7 +111,7 @@ export default function CreatorPostsPage() {
       }
     } catch (error) {
       console.error('Error updating post:', error);
-      alert('Error al actualizar el post');
+      toast.error('Error al actualizar el post');
     }
   };
 
@@ -129,7 +131,7 @@ export default function CreatorPostsPage() {
       }
     } catch (error) {
       console.error('Error deleting post:', error);
-      alert('Error al eliminar el post');
+      toast.error('Error al eliminar el post');
     }
   };
 

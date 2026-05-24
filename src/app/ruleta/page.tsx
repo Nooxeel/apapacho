@@ -9,6 +9,7 @@ import { RouletteWheel } from '@/components/roulette'
 import { useAuthStore } from '@/stores'
 import api from '@/lib/api'
 import { Sparkles, Gift, Zap, Trophy, Ticket } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 
 interface SpinResult {
   prizeId: number
@@ -29,6 +30,7 @@ interface SpinResult {
 export default function RouletaPage() {
   const router = useRouter()
   const { token, hasHydrated } = useAuthStore()
+  const toast = useToast()
   const [points, setPoints] = useState(0)
   const [loading, setLoading] = useState(true)
   const [specialPrizes, setSpecialPrizes] = useState<any[]>([])
@@ -107,9 +109,9 @@ export default function RouletaPage() {
         token,
       })
       loadPrizes()
-      alert('¡Premio reclamado exitosamente!')
+      toast.success('¡Premio reclamado exitosamente!')
     } catch (error: any) {
-      alert(error.message || 'Error al reclamar premio')
+      toast.error(error.message || 'Error al reclamar premio')
     }
   }
 

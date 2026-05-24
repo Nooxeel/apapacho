@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import { blockApi } from '@/lib/api'
 import { Shield, ShieldOff, Loader2 } from 'lucide-react'
+import { useToast } from '@/hooks/useToast'
 
 interface BlockUserButtonProps {
   userId: string
@@ -25,6 +26,7 @@ export default function BlockUserButton({
   className = ''
 }: BlockUserButtonProps) {
   const { token, user } = useAuthStore()
+  const toast = useToast()
   const [isBlocked, setIsBlocked] = useState(initialIsBlocked)
   const [isLoading, setIsLoading] = useState(false)
   const [showReasonModal, setShowReasonModal] = useState(false)
@@ -56,7 +58,7 @@ export default function BlockUserButton({
       setIsBlocked(false)
       onBlockChange?.(false)
     } catch (err: any) {
-      alert(err.message || 'Error al desbloquear usuario')
+      toast.error(err.message || 'Error al desbloquear usuario')
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +75,7 @@ export default function BlockUserButton({
       setReason('')
       onBlockChange?.(true)
     } catch (err: any) {
-      alert(err.message || 'Error al bloquear usuario')
+      toast.error(err.message || 'Error al bloquear usuario')
     } finally {
       setIsLoading(false)
     }

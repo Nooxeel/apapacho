@@ -151,8 +151,11 @@ export default function SettingsPage() {
       id: 'privacy' as const,
       icon: Shield,
       label: 'Privacidad',
-      description: 'Consentimientos, derechos y exportación de datos',
-      href: '/settings/privacy',
+      // Landing dashboard ("tu huella digital con Apapacho") — single page
+      // with stats, visibility buckets and quick actions. Granular toggles
+      // live one level deeper at /settings/privacy/preferences.
+      description: 'Tu huella digital, derechos y exportación de datos',
+      href: '/settings/privacy/overview',
     },
     {
       id: 'security' as const,

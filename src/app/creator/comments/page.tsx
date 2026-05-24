@@ -10,6 +10,7 @@ import { MessageCircle, Check, X, Trash2, Clock, CheckCircle } from 'lucide-reac
 import { API_URL } from '@/lib/config';
 import { sanitizeText } from '@/lib/sanitize';
 import Image from 'next/image';
+import { useToast } from '@/hooks/useToast';
 
 interface Comment {
   id: string;
@@ -27,6 +28,7 @@ interface Comment {
 export default function CreatorCommentsPage() {
   const router = useRouter();
   const { token, user, hasHydrated } = useAuthStore();
+  const toast = useToast();
   const [pendingComments, setPendingComments] = useState<Comment[]>([]);
   const [approvedComments, setApprovedComments] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
@@ -139,7 +141,7 @@ export default function CreatorCommentsPage() {
       }
     } catch (error) {
       console.error('Error al aprobar comentario:', error);
-      alert('Error al aprobar comentario');
+      toast.error('Error al aprobar comentario');
     }
   };
 
@@ -161,7 +163,7 @@ export default function CreatorCommentsPage() {
       }
     } catch (error) {
       console.error('Error al eliminar comentario:', error);
-      alert('Error al eliminar comentario');
+      toast.error('Error al eliminar comentario');
     }
   };
 

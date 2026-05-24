@@ -18,6 +18,7 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { useInView } from 'react-intersection-observer'
 import Image from 'next/image'
+import { useToast } from '@/hooks/useToast'
 
 interface Post {
   id: string
@@ -61,6 +62,7 @@ interface PostsFeedProps {
 export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'posts', onSubscribeClick, isSubscriber = false, isOwner = false, showPostTipping = true, creatorKycStatus }: PostsFeedProps) {
   const router = useRouter()
   const { user, token, isAuthenticated } = useAuthStore()
+  const toast = useToast()
   const { gateway, webpay, mercadoPago, fintoc } = usePayment()
   const { checkForNewBadges } = useBadgeNotification()
   const [posts, setPosts] = useState<Post[]>([])
@@ -189,7 +191,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
       if (!verifyResponse.ok) {
         const error = await verifyResponse.json()
-        alert(error.error || 'Error al verificar la compra')
+        toast.error(error.error || 'Error al verificar la compra')
         return
       }
 
@@ -215,7 +217,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
 
         if (!paymentResponse.ok) {
           const error = await paymentResponse.json()
-          alert(error.error || 'Error al iniciar el pago')
+          toast.error(error.error || 'Error al iniciar el pago')
           return
         }
 
@@ -236,7 +238,7 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
           return
         }
 
-        alert('Error: no se pudo obtener la URL de pago')
+        toast.error('No se pudo obtener la URL de pago')
         return
       }
 
@@ -244,11 +246,11 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       await loadPosts()
     } catch (error) {
       console.error('Error purchasing PPV content:', error)
-      alert('Error al procesar la compra')
+      toast.error('Error al procesar la compra')
     } finally {
       setPurchasingPost(prev => ({ ...prev, [postId]: false }))
     }
-  }, [token, user, router, loadPosts])
+  }, [token, user, router, loadPosts, toast])
 
   const handleLike = useCallback(async (postId: string) => {
     if (!token || !user) {
@@ -346,11 +348,11 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       setNewComment(prev => ({ ...prev, [postId]: '' }))
     } catch (error) {
       console.error('Error submitting comment:', error)
-      alert('Error al enviar el comentario')
+      toast.error('Error al enviar el comentario')
     } finally {
       setSubmittingComment(prev => ({ ...prev, [postId]: false }))
     }
-  }, [token, user, router, newComment])
+  }, [token, user, router, newComment, toast])
 
   const handleDeleteComment = useCallback(async (postId: string, commentId: string) => {
     if (!token || !user) return
@@ -374,9 +376,9 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
       ))
     } catch (error) {
       console.error('Error deleting comment:', error)
-      alert('Error al eliminar el comentario')
+      toast.error('Error al eliminar el comentario')
     }
-  }, [token, user])
+  }, [token, user, toast])
 
   const filteredPosts = useMemo(() => posts.filter(post => {
     if (filterType === 'posts') return true

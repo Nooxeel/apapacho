@@ -12,6 +12,7 @@ import { StreakDisplay, LevelDisplay, LevelBadge, AvatarWithProgress } from '@/c
 import { Navbar } from '@/components/layout';
 import { KycBanner } from '@/components/ui/KycBanner';
 import { sanitizeText } from '@/lib/sanitize';
+import { useToast } from '@/hooks/useToast';
 import {
   User,
   Heart,
@@ -140,6 +141,7 @@ interface MyComment {
 export default function DashboardPage() {
   const router = useRouter();
   const { user, token, logout, updateUser, hasHydrated } = useAuthStore();
+  const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [activeTab, setActiveTab] = useState<'subscriptions' | 'favorites' | 'payments' | 'comments' | 'rankings'>('favorites');
@@ -300,14 +302,16 @@ export default function DashboardPage() {
       setShowManageModal(false);
       setSelectedSubscription(null);
       
-      alert('✅ Suscripción cancelada. Mantendrás acceso hasta el fin del período pagado.');
-      
+      toast.success('Mantendrás acceso hasta el fin del período pagado.', {
+        title: 'Suscripción cancelada',
+      });
+
       // Recargar datos
       loadData();
-      
+
     } catch (error: any) {
       console.error('Error al cancelar suscripción:', error);
-      alert(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.');
+      toast.error(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.');
     } finally {
       setCancelling(false);
     }
@@ -315,13 +319,13 @@ export default function DashboardPage() {
 
   const handleDeleteComment = async (commentId: string) => {
     if (!confirm('¿Estás seguro de eliminar este comentario?')) return;
-    
+
     try {
       const response = await fetch(`${API_URL}/comments/${commentId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
+
       if (response.ok) {
         setComments(prev => prev.filter(c => c.id !== commentId));
         if (stats) {
@@ -330,7 +334,7 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error eliminando comentario:', error);
-      alert('Error al eliminar el comentario');
+      toast.error('Error al eliminar el comentario');
     }
   };
 

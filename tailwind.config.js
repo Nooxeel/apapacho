@@ -61,11 +61,18 @@ module.exports = {
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
+        // Toast slide-in: 200ms ease-out — gentle enough to not violate
+        // prefers-reduced-motion expectations (still visible at 0ms minimum).
+        'toast-in': 'toast-in 200ms cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        'toast-in': {
+          '0%': { opacity: '0', transform: 'translateX(16px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
       },
     },

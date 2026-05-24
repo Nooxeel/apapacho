@@ -19,6 +19,7 @@ import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
 import { usePayment } from '@/hooks/usePayment'
 import { GatewaySelector } from '@/components/payment/GatewaySelector'
+import { useToast } from '@/hooks/useToast'
 import {
   Heart,
   FileText,
@@ -150,6 +151,7 @@ export default function CreatorPublicProfile() {
   const router = useRouter()
   const username = params.username as string
   const { user, token } = useAuthStore()
+  const toast = useToast()
 
   const [creator, setCreator] = useState<CreatorProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -372,7 +374,7 @@ export default function CreatorPublicProfile() {
 
     const tier = profile.subscriptionTiers.find(t => t.id === tierId)
     if (!tier) {
-      alert('Plan no encontrado')
+      toast.error('Plan no encontrado')
       return
     }
 
@@ -431,7 +433,7 @@ export default function CreatorPublicProfile() {
 
     } catch (error: any) {
       console.error('Error al suscribirse:', error)
-      alert(error.message || 'Error al procesar el pago. Intenta de nuevo.')
+      toast.error(error.message || 'Error al procesar el pago. Intenta de nuevo.')
     } finally {
       setSubscribing(false)
     }
@@ -466,9 +468,11 @@ export default function CreatorPublicProfile() {
               month: 'long',
               year: 'numeric'
             })
-            alert(`✅ Suscripción cancelada. Mantendrás acceso hasta el ${formattedDate}.`)
+            toast.success(`Mantendrás acceso hasta el ${formattedDate}.`, {
+              title: 'Suscripción cancelada',
+            })
           } else {
-            alert('✅ Suscripción cancelada.')
+            toast.success('Suscripción cancelada.')
           }
         } catch (error) {
           console.error('Error checking subscription:', error)
@@ -477,7 +481,7 @@ export default function CreatorPublicProfile() {
 
     } catch (error: any) {
       console.error('Error al cancelar suscripción:', error)
-      alert(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.')
+      toast.error(error.message || 'Error al cancelar la suscripción. Intenta de nuevo.')
     } finally {
       setCancelling(false)
     }
@@ -521,11 +525,11 @@ export default function CreatorPublicProfile() {
         setShowChat(true)
       } else {
         console.error('Error creating conversation:', res.status)
-        alert('No se pudo iniciar la conversación. Intenta de nuevo.')
+        toast.error('No se pudo iniciar la conversación. Intenta de nuevo.')
       }
     } catch (error) {
       console.error('Error creating conversation:', error)
-      alert('Error de conexión. Verifica tu internet.')
+      toast.error('Error de conexión. Verifica tu internet.')
     }
   }
 

@@ -7,9 +7,11 @@ import { useAuthStore } from '@/stores'
 import { API_URL } from '@/lib/config'
 import { VisibilitySelector } from './VisibilitySelector'
 import type { PostVisibility } from '@/types'
+import { useToast } from '@/hooks/useToast'
 
 export function ImageUpload() {
   const { token, user } = useAuthStore()
+  const toast = useToast()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -57,13 +59,13 @@ export function ImageUpload() {
 
     // Validar tipo de archivo
     if (!file.type.startsWith('image/')) {
-      alert('Por favor selecciona un archivo de imagen válido')
+      toast.warning('Por favor selecciona un archivo de imagen válido')
       return
     }
 
     // Validar tamaño (50MB max)
     if (file.size > 50 * 1024 * 1024) {
-      alert('La imagen no puede superar los 50MB')
+      toast.warning('La imagen no puede superar los 50MB')
       return
     }
 
@@ -140,8 +142,8 @@ export function ImageUpload() {
         throw new Error('Failed to create post')
       }
 
-      alert('¡Imagen subida exitosamente!')
-      
+      toast.success('¡Imagen subida exitosamente!')
+
       // Reset form
       setSelectedFile(null)
       setPreview(null)
@@ -154,7 +156,7 @@ export function ImageUpload() {
 
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Error al subir la imagen')
+      toast.error('Error al subir la imagen')
     } finally {
       setUploading(false)
     }
