@@ -23,7 +23,14 @@ export class ApiError extends Error {
     public statusCode?: number,
     public endpoint?: string,
     public method?: string,
-    public details?: any
+    public details?: any,
+    /**
+     * Full parsed JSON body of the error response, when available. Callers
+     * that need response-specific fields (e.g. `lockedUntil` on 423,
+     * `captchaRequired` on 400/401) read them from here. Falls back to
+     * undefined for non-JSON errors. — Ola 6 P2.
+     */
+    public data?: any
   ) {
     super(message)
     this.name = 'ApiError'
@@ -104,6 +111,7 @@ export async function api<T>(endpoint: string, options: ApiOptions = {}): Promis
     if (!response.ok) {
       let errorMessage = 'API request failed'
       let errorDetails = undefined
+      let errorBody: any = undefined
 
       try {
         const contentType = response.headers.get('content-type')
@@ -114,6 +122,7 @@ export async function api<T>(endpoint: string, options: ApiOptions = {}): Promis
           console.log(`[API] Error data:`, errorData)
           errorMessage = errorData.error || errorData.message || errorMessage
           errorDetails = errorData.details
+          errorBody = errorData
         } else {
           const textResponse = await response.text()
           console.log(`[API] Error text response:`, textResponse.substring(0, 200))
@@ -123,7 +132,7 @@ export async function api<T>(endpoint: string, options: ApiOptions = {}): Promis
         console.error(`[API] Failed to parse error response:`, parseError)
       }
 
-      throw new ApiError(errorMessage, response.status, endpoint, method, errorDetails)
+      throw new ApiError(errorMessage, response.status, endpoint, method, errorDetails, errorBody)
     }
 
     return response.json()

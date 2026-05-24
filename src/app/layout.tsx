@@ -18,6 +18,13 @@ import CookieConsent from '@/components/ui/CookieConsent'
 import ConsentRefreshModal from '@/components/legal/ConsentRefreshModal'
 // Global accessible toast system — replaces native alert() across the app.
 import { ToastProvider } from '@/components/ui/ToastProvider'
+// Auth hardening (Ola 6 P2):
+//   - EmailVerificationBanner: renders an amber stripe when user.emailVerified
+//     is false; self-hidden on signed-out pages.
+//   - InactivityGuard: enforces user-configured auto-logout by inactivity.
+//   Both are self-gated — safe to mount unconditionally.
+import EmailVerificationBanner from '@/components/auth/EmailVerificationBanner'
+import InactivityGuard from '@/components/security/InactivityGuard'
 
 // Optimized: Only 2 essential fonts for performance
 // Inter: Primary UI font - only load weights actually used
@@ -393,6 +400,8 @@ export default async function RootLayout({
             <ToastProvider>
               <CookieConsent />
               <ConsentRefreshModal />
+              <EmailVerificationBanner />
+              <InactivityGuard />
               <AgeVerificationProvider>
                 <BadgeNotificationProvider>
                   {children}

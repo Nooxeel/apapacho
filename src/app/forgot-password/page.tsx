@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Loader2, CheckCircle } from 'lucide-react'
+import TurnstileWidget from '@/components/security/TurnstileWidget'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
@@ -11,6 +12,10 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState('')
+  // Cloudflare Turnstile token (Ola 6 P2). Widget renders nothing in dev
+  // when the sitekey is unset, and calls onVerify(null) once on mount —
+  // the backend graceful-passes so the form still submits locally.
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,12 +26,18 @@ export default function ForgotPasswordPage() {
       const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.toLowerCase() }),
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          turnstileToken,
+        }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
+        if (data?.error === 'CAPTCHA_FAILED') {
+          throw new Error('Verificación de seguridad fallida. Intenta nuevamente.')
+        }
         throw new Error(data.error || 'Error al enviar el email')
       }
 
@@ -113,9 +124,15 @@ export default function ForgotPasswordPage() {
               </div>
             )}
 
+            <TurnstileWidget onVerify={setTurnstileToken} action="forgot-password" />
+
             <button
               type="submit"
-              disabled={isLoading || !email}
+              disabled={
+                isLoading ||
+                !email ||
+                (!!process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY && !turnstileToken)
+              }
               className="w-full py-3 px-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
               {isLoading ? (

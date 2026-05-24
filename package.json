@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@fintoc/fintoc-js": "^1.1.2",
+    "@marsidev/react-turnstile": "^1.5.2",
     "@react-oauth/google": "^0.13.4",
     "@sentry/nextjs": "^10.53.1",
     "@tailwindcss/postcss": "^4.1.18",

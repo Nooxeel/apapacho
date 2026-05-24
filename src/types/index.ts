@@ -11,6 +11,10 @@ export interface User {
   role?: 'USER' | 'CREATOR' | 'SUPER_ADMIN'
   createdAt: Date
   updatedAt: Date
+  // Auth hardening (Ola 6 P2): drives the email-verification banner.
+  emailVerified?: boolean
+  // null/undefined = no auto-logout. Drives the useInactivityTimer hook.
+  inactivityTimeoutMinutes?: number | null
 }
 
 export interface Creator extends User {

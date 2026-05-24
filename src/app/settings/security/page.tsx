@@ -15,6 +15,7 @@ import { ArrowLeft, Shield } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import MfaSection from '@/components/security/MfaSection'
 import ActiveSessions from '@/components/security/ActiveSessions'
+import InactivityTimeoutSection from '@/components/security/InactivityTimeoutSection'
 
 export default function SecuritySettingsPage() {
   const router = useRouter()
@@ -69,6 +70,13 @@ export default function SecuritySettingsPage() {
             </p>
           </div>
           <ActiveSessions />
+        </section>
+
+        <section className="mt-10 space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+            Tiempo de inactividad
+          </h2>
+          <InactivityTimeoutSection />
         </section>
 
         <section className="mt-8">

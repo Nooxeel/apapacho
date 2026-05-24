@@ -7,10 +7,22 @@ import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
 import { authApi, missionsApi, mfaApi } from '@/lib/api'
 import { Button, Input, Card } from '@/components/ui'
 import { useAuthStore } from '@/stores/authStore'
-import { Eye, EyeOff, ShieldCheck } from 'lucide-react'
+import { Eye, EyeOff, ShieldCheck, Lock } from 'lucide-react'
+import TurnstileWidget from '@/components/security/TurnstileWidget'
 
 // Key for storing remembered credentials
 const REMEMBER_KEY = 'apapacho-remember-credentials'
+
+/**
+ * Format `MM:SS` for the lockout countdown banner.
+ * Caps at 99:59 to keep the layout stable for misconfigured long lockouts.
+ */
+function formatCountdown(totalSeconds: number): string {
+  const clamped = Math.min(Math.max(0, totalSeconds), 99 * 60 + 59)
+  const m = Math.floor(clamped / 60).toString().padStart(2, '0')
+  const s = (clamped % 60).toString().padStart(2, '0')
+  return `${m}:${s}`
+}
 
 function LoginContent() {
   const router = useRouter()
@@ -38,6 +50,43 @@ function LoginContent() {
     displayName: '',
     isCreator: true,
   })
+
+  // Cloudflare Turnstile (Ola 6 P2). Signup ALWAYS requires a token (when the
+  // sitekey env var is set). Login asks for one only after the backend signals
+  // captchaRequired, i.e. after CAPTCHA_LOGIN_THRESHOLD failed attempts.
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [loginCaptchaRequired, setLoginCaptchaRequired] = useState(false)
+
+  // Lockout (423) state — drives the countdown UI. Cleared on success / mode
+  // toggle. Time is rebased every render via setInterval below.
+  const [lockedUntil, setLockedUntil] = useState<Date | null>(null)
+  const [lockoutSecondsLeft, setLockoutSecondsLeft] = useState(0)
+
+  useEffect(() => {
+    if (!lockedUntil) return
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((lockedUntil.getTime() - Date.now()) / 1000))
+      setLockoutSecondsLeft(remaining)
+      if (remaining === 0) {
+        setLockedUntil(null)
+      }
+    }
+    tick()
+    const id = window.setInterval(tick, 1000)
+    return () => window.clearInterval(id)
+  }, [lockedUntil])
+
+  // If the user landed here via `?reason=inactivity`, surface a friendly note
+  // instead of the generic error stripe.
+  const [inactivityNotice, setInactivityNotice] = useState<string | null>(null)
+  useEffect(() => {
+    const reason = searchParams.get('reason')
+    if (reason === 'inactivity') {
+      setInactivityNotice(
+        'Tu sesión se cerró por inactividad. Ingresa de nuevo para continuar.'
+      )
+    }
+  }, [searchParams])
 
   // MFA challenge state (Ley 21.719 — Ola 4 P1.1). When the backend
   // signals requiresMfa we replace the password form with a TOTP/recovery
@@ -113,11 +162,25 @@ function LoginContent() {
       return
     }
 
+    // If the account is currently locked, short-circuit before hitting the API.
+    if (isLogin && lockedUntil && lockedUntil.getTime() > Date.now()) {
+      setError(
+        `Cuenta bloqueada temporalmente. Reintenta en ${Math.ceil(
+          (lockedUntil.getTime() - Date.now()) / 1000
+        )} segundos.`
+      )
+      setIsLoading(false)
+      return
+    }
+
     try {
       if (isLogin) {
         const result = await authApi.login({
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          // Only attach the token when the backend already told us it needs
+          // CAPTCHA. Sending an unused token is harmless but wasteful.
+          ...(loginCaptchaRequired ? { turnstileToken } : {}),
         }) as any
 
         // Handle remember me - only save email for convenience (NOT password)
@@ -169,6 +232,7 @@ function LoginContent() {
           isCreator: formData.isCreator,
           ...(referralCode ? { referralCode } : {}),
           ...(consentsPayload ? { consents: consentsPayload } : {}),
+          turnstileToken,
         }) as any
         
         console.log('[REGISTER] Registration successful:', result)
@@ -187,7 +251,37 @@ function LoginContent() {
       }
     } catch (err: any) {
       console.error('Auth error:', err)
-      
+
+      // Account lockout (423). Surfaces a clear message with countdown.
+      if (err?.statusCode === 423) {
+        const lockedUntilIso: string | undefined = err?.data?.lockedUntil
+        const retryAfter: number | undefined = err?.data?.retryAfterSeconds
+        if (lockedUntilIso) {
+          setLockedUntil(new Date(lockedUntilIso))
+        } else if (typeof retryAfter === 'number') {
+          setLockedUntil(new Date(Date.now() + retryAfter * 1000))
+        }
+        setError(
+          'Tu cuenta está bloqueada temporalmente por intentos fallidos. Intenta de nuevo en unos minutos o revisa tu email.'
+        )
+        setIsLoading(false)
+        return
+      }
+
+      // CAPTCHA required (400 CAPTCHA_FAILED with captchaRequired flag).
+      if (err?.message === 'CAPTCHA_FAILED' || err?.data?.captchaRequired) {
+        setLoginCaptchaRequired(true)
+        setTurnstileToken(null)
+        setError('Por seguridad, completa el CAPTCHA para continuar.')
+        setIsLoading(false)
+        return
+      }
+
+      // Backend hint: next login will require CAPTCHA.
+      if (err?.statusCode === 401 && err?.data?.captchaRequired) {
+        setLoginCaptchaRequired(true)
+      }
+
       const errors: Record<string, string> = {}
       let firstErrorField: string | null = null
       
@@ -373,6 +467,31 @@ function LoginContent() {
           {referralCode && !isLogin && !mfaChallengeToken && (
             <div className="bg-fuchsia-500/20 border border-fuchsia-500/50 rounded-lg p-3 text-fuchsia-300 text-sm mb-4 text-center">
               🎁 Código de referido aplicado: <strong>{referralCode}</strong>
+            </div>
+          )}
+
+          {/* Inactivity logout notice (?reason=inactivity) */}
+          {inactivityNotice && !error && (
+            <div className="bg-amber-500/15 border border-amber-500/40 rounded-lg p-3 text-amber-300 text-sm mb-4">
+              {inactivityNotice}
+            </div>
+          )}
+
+          {/* Account lockout countdown banner. Shown alongside the error stripe */}
+          {lockedUntil && lockoutSecondsLeft > 0 && (
+            <div
+              className="bg-red-500/15 border border-red-500/40 rounded-lg p-3 mb-4 flex items-start gap-2"
+              role="status"
+              aria-live="polite"
+            >
+              <Lock className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-red-300">
+                <p className="font-semibold mb-0.5">Cuenta bloqueada temporalmente</p>
+                <p className="text-red-300/80">
+                  Reintenta en <strong>{formatCountdown(lockoutSecondsLeft)}</strong>. Revisa
+                  tu email para más información.
+                </p>
+              </div>
             </div>
           )}
 
@@ -609,12 +728,39 @@ function LoginContent() {
               </>
             )}
 
+            {/*
+              Cloudflare Turnstile (Ola 6 P2). Always rendered on signup;
+              rendered on login only after the backend says CAPTCHA is
+              required (i.e. after a few failed attempts). The widget itself
+              degrades to nothing when NEXT_PUBLIC_TURNSTILE_SITEKEY is unset,
+              so local dev is unaffected.
+            */}
+            {(!isLogin || loginCaptchaRequired) && (
+              <TurnstileWidget
+                onVerify={setTurnstileToken}
+                action={isLogin ? 'login' : 'register'}
+              />
+            )}
+
             <Button
               type="submit"
               variant="primary"
               className="w-full"
               isLoading={isLoading}
-              disabled={!isLogin && !consents.service}
+              disabled={
+                (!isLogin && !consents.service) ||
+                (isLogin && !!lockedUntil && lockoutSecondsLeft > 0) ||
+                // When CAPTCHA is required but the user hasn't completed the
+                // widget yet, gate the button. If the sitekey is unset the
+                // widget itself short-circuits and onVerify(null) is called,
+                // so the button stays enabled in dev.
+                (loginCaptchaRequired &&
+                  !!process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY &&
+                  !turnstileToken) ||
+                (!isLogin &&
+                  !!process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY &&
+                  !turnstileToken)
+              }
             >
               {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
             </Button>
