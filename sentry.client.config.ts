@@ -9,8 +9,15 @@
  *     agresivo: maskAllText + blockAllMedia).
  */
 import * as Sentry from '@sentry/nextjs'
+import { isDntEnabled } from './src/lib/dnt'
 
 const DSN = process.env.NEXT_PUBLIC_SENTRY_DSN
+
+// DNT (Do Not Track) — Ley 21.719 hardening.
+// Resolve once at init. We still capture errors (essential to operate the
+// service safely), but turn off session replay — that IS behavioral tracking
+// because it records DOM mutations + interactions over time.
+const DNT_ON = isDntEnabled()
 
 const SENSITIVE_KEY_PATTERNS = [
   /password/i,
@@ -61,9 +68,11 @@ Sentry.init({
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
   // Replays: 1% sesiones, 100% si hay error. Estricto masking porque el
   // contenido del usuario es adulto y sensible (Ley 21.719 dato sensible
-  // "vida sexual").
-  replaysSessionSampleRate: 0.01,
-  replaysOnErrorSampleRate: 1.0,
+  // "vida sexual"). DNT: cuando el navegador opta por no ser rastreado
+  // forzamos AMBAS sample rates a 0 — error reporting (mensajes + stacks)
+  // sigue funcionando, pero NO grabamos sesión.
+  replaysSessionSampleRate: DNT_ON ? 0 : 0.01,
+  replaysOnErrorSampleRate: DNT_ON ? 0 : 1.0,
   integrations: [
     Sentry.replayIntegration({
       maskAllText: true,

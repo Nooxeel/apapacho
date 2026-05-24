@@ -46,12 +46,25 @@ function buildCsp(nonce: string): string {
     .filter(Boolean)
     .join(' ')
 
-  // NOTE on style-src: Tailwind v4 / Next.js 15 still emit runtime inline
-  // styles (e.g. styled-jsx, some third-party widgets) that cannot be nonce'd
-  // reliably today. We keep 'unsafe-inline' for style-src only — this is a
-  // recognized trade-off that still materially improves XSS posture because
-  // script execution is the actual exploitation vector. Revisit once Next
-  // supports nonce'd inline CSS end-to-end.
+  // NOTE on style-src — documented trade-off (Ley 21.719 hardening review).
+  //
+  // We KEEP `'unsafe-inline'` on style-src and use nonces ONLY on script-src.
+  // Rationale:
+  //   1. Tailwind v4 + Next.js 15 still emit inline <style> tags (styled-jsx
+  //      runtime, optimizeCss, and third-party widgets such as Transbank /
+  //      MercadoPago iframes pull in inline CSS we cannot nonce).
+  //   2. Next.js auto-injects the nonce into its OWN scripts when it reads
+  //      the x-nonce request header, but there is no equivalent end-to-end
+  //      story for emitted CSS at the time of writing.
+  //   3. CSS injection is NOT a code-execution vector — it can cause minor
+  //      data exfiltration (CSS attribute selectors + background-image leaks)
+  //      but cannot run JavaScript. The XSS posture is dominated by
+  //      script-src, which IS nonce'd + 'strict-dynamic' here.
+  //
+  // Revisit when:
+  //   - Next.js ships native nonce propagation for inline CSS (track:
+  //     https://github.com/vercel/next.js/discussions/54907)
+  //   - OR we move all inline CSS into static stylesheet files.
   const scriptSrc = isDev
     ? `'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' https://www.youtube.com https://www.googletagmanager.com https://accounts.google.com`
     : `'self' 'nonce-${nonce}' 'strict-dynamic' https://www.youtube.com https://www.googletagmanager.com https://accounts.google.com`
