@@ -12,6 +12,7 @@ import { MusicPlayer, Comments, FavoriteButton, PostsFeed } from '@/components/p
 import { ProfileFontsLoader } from '@/components/profile/ProfileFontsLoader'
 import { Navbar } from '@/components/layout'
 import SocialLinksDisplay from '@/components/social/SocialLinksDisplay'
+import { ReportButton } from '@/components/social/ReportButton'
 import { useAuthStore } from '@/stores/authStore'
 import { socketService } from '@/lib/socket'
 import { API_URL } from '@/lib/config'
@@ -675,6 +676,18 @@ export default function CreatorPublicProfile() {
                 <button className="p-3 rounded-full border border-gray-600 hover:bg-white/5 transition-colors">
                   <Share2 className="w-5 h-5" />
                 </button>
+
+                {/* Botón de reportar — solo visible cuando no eres el dueño */}
+                {!isOwner && (
+                  <ReportButton
+                    targetType="CREATOR"
+                    targetId={profile.id}
+                    targetUserId={creator.id}
+                    variant="button"
+                    label="Reportar"
+                    className="p-3 rounded-full border border-gray-600 text-white/60 hover:text-red-400 hover:border-red-400/40 transition-colors"
+                  />
+                )}
               </div>
 
               {/* Stats */}

@@ -90,6 +90,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               Legal
             </Link>
+            <Link
+              href="/admin/reports"
+              className="text-sm text-white/70 hover:text-white"
+            >
+              Reportes
+            </Link>
           </div>
         </div>
       </nav>

@@ -27,6 +27,16 @@ export default function AdminIndexPage() {
             Solicitudes ARCO-P (15 días), DMCA (7 días) y brechas (Ley 21.719).
           </p>
         </Link>
+        <Link
+          href="/admin/reports"
+          className="block bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-6 transition"
+        >
+          <h2 className="text-lg font-semibold">Reportes de moderación</h2>
+          <p className="text-sm text-white/60 mt-1">
+            Reportes de contenido y usuarios. CSAM y sospecha de menores se
+            auto-escalan a la cola de incidentes.
+          </p>
+        </Link>
       </div>
     </div>
   )

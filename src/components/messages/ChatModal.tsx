@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { X, Minimize2, Send, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { messageApi } from '@/lib/api'
+import { ReportButton } from '@/components/social/ReportButton'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import type { Message, User } from '@/types'
@@ -198,7 +199,7 @@ export default function ChatModal({ conversationId, otherUser, onClose }: ChatMo
           return (
             <div
               key={message.id}
-              className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+              className={`group flex ${isOwn ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`max-w-[75%] ${isOwn ? 'order-2' : 'order-1'}`}>
                 <div
@@ -212,9 +213,21 @@ export default function ChatModal({ conversationId, otherUser, onClose }: ChatMo
                     {message.content}
                   </p>
                 </div>
-                <p className={`text-xs text-gray-500 mt-1 ${isOwn ? 'text-right' : 'text-left'}`}>
-                  {format(messageDate, "d 'de' MMMM 'a las' HH:mm", { locale: es })}
-                </p>
+                <div className={`flex items-center gap-2 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                  <p className="text-xs text-gray-500">
+                    {format(messageDate, "d 'de' MMMM 'a las' HH:mm", { locale: es })}
+                  </p>
+                  {!isOwn && (
+                    <ReportButton
+                      targetType="MESSAGE"
+                      targetId={message.id}
+                      targetUserId={message.sender.id}
+                      variant="icon"
+                      label="Reportar mensaje"
+                      className="opacity-0 group-hover:opacity-100 sm:focus:opacity-100 p-1 text-white/30 hover:text-red-400 transition-all"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           )

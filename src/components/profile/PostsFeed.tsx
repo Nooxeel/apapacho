@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState, useCallback, useMemo, memo } from 'react'
-import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2, Loader2 } from 'lucide-react'
+import { Video, Heart, MessageCircle, DollarSign, Lock, Globe, Star, LogIn, Send, Trash2, Loader2, MoreHorizontal } from 'lucide-react'
 import { Button, ProtectedMedia } from '@/components/ui'
+import { ReportButton } from '@/components/social/ReportButton'
 import { API_URL } from '@/lib/config'
 import { useAuthStore } from '@/stores'
 import { postApi, missionsApi } from '@/lib/api'
@@ -470,13 +471,19 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                         {formatDate(post.createdAt)}
                       </p>
                     </div>
-                    {/* Mostrar badge siempre para PPV, o cuando no es público */}
-                    {(post.visibility === 'ppv' || post.visibility !== 'public') && (
-                      <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${visibilityBadge.color}`}>
-                        <VisibilityIcon className="w-4 h-4" />
-                        <span className="text-xs font-medium">{visibilityBadge.label}</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {/* Mostrar badge siempre para PPV, o cuando no es público */}
+                      {(post.visibility === 'ppv' || post.visibility !== 'public') && (
+                        <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 ${visibilityBadge.color}`}>
+                          <VisibilityIcon className="w-4 h-4" />
+                          <span className="text-xs font-medium">{visibilityBadge.label}</span>
+                        </div>
+                      )}
+                      {/* Menú de acciones (reportar) — solo si no es el dueño del perfil. */}
+                      {!isOwner && (
+                        <PostActionsMenu postId={post.id} creatorUserId={creatorId} />
+                      )}
+                    </div>
                   </div>
                   {post.description && (
                     <p className="text-white/70 text-sm mt-3 leading-relaxed">
@@ -787,6 +794,15 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
                                       Eliminar
                                     </button>
                                   )}
+                                  {!canDelete && user?.id !== comment.userId && (
+                                    <ReportButton
+                                      targetType="COMMENT"
+                                      targetId={comment.id}
+                                      targetUserId={comment.userId}
+                                      variant="icon"
+                                      label="Reportar comentario"
+                                    />
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -816,6 +832,50 @@ export function PostsFeed({ creatorId, accentColor = '#d946ef', filterType = 'po
               <p className="text-white/40 text-sm">Has visto todos los posts</p>
             </div>
           )}
+        </>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Per-post "more actions" menu. Currently only exposes a Report shortcut —
+ * extracted so we can add Save / Share later without re-touching the feed.
+ *
+ * `creatorUserId` is the Creator.id of the post's owner — used by ReportButton
+ * to hide the button when the viewer is the owner. Backend re-validates.
+ */
+function PostActionsMenu({ postId, creatorUserId }: { postId: string; creatorUserId: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Más acciones"
+        className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        <MoreHorizontal className="w-5 h-5" />
+      </button>
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            aria-hidden="true"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            role="menu"
+            className="absolute right-0 top-full mt-1 z-20 w-48 bg-zinc-900 border border-white/10 rounded-lg shadow-xl overflow-hidden"
+          >
+            <ReportButton
+              targetType="POST"
+              targetId={postId}
+              targetUserId={creatorUserId}
+              variant="menu-item"
+              label="Reportar publicación"
+            />
+          </div>
         </>
       )}
     </div>

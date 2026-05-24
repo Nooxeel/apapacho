@@ -17,6 +17,7 @@ export * from './consents'
 export * from './legal'
 export * from './recommendations'
 export * from './mfa'
+export * from './reports'
 
 // Default export: the api function
 export { default } from './client'

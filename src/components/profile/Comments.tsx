@@ -6,7 +6,12 @@ import { API_URL } from '@/lib/config';
 import { sanitizeText } from '@/lib/sanitize';
 import { missionsApi } from '@/lib/api';
 import { LevelBadge, useBadgeNotification } from '@/components/gamification';
+import { ReportButton } from '@/components/social/ReportButton';
 import Image from 'next/image';
+// Note: the guestbook `Comment` model is distinct from `PostComment`. Reporting
+// here surfaces the comment AUTHOR as a USER report so the moderation queue
+// captures repeat offenders even when individual comments are deleted by the
+// creator who owns the guestbook.
 
 interface CommentUser {
   id: string;
@@ -350,6 +355,16 @@ function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: Comme
                 >
                   ✕
                 </button>
+              )}
+              {user && user.id !== comment.userId && !isOwner && (
+                <ReportButton
+                  targetType="USER"
+                  targetId={comment.userId}
+                  targetUserId={comment.userId}
+                  variant="icon"
+                  label="Reportar autor del comentario"
+                  className="opacity-0 group-hover:opacity-100 p-1 text-white/40 hover:text-red-400 transition-all"
+                />
               )}
             </div>
           ))}
