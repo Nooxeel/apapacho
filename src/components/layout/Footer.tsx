@@ -4,9 +4,9 @@ export function Footer() {
   return (
     <footer className="border-t border-white/10 bg-black/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
-          <div className="col-span-1 md:col-span-1">
+          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
                 <span className="text-white font-bold text-xl">A</span>
@@ -77,6 +77,33 @@ export function Footer() {
               <li>
                 <Link href="/guidelines" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
                   Guías de Comunidad
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Empresa */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Empresa</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/empresa" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Sobre nosotros
+                </Link>
+              </li>
+              <li>
+                <Link href="/transparencia" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Transparencia
+                </Link>
+              </li>
+              <li>
+                <Link href="/seguridad" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Seguridad
+                </Link>
+              </li>
+              <li>
+                <Link href="/security/disclosure" className="text-white/70 hover:text-white text-sm transition-colors underline decoration-white/30 hover:decoration-white">
+                  Reporte de vulnerabilidades
                 </Link>
               </li>
             </ul>
