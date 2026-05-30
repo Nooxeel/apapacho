@@ -1,6 +1,6 @@
 {
   "name": "apapacho",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Plataforma para creadores de contenido con personalización estilo MySpace",
   "scripts": {
     "dev": "next dev",
