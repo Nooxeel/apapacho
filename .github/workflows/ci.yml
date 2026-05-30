@@ -25,5 +25,24 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
+      - name: Test
+        run: npm run test
+
       - name: Build
         run: npm run build
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret scanning
+        # SEC-F-002: fijado por tag específico en lugar del tag móvil @v2.
+        # Preferible fijar por SHA completo de 40 chars; se usa tag semántico como
+        # alternativa segura hasta que se pueda resolver el SHA en el entorno de CI.
+        # Para obtener el SHA: git ls-remote https://github.com/gitleaks/gitleaks-action refs/tags/v2.3.9
+        uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
