@@ -82,7 +82,10 @@ type ActiveTab = 'new' | 'history' | 'third-party'
 // ---------------------------------------------------------------------------
 
 export default function DerechosPage() {
-  const { user, token, isAuthenticated, hasHydrated } = useAuthStore()
+  const { user, token, isAuthenticated, hasHydrated, sessionChecked } = useAuthStore()
+  // Combinar hasHydrated + sessionChecked para que la carga de datos y los
+  // ajustes de pestaña no se disparen antes de que la cookie sea verificada.
+  const authReady = hasHydrated && sessionChecked
   const [activeTab, setActiveTab] = useState<ActiveTab>('new')
 
   // Pre-fill profile data for the personal form
@@ -125,7 +128,7 @@ export default function DerechosPage() {
   }, [isAuthenticated, token])
 
   useEffect(() => {
-    if (!hasHydrated) return
+    if (!authReady) return
     if (isAuthenticated) {
       loadPreviousRequests()
       loadProfilePrefill()
@@ -133,15 +136,15 @@ export default function DerechosPage() {
       setProfilePrefill(null)
       setPreviousRequests([])
     }
-  }, [hasHydrated, isAuthenticated, loadPreviousRequests, loadProfilePrefill])
+  }, [authReady, isAuthenticated, loadPreviousRequests, loadProfilePrefill])
 
   // When the user is not authenticated, default to the third-party tab since
   // the personal tab requires login.
   useEffect(() => {
-    if (hasHydrated && !isAuthenticated && activeTab === 'history') {
+    if (authReady && !isAuthenticated && activeTab === 'history') {
       setActiveTab('third-party')
     }
-  }, [hasHydrated, isAuthenticated, activeTab])
+  }, [authReady, isAuthenticated, activeTab])
 
   return (
     <div className="min-h-screen bg-[#0f0f14] py-12 px-4">

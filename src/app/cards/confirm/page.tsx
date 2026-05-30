@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle, XCircle, Loader2, CreditCard, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import api from '@/lib/api'
 import Link from 'next/link'
 
@@ -24,20 +25,16 @@ interface ConfirmResponse {
 function ConfirmCardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { token, hasHydrated } = useAuthStore()
+  const { token } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   
   const [state, setState] = useState<ConfirmationState>('loading')
   const [card, setCard] = useState<CardInfo | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   
   useEffect(() => {
-    if (!hasHydrated) return
-    
-    if (!token) {
-      router.push('/login')
-      return
-    }
-    
+    if (authLoading) return
+
     // Get token from URL (TBK_TOKEN from Transbank)
     const tbkToken = searchParams.get('TBK_TOKEN') || searchParams.get('token_ws')
     
@@ -48,7 +45,7 @@ function ConfirmCardContent() {
     }
     
     confirmInscription(tbkToken)
-  }, [hasHydrated, token, searchParams, router])
+  }, [authLoading, searchParams])
   
   const confirmInscription = async (tbkToken: string) => {
     if (!token) return
@@ -73,7 +70,7 @@ function ConfirmCardContent() {
     }
   }
   
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-pink-500" />

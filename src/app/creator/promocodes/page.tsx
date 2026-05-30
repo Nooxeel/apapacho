@@ -21,6 +21,7 @@ import {
   X
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { promocodesApi } from '@/lib/api'
 import { Navbar } from '@/components/layout/Navbar'
 
@@ -260,7 +261,8 @@ function CreatePromocodeModal({ isOpen, onClose, onCreated, token }: CreateModal
 
 export default function PromocodesPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
   const [promocodes, setPromocodes] = useState<Promocode[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'active' | 'expired'>('all')
@@ -269,13 +271,6 @@ export default function PromocodesPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
   const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 0 })
 
-  // Proteger ruta
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!token || !user?.isCreator) {
-      router.push('/login')
-    }
-  }, [token, user, hasHydrated, router])
 
   const fetchPromocodes = useCallback(async () => {
     if (!token) return
@@ -352,7 +347,7 @@ export default function PromocodesPage() {
     search ? p.code.toLowerCase().includes(search.toLowerCase()) : true
   )
 
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>

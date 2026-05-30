@@ -26,13 +26,15 @@ import {
   Loader2,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { mfaApi } from '@/lib/api/mfa'
 
 type Step = 1 | 2 | 3 | 4
 
 export default function MfaSetupPage() {
   const router = useRouter()
-  const { hasHydrated, user } = useAuthStore()
+  const { user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ redirectTo: '/login?redirect=/settings/security/mfa/setup' })
   const [step, setStep] = useState<Step>(1)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -50,13 +52,7 @@ export default function MfaSetupPage() {
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([])
   const [acknowledgedSaved, setAcknowledgedSaved] = useState(false)
 
-  // Redirect guard
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!user) {
-      router.replace('/login?redirect=/settings/security/mfa/setup')
-    }
-  }, [hasHydrated, user, router])
+
 
   // Bootstrap enrollment on mount.
   useEffect(() => {
@@ -80,11 +76,11 @@ export default function MfaSetupPage() {
         if (!cancelled) setLoading(false)
       }
     }
-    if (hasHydrated && user) setup()
+    if (!authLoading && user) setup()
     return () => {
       cancelled = true
     }
-  }, [hasHydrated, user])
+  }, [authLoading, user])
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -137,7 +133,7 @@ export default function MfaSetupPage() {
     URL.revokeObjectURL(url)
   }
 
-  if (!hasHydrated) return null
+  if (authLoading) return null
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

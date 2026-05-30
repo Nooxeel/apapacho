@@ -1,25 +1,16 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { Navbar, Footer } from '@/components/layout'
 import { ImageUpload } from '@/components/profile'
-import { useAuthStore } from '@/stores'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 
 export default function UploadImagePage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
 
-  useEffect(() => {
-    if (!hasHydrated) return
-    
-    if (!token || !user?.isCreator) {
-      router.push('/login')
-    }
-  }, [token, user, hasHydrated, router])
-
-  if (!hasHydrated || !token || !user?.isCreator) {
+  if (authLoading) {
     return null
   }
 

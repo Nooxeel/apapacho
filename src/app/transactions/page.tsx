@@ -24,6 +24,7 @@ import {
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import api from '@/lib/api'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -149,7 +150,8 @@ function formatCurrency(amount: number, currency: string = 'CLP'): string {
 
 export default function TransactionsPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [summary, setSummary] = useState<TransactionSummary | null>(null)
@@ -209,13 +211,6 @@ export default function TransactionsPage() {
     }
   }, [token, period])
 
-  // Auth check
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-    }
-  }, [token, hasHydrated, router])
 
   // Fetch data
   useEffect(() => {
@@ -225,7 +220,7 @@ export default function TransactionsPage() {
     }
   }, [token, filter, period])
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-fuchsia-500" />

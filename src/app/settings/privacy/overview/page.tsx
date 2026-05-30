@@ -45,6 +45,7 @@ import {
   X,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { usersApi, type PrivacySummaryStats } from '@/lib/api/users'
 import { consentsApi, type ConsentHistoryEntry, type ConsentPurpose } from '@/lib/api/consents'
 import { requestDataExport } from '@/lib/api/legal'
@@ -96,7 +97,8 @@ function formatDateTime(value: string | null | undefined): string {
 
 export default function PrivacyOverviewPage() {
   const router = useRouter()
-  const { token, hasHydrated, user } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ redirectTo: '/login?redirect=/settings/privacy/overview' })
   const toast = useToast()
 
   const [loading, setLoading] = useState(true)
@@ -109,13 +111,9 @@ export default function PrivacyOverviewPage() {
 
   const [exporting, setExporting] = useState(false)
 
-  // Auth guard + initial data load — runs once auth state is hydrated.
+  // Carga inicial de datos — espera a que la verificación de sesión resuelva.
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login?redirect=/settings/privacy/overview')
-      return
-    }
+    if (authLoading) return
 
     let cancelled = false
 
@@ -138,7 +136,7 @@ export default function PrivacyOverviewPage() {
     return () => {
       cancelled = true
     }
-  }, [hasHydrated, token, router])
+  }, [authLoading, token])
 
   const isCreator = !!user?.isCreator
   const memberSince = stats?.memberSince ?? (user as any)?.createdAt ?? null
@@ -207,7 +205,7 @@ export default function PrivacyOverviewPage() {
     }
   }
 
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-pink-500" aria-label="Cargando" />

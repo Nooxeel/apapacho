@@ -9,28 +9,25 @@
  * más estricto: password + sesión activa con MFA ya verificada en login.
  */
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ShieldOff, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { mfaApi } from '@/lib/api/mfa'
 
 export default function MfaDisablePage() {
   const router = useRouter()
-  const { hasHydrated, user } = useAuthStore()
+  const { user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ redirectTo: '/login?redirect=/settings/security/mfa/disable' })
 
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
 
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!user) {
-      router.replace('/login?redirect=/settings/security/mfa/disable')
-    }
-  }, [hasHydrated, user, router])
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,7 +49,7 @@ export default function MfaDisablePage() {
     }
   }
 
-  if (!hasHydrated) return null
+  if (authLoading) return null
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

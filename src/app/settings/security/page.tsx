@@ -13,22 +13,17 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Shield } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import MfaSection from '@/components/security/MfaSection'
 import ActiveSessions from '@/components/security/ActiveSessions'
 import InactivityTimeoutSection from '@/components/security/InactivityTimeoutSection'
 
 export default function SecuritySettingsPage() {
   const router = useRouter()
-  const { token, hasHydrated, user } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ redirectTo: '/login?redirect=/settings/security' })
 
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!token && !user) {
-      router.replace('/login?redirect=/settings/security')
-    }
-  }, [hasHydrated, token, user, router])
-
-  if (!hasHydrated) return null
+  if (authLoading) return null
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

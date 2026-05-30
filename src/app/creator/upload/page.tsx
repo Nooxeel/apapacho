@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { Navbar, Footer } from '@/components/layout'
 import { MediaUpload } from '@/components/profile/MediaUpload'
 import { ArrowLeft } from 'lucide-react'
@@ -10,17 +9,10 @@ import Link from 'next/link'
 
 export default function UploadPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
 
-  useEffect(() => {
-    if (!hasHydrated) return
-    
-    if (!token || !user?.isCreator) {
-      router.push('/login')
-    }
-  }, [token, user, hasHydrated, router])
 
-  if (!hasHydrated || !token || !user?.isCreator) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

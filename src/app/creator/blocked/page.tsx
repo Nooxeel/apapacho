@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Navbar } from '@/components/layout'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { blockApi, usersApi } from '@/lib/api'
 import { useToast } from '@/hooks/useToast'
 import { 
@@ -42,7 +43,8 @@ interface BlockedUser {
 
 export default function BlockedUsersPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
   const toast = useToast()
   
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([])
@@ -63,18 +65,9 @@ export default function BlockedUsersPage() {
   const [blockReason, setBlockReason] = useState('')
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-      return
-    }
-    if (!user?.isCreator) {
-      // Redirect non-creators to their profile or home
-      router.push('/profile')
-      return
-    }
+    if (authLoading) return
     loadBlockedUsers()
-  }, [hasHydrated, token, user, page, router])
+  }, [authLoading, page])
 
   const loadBlockedUsers = async () => {
     if (!token || !user?.isCreator) return
@@ -200,7 +193,7 @@ export default function BlockedUsersPage() {
     })
   }
 
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-fuchsia-500" />

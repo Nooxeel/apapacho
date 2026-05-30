@@ -17,6 +17,7 @@ import {
   Download
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import SavedCardsList from '@/components/cards/SavedCardsList'
 import api from '@/lib/api'
 
@@ -36,7 +37,8 @@ interface DeletionCheck {
 
 export default function SettingsPage() {
   const router = useRouter()
-  const { token, hasHydrated, logout, user } = useAuthStore()
+  const { token, logout, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   const [activeSection, setActiveSection] = useState<SettingsSection>('cards')
   
   // Account deletion state
@@ -48,12 +50,6 @@ export default function SettingsPage() {
   const [deleteError, setDeleteError] = useState('')
   const [deleting, setDeleting] = useState(false)
   
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-    }
-  }, [hasHydrated, token, router])
   
   // Check deletion eligibility when account section is opened
   useEffect(() => {
@@ -118,7 +114,7 @@ export default function SettingsPage() {
     router.push('/login')
   }
   
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-pink-500" />

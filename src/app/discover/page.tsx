@@ -36,7 +36,8 @@ interface Creator {
 
 export default function DiscoverPage() {
   const router = useRouter()
-  const { user, token, hasHydrated } = useAuthStore()
+  const { user, token, hasHydrated, sessionChecked } = useAuthStore()
+  const authReady = hasHydrated && sessionChecked
   const [creators, setCreators] = useState<Creator[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -49,10 +50,10 @@ export default function DiscoverPage() {
   }, [])
 
   useEffect(() => {
-    if (!hasHydrated) return
+    if (!authReady) return
     loadCreators()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasHydrated, selectedInterests, showRecommended, token])
+  }, [authReady, selectedInterests, showRecommended, token])
 
   const loadInterests = async () => {
     try {

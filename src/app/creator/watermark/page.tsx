@@ -18,6 +18,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { watermarkApi, WatermarkSettings } from '@/lib/api'
 import { Navbar } from '@/components/layout/Navbar'
 
@@ -37,7 +38,8 @@ const SIZE_OPTIONS: { value: WatermarkSettings['size']; label: string }[] = [
 
 export default function WatermarkPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -55,13 +57,6 @@ export default function WatermarkPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [loadingPreview, setLoadingPreview] = useState(false)
 
-  // Proteger ruta
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!token || !user?.isCreator) {
-      router.push('/login')
-    }
-  }, [token, user, hasHydrated, router])
 
   // Cargar settings
   useEffect(() => {
@@ -126,7 +121,7 @@ export default function WatermarkPage() {
     }
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>

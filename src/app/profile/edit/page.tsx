@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button, Input, Card } from '@/components/ui'
 import { uploadApi, authApi, ApiError, interestsApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { useFontContext } from '@/contexts/FontContext'
 import { Navbar } from '@/components/layout'
 import { API_URL } from '@/lib/config'
@@ -48,7 +49,8 @@ interface ProfileData {
 
 export default function ProfileEditPage() {
   const router = useRouter()
-  const { token, logout, hasHydrated, updateUser, user } = useAuthStore()
+  const { token, logout, updateUser, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   const { clearPreviewFont } = useFontContext()
   const [profile, setProfile] = useState<ProfileData>({
     displayName: '',
@@ -75,12 +77,7 @@ export default function ProfileEditPage() {
   const avatarInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (!hasHydrated) return
-
-    if (!token) {
-      router.push('/login')
-      return
-    }
+    if (authLoading || !token) return
 
     // Si es creador, redirigir a /creator/edit
     if (user?.isCreator) {
@@ -89,7 +86,7 @@ export default function ProfileEditPage() {
     }
 
     loadProfile(token)
-  }, [token, hasHydrated, router, user])
+  }, [authLoading, token, router, user])
 
   const loadProfile = async (authToken: string) => {
     setIsLoading(true)
@@ -253,7 +250,7 @@ export default function ProfileEditPage() {
     }
   }
 
-  if (!hasHydrated || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

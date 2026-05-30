@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { referralsApi, ReferralData, ReferralCommission } from '@/lib/api'
 import { Navbar } from '@/components/layout/Navbar'
 
@@ -33,7 +34,8 @@ const DollarIcon = () => (
 
 export default function ReferralsPage() {
   const router = useRouter()
-  const { token, hasHydrated } = useAuthStore()
+  const { token } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   
   const [loading, setLoading] = useState(true)
   const [referralData, setReferralData] = useState<ReferralData | null>(null)
@@ -63,13 +65,9 @@ export default function ReferralsPage() {
   }, [token])
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-      return
-    }
+    if (authLoading) return
     fetchData()
-  }, [hasHydrated, token, router, fetchData])
+  }, [authLoading, fetchData])
 
   const handleCopy = async (text: string) => {
     try {
@@ -116,7 +114,7 @@ export default function ReferralsPage() {
     }).format(amount)
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#0d0d1a]">
         <Navbar />

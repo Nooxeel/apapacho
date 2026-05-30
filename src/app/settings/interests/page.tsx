@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { Navbar } from '@/components/layout'
 import { Button } from '@/components/ui'
 import { InterestSelector } from '@/components/interests'
@@ -12,7 +13,8 @@ import type { Interest } from '@/types'
 
 export default function InterestsSettingsPage() {
   const router = useRouter()
-  const { user, token, hasHydrated } = useAuthStore()
+  const { user, token } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   const [selectedInterests, setSelectedInterests] = useState<Interest[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -24,15 +26,9 @@ export default function InterestsSettingsPage() {
   const maxInterests = isCreator ? 15 : 10
 
   useEffect(() => {
-    if (!hasHydrated) return
-
-    if (!token) {
-      router.push('/login')
-      return
-    }
-
+    if (authLoading) return
     loadMyInterests()
-  }, [token, hasHydrated, router, isCreator])
+  }, [authLoading, isCreator])
 
   const loadMyInterests = async () => {
     try {
@@ -115,7 +111,7 @@ export default function InterestsSettingsPage() {
     }
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
         <Navbar />
