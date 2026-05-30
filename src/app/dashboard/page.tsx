@@ -891,7 +891,7 @@ export default function DashboardPage() {
                       })}
                     </div>
                     {payment.message && (
-                      <p className="text-white/50 italic truncate max-w-[200px]">"{payment.message}"</p>
+                      <p className="text-white/50 italic truncate max-w-[200px]">&ldquo;{payment.message}&rdquo;</p>
                     )}
                   </div>
                 </div>
