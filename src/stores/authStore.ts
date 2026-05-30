@@ -34,6 +34,14 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   hasHydrated: boolean
+  /**
+   * True while rehydrateFromCookie() is in flight (i.e. the session cookie
+   * is being verified with the backend). Guards should wait for
+   * sessionChecked === true before deciding to redirect to /login, so that a
+   * valid cookie-based session is not mistaken for "logged out" during the
+   * brief window after a full page reload.
+   */
+  sessionChecked: boolean
   isRefreshing: boolean
   login: (user: User | Creator, token?: string, expiresIn?: number) => void
   logout: () => Promise<void>
@@ -70,6 +78,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       hasHydrated: false,
+      sessionChecked: false,
       isRefreshing: false,
 
       login: (user, token, expiresIn) => {
@@ -225,8 +234,13 @@ export const useAuthStore = create<AuthState>()(
           state.isAuthenticated = true
         }
         state.setHasHydrated(true)
-        // Fire-and-forget session verification against the cookie.
-        state.rehydrateFromCookie()
+        // Verify the session cookie with the backend before marking it as
+        // checked. Guards read sessionChecked to avoid a spurious redirect to
+        // /login during the window between localStorage hydration (instant)
+        // and cookie validation (one network round-trip).
+        state.rehydrateFromCookie().finally(() => {
+          useAuthStore.setState({ sessionChecked: true })
+        })
       },
     }
   )

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import {
   getKycStatus,
   submitKyc,
@@ -59,7 +60,8 @@ function ageFromBirthdate(iso: string): number | null {
 
 export default function CreatorKycPage() {
   const router = useRouter()
-  const { user, token, isAuthenticated, hasHydrated } = useAuthStore()
+  const { user, token, isAuthenticated } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ redirectTo: '/login?redirect=/creator/kyc' })
 
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [status, setStatus] = useState<KycStatusResponse | null>(null)
@@ -74,17 +76,11 @@ export default function CreatorKycPage() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
 
-  // Auth redirect guard
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!isAuthenticated) router.replace('/login?redirect=/creator/kyc')
-  }, [hasHydrated, isAuthenticated, router])
-
   // Fetch current KYC status
   useEffect(() => {
+    if (authLoading || !isAuthenticated) return
     let cancelled = false
     async function fetchStatus() {
-      if (!hasHydrated || !isAuthenticated) return
       setLoadingStatus(true)
       try {
         const data = await getKycStatus(token ?? undefined)
@@ -106,7 +102,7 @@ export default function CreatorKycPage() {
     return () => {
       cancelled = true
     }
-  }, [hasHydrated, isAuthenticated, token, router])
+  }, [authLoading, isAuthenticated, token, router])
 
   // Cleanup object URLs on unmount / file swap
   useEffect(() => {
@@ -206,7 +202,7 @@ export default function CreatorKycPage() {
     [canSubmit, files, fullLegalName, nationalId, birthdate, consent, token]
   )
 
-  if (!hasHydrated || loadingStatus) {
+  if (authLoading || loadingStatus) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white/70">
         <div className="animate-pulse">Cargando…</div>

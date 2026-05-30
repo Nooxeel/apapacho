@@ -18,6 +18,7 @@ import {
   MessageSquare
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { broadcastsApi, subscriptionsApi, BroadcastTarget, BroadcastStatus, Broadcast } from '@/lib/api'
 import { Navbar } from '@/components/layout/Navbar'
 import { useToast } from '@/hooks/useToast'
@@ -67,7 +68,8 @@ interface SubscriptionTier {
 
 export default function BroadcastsPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
   const toast = useToast()
 
   // State
@@ -91,13 +93,6 @@ export default function BroadcastsPage() {
     scheduledBroadcasts: number
   } | null>(null)
 
-  // Proteger ruta
-  useEffect(() => {
-    if (!hasHydrated) return
-    if (!token || !user?.isCreator) {
-      router.push('/login')
-    }
-  }, [token, user, hasHydrated, router])
 
   // Cargar datos
   const fetchData = useCallback(async () => {
@@ -198,7 +193,7 @@ export default function BroadcastsPage() {
     }
   }
 
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>

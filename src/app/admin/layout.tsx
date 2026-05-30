@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ShieldAlert } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { authApi } from '@/lib/api'
 
 /**
@@ -18,7 +19,8 @@ import { authApi } from '@/lib/api'
  */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { token, isAuthenticated, hasHydrated, logout } = useAuthStore()
+  const { token, isAuthenticated, logout } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ redirectTo: '/login?redirect=/admin' })
   const [checking, setChecking] = useState(true)
   const [authorized, setAuthorized] = useState(false)
   // Ley 21.719 — Ola 4 P1.1: surface MFA enforcement client-side so the
@@ -27,11 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mfaRequired, setMfaRequired] = useState(false)
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!isAuthenticated || !token) {
-      router.replace('/login?redirect=/admin')
-      return
-    }
+    if (authLoading || !isAuthenticated || !token) return
     let cancelled = false
     async function verify() {
       try {
@@ -59,7 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => {
       cancelled = true
     }
-  }, [hasHydrated, isAuthenticated, token, router, logout])
+  }, [authLoading, isAuthenticated, token, router, logout])
 
   if (checking) {
     return (

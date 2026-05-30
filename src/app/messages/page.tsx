@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { API_URL } from '@/lib/config'
 import { Navbar } from '@/components/layout'
 import { formatDistanceToNow } from 'date-fns'
@@ -33,32 +34,22 @@ interface Conversation {
 
 export default function MessagesPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token || !user) {
-      router.push('/login')
-      return
-    }
+    if (authLoading || !user) return
     loadConversations()
 
-    // Connect to WebSocket for real-time conversation updates
+    // Conectar al WebSocket para actualizaciones en tiempo real
     socketService.connect(user.id)
 
-    // Listen for new messages - reload conversation list when any message arrives
-    const handleMessageNew = () => {
-      loadConversations()
-    }
-
-    // Listen for unread count updates
-    const handleUnreadUpdate = () => {
-      loadConversations()
-    }
+    const handleMessageNew = () => loadConversations()
+    const handleUnreadUpdate = () => loadConversations()
 
     socketService.on('message:new', handleMessageNew)
     socketService.on('unread:update', handleUnreadUpdate)
@@ -67,7 +58,7 @@ export default function MessagesPage() {
       socketService.off('message:new', handleMessageNew)
       socketService.off('unread:update', handleUnreadUpdate)
     }
-  }, [token, hasHydrated, user, router])
+  }, [authLoading, user])
 
   const loadConversations = async () => {
     try {
@@ -99,7 +90,7 @@ export default function MessagesPage() {
     return content.substring(0, maxLength) + '...'
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

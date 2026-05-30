@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { gamificationApi, type UserLevelResponse, type UserPointsInfo } from '@/lib/api';
 import { 
   StreakDisplay, 
@@ -34,20 +35,17 @@ import {
 
 export default function RewardsPage() {
   const router = useRouter();
-  const { user, token, hasHydrated } = useAuthStore();
+  const { user, token } = useAuthStore();
+  const { isLoading: authLoading } = useRequireAuth();
   const [levelData, setLevelData] = useState<UserLevelResponse | null>(null);
   const [pointsData, setPointsData] = useState<UserPointsInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'missions' | 'badges' | 'perks' | 'leaderboard'>('missions');
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (!token) {
-      router.push('/login');
-      return;
-    }
+    if (authLoading) return;
     loadLevelData();
-  }, [hasHydrated, token, router]);
+  }, [authLoading]);
 
   const loadLevelData = async () => {
     if (!token) return;
@@ -70,7 +68,7 @@ export default function RewardsPage() {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=random&size=150`;
   };
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

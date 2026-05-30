@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button, Card } from '@/components/ui';
@@ -27,7 +28,8 @@ interface Comment {
 
 export default function CreatorCommentsPage() {
   const router = useRouter();
-  const { token, user, hasHydrated } = useAuthStore();
+  const { token, user } = useAuthStore();
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true });
   const toast = useToast();
   const [pendingComments, setPendingComments] = useState<Comment[]>([]);
   const [approvedComments, setApprovedComments] = useState<Comment[]>([]);
@@ -36,13 +38,9 @@ export default function CreatorCommentsPage() {
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (!token || !user?.isCreator) {
-      router.push('/login');
-      return;
-    }
+    if (authLoading) return;
     fetchCreatorProfile();
-  }, [token, user, hasHydrated, router]);
+  }, [authLoading]);
 
   useEffect(() => {
     if (creatorProfile) {
@@ -236,7 +234,7 @@ export default function CreatorCommentsPage() {
     </Card>
   );
 
-  if (!hasHydrated || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

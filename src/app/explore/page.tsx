@@ -9,7 +9,8 @@ import { useAuthStore } from '@/stores/authStore'
 import type { CreatorCardData, ExploreFiltersState } from '@/components/explore'
 
 export default function ExplorePage() {
-  const { token, hasHydrated } = useAuthStore()
+  const { token, hasHydrated, sessionChecked } = useAuthStore()
+  const authReady = hasHydrated && sessionChecked
   
   const [creators, setCreators] = useState<CreatorCardData[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -27,20 +28,20 @@ export default function ExplorePage() {
 
   // Cargar intereses del usuario si está autenticado
   useEffect(() => {
-    if (hasHydrated && token) {
+    if (authReady && token) {
       interestsApi
         .getMyInterests(token)
         .then(interests => setUserInterests(interests.map((i: any) => i.id)))
         .catch(err => console.error('Error loading user interests:', err))
     }
-  }, [token, hasHydrated])
+  }, [token, authReady])
 
   // Cargar creadores cuando cambian los filtros
   useEffect(() => {
-    if (hasHydrated) {
+    if (authReady) {
       loadCreators(true)
     }
-  }, [hasHydrated, filters])
+  }, [authReady, filters])
 
   const loadCreators = async (reset = false) => {
     setIsLoading(true)

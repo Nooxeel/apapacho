@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { creatorEarningsApi, ApiError } from '@/lib/api'
 import { Navbar } from '@/components/layout'
 import {
@@ -106,7 +107,8 @@ type TabType = 'overview' | 'transactions' | 'payouts' | 'donations' | 'subscrib
 
 export default function CreatorEarningsPage() {
   const router = useRouter()
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true })
   
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [isLoading, setIsLoading] = useState(true)
@@ -126,20 +128,9 @@ export default function CreatorEarningsPage() {
   const [payoutMessage, setPayoutMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
-    if (!hasHydrated) return
-    
-    if (!token) {
-      router.push('/login')
-      return
-    }
-
-    if (!(user as any)?.isCreator) {
-      router.push('/dashboard')
-      return
-    }
-
+    if (authLoading) return
     loadData()
-  }, [token, hasHydrated, router, user])
+  }, [authLoading])
 
   const loadData = async () => {
     if (!token) return
@@ -261,7 +252,7 @@ export default function CreatorEarningsPage() {
     )
   }
 
-  if (!hasHydrated || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <>
         <Navbar />

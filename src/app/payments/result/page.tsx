@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { SaveCardPrompt } from '@/components/cards';
 import api from '@/lib/api';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -33,7 +34,8 @@ interface CardsCheckResponse {
 function PaymentResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { token, hasHydrated, isRefreshing } = useAuthStore();
+  const { token, isRefreshing } = useAuthStore();
+  const { isLoading: authLoading } = useRequireAuth();
   const [details, setDetails] = useState<PaymentDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -337,8 +339,8 @@ function PaymentResultContent() {
   // Effect 2: Check saved cards after payment is confirmed AND auth is hydrated (and not refreshing)
   useEffect(() => {
     const checkSavedCards = async () => {
-      // Wait for hydration and any token refresh to complete
-      if (!paymentConfirmed || !hasHydrated || isRefreshing) return;
+      // Wait for session verification and any token refresh to complete
+      if (!paymentConfirmed || authLoading || isRefreshing) return;
       if (!token) {
         console.log('[PaymentResult] No auth token, skipping card check');
         return;
@@ -359,7 +361,7 @@ function PaymentResultContent() {
     };
     
     checkSavedCards();
-  }, [paymentConfirmed, hasHydrated, isRefreshing, token]);
+  }, [paymentConfirmed, authLoading, isRefreshing, token]);
 
   // Effect 3: Auto-redirect countdown for content purchases
   useEffect(() => {

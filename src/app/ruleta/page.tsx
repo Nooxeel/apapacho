@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { RouletteWheel } from '@/components/roulette'
 import { useAuthStore } from '@/stores'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import api from '@/lib/api'
 import { Sparkles, Gift, Zap, Trophy, Ticket } from 'lucide-react'
 import { useToast } from '@/hooks/useToast'
@@ -29,22 +30,18 @@ interface SpinResult {
 
 export default function RouletaPage() {
   const router = useRouter()
-  const { token, hasHydrated } = useAuthStore()
+  const { token } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   const toast = useToast()
   const [points, setPoints] = useState(0)
   const [loading, setLoading] = useState(true)
   const [specialPrizes, setSpecialPrizes] = useState<any[]>([])
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-      return
-    }
-
+    if (authLoading) return
     loadPoints()
     loadPrizes()
-  }, [token, hasHydrated, router])
+  }, [authLoading])
 
   const loadPoints = async () => {
     if (!token) return
@@ -115,7 +112,7 @@ export default function RouletaPage() {
     }
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <>
         <Navbar />

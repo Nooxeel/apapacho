@@ -6,6 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Card, Button } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Edit2, Trash2, Eye, Heart, MessageCircle, Image as ImageIcon, Video, Plus, DollarSign, Globe, Lock, Star } from 'lucide-react';
 import Link from 'next/link';
 import { API_URL } from '@/lib/config';
@@ -37,7 +38,8 @@ interface Post {
 
 export default function CreatorPostsPage() {
   const router = useRouter();
-  const { token, hasHydrated, user } = useAuthStore();
+  const { token, user } = useAuthStore();
+  const { isLoading: authLoading } = useRequireAuth();
   const toast = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,13 +49,9 @@ export default function CreatorPostsPage() {
   const [editVisibility, setEditVisibility] = useState<PostVisibility>('public');
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (!token) {
-      router.push('/login');
-      return;
-    }
+    if (authLoading) return;
     loadPosts();
-  }, [token, hasHydrated, router]);
+  }, [authLoading]);
 
   const loadPosts = async () => {
     try {
@@ -172,7 +170,7 @@ export default function CreatorPostsPage() {
     );
   };
 
-  if (!hasHydrated || isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

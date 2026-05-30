@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Navbar } from '@/components/layout';
 import SubscriptionTiersManager from '@/components/subscriptions/SubscriptionTiersManager';
 import { ArrowLeft, Users, CreditCard } from 'lucide-react';
@@ -30,19 +31,16 @@ interface SubscriberInfo {
 
 export default function CreatorSubscriptionsPage() {
   const router = useRouter();
-  const { user, token, hasHydrated } = useAuthStore();
+  const { user, token } = useAuthStore();
+  const { isLoading: authLoading } = useRequireAuth({ requireCreator: true });
   const [subscribers, setSubscribers] = useState<SubscriberInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'tiers' | 'subscribers'>('tiers');
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (!token || !user?.isCreator) {
-      router.push('/login');
-      return;
-    }
+    if (authLoading) return;
     loadSubscribers();
-  }, [hasHydrated, token, user, router]);
+  }, [authLoading]);
 
   const loadSubscribers = async () => {
     try {
@@ -62,7 +60,7 @@ export default function CreatorSubscriptionsPage() {
     }
   };
 
-  if (!hasHydrated || !user) {
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

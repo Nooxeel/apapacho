@@ -99,8 +99,10 @@ export async function api<T>(endpoint: string, options: ApiOptions = {}): Promis
       console.log(`[API] Response status: ${response.status}`)
     }
 
-    // If 401 and not skipping refresh, try to refresh token and retry
-    if (response.status === 401 && !skipRefresh && token) {
+    // If 401 and not skipping refresh, try to refresh and retry.
+    // No `token` requirement: tras una recarga el token en memoria es null pero la
+    // cookie httpOnly (first-party) sostiene el refresh. skipRefresh evita el bucle.
+    if (response.status === 401 && !skipRefresh) {
       const newToken = await tryRefreshToken()
       if (newToken) {
         // Retry with new token
@@ -170,16 +172,35 @@ export async function uploadFile(
   const formData = new FormData()
   formData.append(fieldName, file)
 
-  try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+  const buildHeaders = (bearerToken: string): HeadersInit => {
+    const headers: HeadersInit = {
+      'X-Requested-With': 'XMLHttpRequest',
+    }
+    if (bearerToken) {
+      headers['Authorization'] = `Bearer ${bearerToken}`
+    }
+    return headers
+  }
+
+  const doFetch = (bearerToken: string) =>
+    fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: buildHeaders(bearerToken),
       body: formData,
+      credentials: 'include', // Autenticar via cookie httpOnly cuando el token en memoria es null (ej. tras una recarga)
       signal,
     })
+
+  try {
+    let response = await doFetch(token)
+
+    // En 401, intentar refrescar el token una vez y reintentar — igual que api()
+    if (response.status === 401) {
+      const newToken = await tryRefreshToken()
+      if (newToken) {
+        response = await doFetch(newToken)
+      }
+    }
 
     if (!response.ok) {
       let errorMessage = 'Upload failed'

@@ -35,6 +35,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import {
   consentsApi,
   type ConsentPurpose,
@@ -131,7 +132,8 @@ function formatDate(value: string | null | undefined): string {
 
 export default function PrivacySettingsPage() {
   const router = useRouter()
-  const { token, hasHydrated, user } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -140,14 +142,10 @@ export default function PrivacySettingsPage() {
   const [updatingPurpose, setUpdatingPurpose] = useState<ConsentPurpose | null>(null)
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-      return
-    }
+    if (authLoading) return
     void loadConsents()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasHydrated, token])
+  }, [authLoading])
 
   async function loadConsents() {
     if (!token) return
@@ -186,7 +184,7 @@ export default function PrivacySettingsPage() {
     return map
   }, [consents])
 
-  if (!hasHydrated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-pink-500" />

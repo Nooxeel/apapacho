@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { API_URL } from '@/lib/config'
 import { Navbar } from '@/components/layout'
 import { format, isToday, isYesterday } from 'date-fns'
@@ -37,7 +38,8 @@ export default function ChatPage() {
   const router = useRouter()
   const params = useParams()
   const conversationId = params.conversationId as string
-  const { token, user, hasHydrated } = useAuthStore()
+  const { token, user } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   
   const [messages, setMessages] = useState<Message[]>([])
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null)
@@ -152,14 +154,10 @@ export default function ChatPage() {
   }, [conversationId, token, router])
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-      return
-    }
+    if (authLoading) return
     loadConversationInfo()
     loadMessages()
-  }, [token, hasHydrated, router, loadMessages])
+  }, [authLoading, loadMessages])
 
   useEffect(() => {
     if (!loading && messages.length > 0) {
@@ -265,7 +263,7 @@ export default function ChatPage() {
     return format(date, 'd MMMM yyyy', { locale: es })
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>

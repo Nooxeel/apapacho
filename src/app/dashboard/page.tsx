@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { uploadApi, ApiError, subscriptionsApi, gamificationApi, type UserLevelResponse } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { StreakDisplay, LevelDisplay, LevelBadge, AvatarWithProgress } from '@/components/gamification';
@@ -141,7 +142,8 @@ interface MyComment {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, token, logout, updateUser, hasHydrated } = useAuthStore();
+  const { user, token, logout, updateUser } = useAuthStore();
+  const { isLoading: authLoading } = useRequireAuth();
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -161,17 +163,10 @@ export default function DashboardPage() {
   const [levelData, setLevelData] = useState<UserLevelResponse | null>(null);
 
   useEffect(() => {
-    // Esperar a que el store se hidrate desde localStorage
-    if (!hasHydrated) return;
-    
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
+    if (authLoading) return;
     loadData();
     loadLevelData();
-  }, [token, router, hasHydrated]);
+  }, [authLoading]);
 
   const loadLevelData = async () => {
     if (!token) return;
@@ -356,8 +351,8 @@ export default function DashboardPage() {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || 'User')}&background=random&size=150`;
   };
 
-  // Mostrar loading mientras se hidrata el store o no hay usuario
-  if (!hasHydrated || !user) {
+  // Mostrar loading mientras se verifica la sesión o no hay usuario
+  if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-[#0f0f14] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fuchsia-500"></div>
@@ -891,7 +886,7 @@ export default function DashboardPage() {
                       })}
                     </div>
                     {payment.message && (
-                      <p className="text-white/50 italic truncate max-w-[200px]">"{payment.message}"</p>
+                      <p className="text-white/50 italic truncate max-w-[200px]">&ldquo;{payment.message}&rdquo;</p>
                     )}
                   </div>
                 </div>

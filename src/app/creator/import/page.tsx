@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { importApi, ImportPlatformInfo, PlatformImport } from '@/lib/api'
 import { Navbar } from '@/components/layout/Navbar'
 
@@ -33,7 +34,8 @@ const ClockIcon = () => (
 
 export default function ImportPage() {
   const router = useRouter()
-  const { token, hasHydrated } = useAuthStore()
+  const { token } = useAuthStore()
+  const { isLoading: authLoading } = useRequireAuth()
   
   const [loading, setLoading] = useState(true)
   const [platforms, setPlatforms] = useState<ImportPlatformInfo[]>([])
@@ -70,13 +72,9 @@ export default function ImportPage() {
   }, [token])
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!token) {
-      router.push('/login')
-      return
-    }
+    if (authLoading) return
     fetchData()
-  }, [hasHydrated, token, router, fetchData])
+  }, [authLoading, fetchData])
 
   const handleImportProfile = async () => {
     if (!token || !selectedPlatform) return
@@ -163,7 +161,7 @@ export default function ImportPage() {
     return names[platform] || platform
   }
 
-  if (!hasHydrated || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-[#0d0d1a]">
         <Navbar />
