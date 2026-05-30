@@ -1,14 +1,18 @@
 'use client'
 
 import type { PaymentGateway } from '@/hooks/usePayment'
-import { CreditCard, Building2, Wallet } from 'lucide-react'
+import { CreditCard, Wallet, ArrowRightLeft } from 'lucide-react'
 
 interface GatewaySelectorProps {
   selected: PaymentGateway
   onChange: (gateway: PaymentGateway) => void
 }
 
-const gateways: { id: PaymentGateway; label: string; description: string; icon: typeof CreditCard }[] = [
+// Flag controlado por env: Flow solo es visible cuando el operador activa
+// NEXT_PUBLIC_FLOW_ENABLED=true (default hidden — espera credenciales de prod).
+const flowEnabled = process.env.NEXT_PUBLIC_FLOW_ENABLED === 'true'
+
+const BASE_GATEWAYS: { id: PaymentGateway; label: string; description: string; icon: typeof CreditCard }[] = [
   {
     id: 'webpay',
     label: 'Webpay',
@@ -23,7 +27,20 @@ const gateways: { id: PaymentGateway; label: string; description: string; icon: 
   },
 ]
 
+const FLOW_GATEWAY: { id: PaymentGateway; label: string; description: string; icon: typeof CreditCard } = {
+  id: 'flow',
+  label: 'Flow',
+  description: 'Pago en línea vía Flow',
+  // ArrowRightLeft evoca el concepto de transferencia/pasarela de pago
+  icon: ArrowRightLeft,
+}
+
 export function GatewaySelector({ selected, onChange }: GatewaySelectorProps) {
+  // Flow se añade a la lista solo cuando el flag está activo en el entorno
+  const gateways = flowEnabled ? [...BASE_GATEWAYS, FLOW_GATEWAY] : BASE_GATEWAYS
+
+  // El grid usa 2 columnas: con 2 proveedores llena las dos celdas;
+  // con 3 (Flow activo) la tercera celda ocupa la mitad izquierda del segundo renglón.
   return (
     <div className="space-y-2 mb-4">
       <p className="text-xs text-white/50 uppercase tracking-wider mb-2">Método de pago</p>

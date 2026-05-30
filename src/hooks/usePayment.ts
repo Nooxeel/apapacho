@@ -18,8 +18,9 @@ import { useState, useCallback } from 'react';
 import { useWebpay } from './useWebpay';
 import { useMercadoPago } from './useMercadoPago';
 import { useFintoc } from './useFintoc';
+import { useFlow } from './useFlow';
 
-export type PaymentGateway = 'webpay' | 'mercadopago' | 'fintoc';
+export type PaymentGateway = 'webpay' | 'mercadopago' | 'fintoc' | 'flow';
 
 export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
   const [gateway, setGateway] = useState<PaymentGateway>(defaultGateway);
@@ -27,18 +28,19 @@ export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
   const webpay = useWebpay();
   const mercadoPago = useMercadoPago();
   const fintoc = useFintoc();
+  const flow = useFlow();
 
-  const loading = gateway === 'webpay'
-    ? webpay.loading
-    : gateway === 'mercadopago'
-    ? mercadoPago.loading
-    : fintoc.loading;
+  const loading =
+    gateway === 'webpay' ? webpay.loading :
+    gateway === 'mercadopago' ? mercadoPago.loading :
+    gateway === 'fintoc' ? fintoc.loading :
+    flow.loading;
 
-  const error = gateway === 'webpay'
-    ? webpay.error
-    : gateway === 'mercadopago'
-    ? mercadoPago.error
-    : fintoc.error;
+  const error =
+    gateway === 'webpay' ? webpay.error :
+    gateway === 'mercadopago' ? mercadoPago.error :
+    gateway === 'fintoc' ? fintoc.error :
+    flow.error;
 
   const payForSubscription = useCallback(async (
     subscriptionTierId: string,
@@ -51,8 +53,11 @@ export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
     if (gateway === 'fintoc') {
       return fintoc.payForSubscription(subscriptionTierId, creatorId, amount);
     }
+    if (gateway === 'flow') {
+      return flow.payForSubscription(subscriptionTierId, creatorId, amount);
+    }
     return webpay.payForSubscription(subscriptionTierId, creatorId, amount);
-  }, [gateway, webpay.payForSubscription, mercadoPago.payForSubscription, fintoc.payForSubscription]);
+  }, [gateway, webpay.payForSubscription, mercadoPago.payForSubscription, fintoc.payForSubscription, flow.payForSubscription]);
 
   const payForDonation = useCallback(async (
     creatorId: string,
@@ -65,8 +70,11 @@ export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
     if (gateway === 'fintoc') {
       return fintoc.payForDonation(creatorId, amount, message);
     }
+    if (gateway === 'flow') {
+      return flow.payForDonation(creatorId, amount, message);
+    }
     return webpay.payForDonation(creatorId, amount, message);
-  }, [gateway, webpay.payForDonation, mercadoPago.payForDonation, fintoc.payForDonation]);
+  }, [gateway, webpay.payForDonation, mercadoPago.payForDonation, fintoc.payForDonation, flow.payForDonation]);
 
   const payForTip = useCallback(async (
     creatorId: string,
@@ -79,8 +87,11 @@ export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
     if (gateway === 'fintoc') {
       return fintoc.payForTip(creatorId, amount, message);
     }
+    if (gateway === 'flow') {
+      return flow.payForTip(creatorId, amount, message);
+    }
     return webpay.payForTip(creatorId, amount, message);
-  }, [gateway, webpay.payForTip, mercadoPago.payForTip, fintoc.payForTip]);
+  }, [gateway, webpay.payForTip, mercadoPago.payForTip, fintoc.payForTip, flow.payForTip]);
 
   return {
     gateway,
@@ -94,5 +105,6 @@ export function usePayment(defaultGateway: PaymentGateway = 'webpay') {
     webpay,
     mercadoPago,
     fintoc,
+    flow,
   };
 }

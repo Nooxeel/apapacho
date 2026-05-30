@@ -242,6 +242,90 @@ function PaymentResultContent() {
         return;
       }
 
+      // ==================== FLOW FLOW ====================
+      // El backend GET /return (flow.ts líneas 166-173) redirige con los params:
+      //   gateway=flow, status=success|failed, external_reference=<commerceOrder>,
+      //   redirect_to=<path>  (opcional)
+      // No envía un param "token" al frontend; el token es interno entre Flow y el backend.
+      if (gateway === 'flow') {
+        const flowStatus = searchParams.get('status');
+        // external_reference contiene el commerceOrder (FLW-...)
+        const commerceOrder = searchParams.get('external_reference');
+        const errorParam = searchParams.get('error');
+        const redirectTo = searchParams.get('redirect_to');
+
+        // Errores explícitos del backend (missing_params, not_found, processing_error)
+        if (errorParam) {
+          setError(
+            errorParam === 'missing_params'
+              ? 'Parámetros de pago incompletos'
+              : errorParam === 'not_found'
+              ? 'Transacción no encontrada'
+              : 'Error al procesar el pago. Por favor contacta a soporte.'
+          );
+          setLoading(false);
+          return;
+        }
+
+        if (flowStatus === 'failed') {
+          setDetails({
+            status: 'FAILED',
+            success: false,
+            buyOrder: commerceOrder || '',
+            amount: 0,
+            transactionId: '',
+            error: 'El pago no pudo ser procesado',
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Para status=success confirmamos con el endpoint de estado autoritativo
+        // (igual que el branch Fintoc con external_reference).
+        if (commerceOrder) {
+          try {
+            const response = await fetch(
+              `${API_URL}/payments/flow/status/${encodeURIComponent(commerceOrder)}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            const data = await response.json();
+
+            if (data.success) {
+              setDetails({
+                status: 'APPROVED',
+                success: true,
+                buyOrder: data.commerceOrder || commerceOrder,
+                amount: data.amount || 0,
+                transactionId: data.transactionId || '',
+                paymentType: data.paymentType,
+                // Preferir redirectTo devuelto por el backend; el param URL es respaldo
+                redirectTo: data.redirectTo || redirectTo || undefined,
+              });
+              setPaymentConfirmed(true);
+              if (data.redirectTo || redirectTo) setRedirectCountdown(5);
+            } else {
+              setDetails({
+                status: (data.status as PaymentStatus) || 'FAILED',
+                success: false,
+                buyOrder: data.commerceOrder || commerceOrder,
+                amount: data.amount || 0,
+                transactionId: data.transactionId || '',
+                error: data.errorMessage || data.error || 'El pago no pudo ser procesado',
+              });
+            }
+          } catch (err) {
+            console.error('[PaymentResult] Error confirmando pago Flow:', err);
+            setError('Error al confirmar el pago. Por favor contacta a soporte.');
+          }
+          setLoading(false);
+          return;
+        }
+
+        setError('No se encontraron datos de pago válidos.');
+        setLoading(false);
+        return;
+      }
+
       // ==================== WEBPAY FLOW (existing) ====================
       // Get token from Webpay redirect
       const token_ws = searchParams.get('token_ws');
@@ -629,8 +713,12 @@ function PaymentResultContent() {
             Pago procesado de forma segura por
           </p>
           <p className="text-white/50 text-sm font-medium mt-1">
-            {searchParams.get('gateway') === 'mercadopago' 
-              ? 'MercadoPago' 
+            {searchParams.get('gateway') === 'mercadopago'
+              ? 'MercadoPago'
+              : searchParams.get('gateway') === 'fintoc'
+              ? 'Fintoc'
+              : searchParams.get('gateway') === 'flow'
+              ? 'Flow'
               : 'Webpay Plus - Transbank'}
           </p>
         </div>
