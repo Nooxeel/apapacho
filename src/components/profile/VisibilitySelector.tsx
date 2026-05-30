@@ -164,7 +164,7 @@ export function VisibilitySelector({
       {!hasSubscriptionTiers && (
         <p className="text-sm text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
           <strong>Nota:</strong> Necesitas crear al menos un tier de suscripción para poder usar la
-          opción "Solo suscriptores".
+          opción &ldquo;Solo suscriptores&rdquo;.
         </p>
       )}
     </div>

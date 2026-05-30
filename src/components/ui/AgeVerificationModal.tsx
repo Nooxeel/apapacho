@@ -4,6 +4,7 @@ import { useState, useEffect, useId, useRef } from 'react'
 import { useAuthStore } from '@/stores'
 import { ageVerificationApi } from '@/lib/api'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+import Link from 'next/link'
 
 interface AgeVerificationModalProps {
   onVerified?: () => void
@@ -135,9 +136,9 @@ export function AgeVerificationModal({ onVerified, onClose }: AgeVerificationMod
               <p id={descId} className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                 Esta plataforma contiene contenido explícito para adultos mayores de 18 años.
                 Al continuar, confirmas que tienes al menos <span className="text-fuchsia-400 font-bold">18 años</span>.{' '}
-                <a href="/terminos" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
+                <Link href="/terminos" className="text-fuchsia-400 hover:text-fuchsia-300 underline">
                   Términos
-                </a>
+                </Link>
               </p>
             </div>
 

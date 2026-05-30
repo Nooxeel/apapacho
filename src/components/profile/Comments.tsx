@@ -8,6 +8,7 @@ import { missionsApi } from '@/lib/api';
 import { LevelBadge, useBadgeNotification } from '@/components/gamification';
 import { ReportButton } from '@/components/social/ReportButton';
 import Image from 'next/image';
+import Link from 'next/link';
 // Note: the guestbook `Comment` model is distinct from `PostComment`. Reporting
 // here surfaces the comment AUTHOR as a USER report so the moderation queue
 // captures repeat offenders even when individual comments are deleted by the
@@ -314,7 +315,7 @@ function Comments({ creatorId, isOwner = false, accentColor = '#d946ef' }: Comme
       ) : (
         <div className="mb-4 p-4 bg-white/5 rounded-lg text-center">
           <p className="text-white/60 text-sm">
-            <a href="/login" className="underline" style={{ color: accentColor }}>Inicia sesión</a> para dejar un comentario
+            <Link href="/login" className="underline" style={{ color: accentColor }}>Inicia sesión</Link> para dejar un comentario
           </p>
         </div>
       )}
